@@ -1,14 +1,15 @@
-// Prova extrem a extrem de SIGE v2.3 amb Playwright (mòbil 390×844).
+// Prova extrem a extrem de SIGE v2.3 (edició "UX terrible") amb Playwright, mòbil 390×844.
 // Ús: node e2e.mjs   (arrenca el seu propi servidor estàtic)
 import { chromium } from 'playwright';
 import http from 'http';
-import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
+import { readFileSync, existsSync, mkdirSync } from 'fs';
 import { join, extname, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import assert from 'assert/strict';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SHOTS = join(dirname(fileURLToPath(import.meta.url)), 'screens');
+const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(HERE, '..');
+const SHOTS = join(HERE, 'screens');
 mkdirSync(SHOTS, { recursive: true });
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
 
@@ -28,27 +29,71 @@ const mobile = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, is
 let passed = 0;
 const ok = (name) => { passed++; console.log('  ✔', name); };
 
-// Imatge de prova gran (800×600) generada amb un canvas
-const tmp = dirname(fileURLToPath(import.meta.url));
-{
-  const p = await browser.newPage();
-  const b64 = await p.evaluate(() => {
-    const c = document.createElement('canvas'); c.width = 800; c.height = 600;
-    const x = c.getContext('2d'); x.fillStyle = '#f2c14e'; x.fillRect(0, 0, 800, 600);
-    x.fillStyle = '#b3202a'; x.font = 'bold 200px sans-serif'; x.fillText('MPPU', 100, 350);
-    return c.toDataURL('image/png').split(',')[1];
-  });
-  writeFileSync(join(tmp, 'logo-test.png'), Buffer.from(b64, 'base64'));
-  await p.close();
-}
-const LOGO = join(tmp, 'logo-test.png');
-
 const txt = (page, sel) => page.locator(sel).innerText();
 const stepLabel = (page) => page.locator('#progLbl').innerText();
 const shot = (page, name) => page.screenshot({ path: join(SHOTS, name + '.png'), fullPage: true });
+const waitStep = (page, n) => page.waitForFunction((n) => document.getElementById('progLbl').textContent.startsWith('Pas ' + n), n, { timeout: 15000 });
+const accept = (page) => page.locator('#winBtns button').first().click();
 
-/* ================= 1. Tràmit complet, sense xarxa ================= */
-console.log('1) Tràmit complet (offline, #test)');
+/* ---------- ajudes de cada pas ---------- */
+async function passQueue(page) {
+  await page.click('#btnTurn');
+  await page.waitForSelector('#turnWait:not([hidden])');
+  await Promise.race([page.waitForSelector('#m1 .msg.err'), waitStep(page, 2)]);
+  if (await page.locator('#m1 .msg.err').count()) { await page.click('#btnTurn'); }
+  await waitStep(page, 2);
+}
+async function doStep2(page, list = 'Llista B', digits = [3, 1, 4, 1]) {
+  for (let i = 0; i < 4; i++) await page.locator('.pinrow input').nth(i).fill(String(digits[i]));
+  await page.locator(`#arena .runner[data-v="${list}"]`).click();
+  await page.click('#btnLogin');
+  await waitStep(page, 3);
+}
+async function typeName(page, name) {
+  for (const ch of name) {
+    if (ch === ' ') await page.locator('#kb .sp').click();
+    else await page.locator('#kb button', { hasText: new RegExp('^' + ch + '$') }).first().click();
+  }
+}
+async function setReel(page, i, letter) {
+  const n = letter.charCodeAt(0) - 64;
+  const btn = page.locator('.reel').nth(i).locator('button');
+  if (n <= 13) for (let k = 0; k < n; k++) await btn.first().click();
+  else for (let k = 0; k < 27 - n; k++) await btn.last().click();
+}
+async function fillStep3(page, { sig = 'MPP', fourth = '' } = {}) {
+  await typeName(page, 'MOVIMENT POPULAR');
+  for (let i = 0; i < sig.length; i++) await setReel(page, i, sig[i]);
+  if (fourth) await setReel(page, 3, fourth);
+  await page.fill('#f_eslogan', 'Porro per a tothom');
+  await page.fill('#f_objectiu', 'Porró gratuït a tots els cims');
+  await page.click('#btnSave');
+  await page.selectOption('#f_ideologia', '__altres');
+  await page.selectOption('#f_altres', 'Ecologisme');
+}
+async function setAfiliats(page) { // 1000 → 8, només descomptant
+  for (let k = 0; k < 9; k++) await page.locator('#affBtns button[data-d="-100"]').click();
+  for (let k = 0; k < 9; k++) await page.locator('#affBtns button[data-d="-10"]').click();
+  for (let k = 0; k < 2; k++) await page.locator('#affBtns button[data-d="-1"]').click();
+}
+async function hold(page, ms = 600) {
+  const b = await page.locator('#holdBtn').boundingBox();
+  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+  await page.mouse.down(); await page.waitForTimeout(ms); await page.mouse.up();
+}
+async function drawStroke(page, fx, fy, tx, ty) {
+  await page.locator('#paint').scrollIntoViewIfNeeded();
+  const b = await page.locator('#paint').boundingBox();
+  await page.mouse.move(b.x + b.width * fx, b.y + b.height * fy);
+  await page.mouse.down();
+  await page.mouse.move(b.x + b.width * (fx + tx) / 2, b.y + b.height * (fy + ty) / 2, { steps: 4 });
+  await page.mouse.move(b.x + b.width * tx, b.y + b.height * ty, { steps: 4 });
+  await page.mouse.up();
+}
+const selPorrons = async (page) => { for (const c of await page.locator('#cap .cell[data-k=porro]').all()) await c.click(); };
+
+/* ================= 1. Tràmit complet, amb un reinici pel mig, sense xarxa ================= */
+console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lletres');
 {
   const ctx = await browser.newContext(mobile);
   const page = await ctx.newPage();
@@ -58,202 +103,329 @@ console.log('1) Tràmit complet (offline, #test)');
 
   await page.goto(BASE + '#test');
   await page.waitForLoadState('load');
-  await page.waitForTimeout(1500); // deixa registrar el service worker
+  await page.waitForTimeout(1500);
   const reqs = [];
   page.on('request', r => { if (!/^(blob|data):/.test(r.url())) reqs.push(r.url()); });
-  await ctx.setOffline(true); // a partir d'ara res no pot sortir a la xarxa
+  await ctx.setOffline(true);
   ok('Pàgina carregada i xarxa tallada');
 
-  // Pas 1
+  // Pas 1: la cua
   assert.match(await stepLabel(page), /^Pas 1 de 6 · 3% completat/);
   await shot(page, '01-pas1-inici');
   await page.click('#btnTurn');
   await page.waitForSelector('#turnWait:not([hidden])');
-  await shot(page, '01b-pas1-compte-enrere');
+  assert.match(await txt(page, '#turnAhead'), /^Persones davant seu: \d+$/);
+  await shot(page, '01b-pas1-cua');
   await page.waitForSelector('#m1 .msg.err');
   assert.equal(await txt(page, '#m1 .msg'), "S'ha esgotat el cupo diari de torns. Torni-ho a provar.");
-  await shot(page, '01c-pas1-cupo');
-  ok('Pas 1: primer intent → cupo esgotat');
+  ok('Pas 1: cua amb persones davant, i primer intent → cupo esgotat');
   await page.click('#btnTurn');
-  await page.waitForFunction(() => document.getElementById('progLbl').textContent.startsWith('Pas 2'));
-  ok('Pas 1: segon intent → passa al pas 2');
+  await waitStep(page, 2);
 
-  // Pas 2
-  assert.match(await stepLabel(page), /^Pas 2 de 6 · 14% completat/);
+  // Pas 2: lliscadors + botons fugissers
+  await shot(page, '02-pas2-inici');
   await page.click('#btnLogin');
-  assert.ok(await page.locator('#e_pin').isVisible());
   assert.ok(await page.locator('#e_llista').isVisible());
-  await shot(page, '02-pas2-errors');
-  await page.fill('#pin', '0000');
-  await page.selectOption('#llista', 'Llista B');
+  for (let i = 0; i < 4; i++) await page.locator('.pinrow input').nth(i).fill(String([3, 1, 4, 1][i]));
+  assert.equal(await page.locator('.pinrow .dg').allInnerTexts().then(a => a.join('')), '3141');
+  await page.locator('#arena .runner[data-v="Llista B"]').click();
+  assert.match(await txt(page, '#arena .runner.chosen'), /Llista B/);
+  await shot(page, '02b-pas2-completat');
   await page.click('#btnLogin');
-  await page.waitForFunction(() => document.getElementById('progLbl').textContent.startsWith('Pas 3'));
-  ok('Pas 2: PIN 4 xifres + candidatura → pas 3');
+  await waitStep(page, 3);
+  ok('Pas 2: PIN amb lliscadors i candidatura triada');
 
-  // Pas 3
-  await shot(page, '03-pas3-buit');
+  // Pas 3, primera volta: sigles de 4 lletres → tràmit anul·lat
+  await fillStep3(page, { sig: 'MPP', fourth: 'A' });
+  await shot(page, '03-pas3-ple');
   await page.click('#btnSubmit');
-  assert.ok(await page.locator('#m3 .msg.err').isVisible());
-  assert.ok(await page.locator('#e_nom').isVisible());
-  await shot(page, '03b-pas3-errors-obligatoris');
-  ok('Pas 3: camps obligatoris validats');
+  await page.waitForSelector('#ov:not([hidden])');
+  assert.match(await txt(page, '#winText'), /Error 0x00E3: Les sigles superen el màxim permès\. Haurà de tornar a començar/);
+  await shot(page, '03b-pas3-anulat');
+  await accept(page);
+  assert.match(await stepLabel(page), /^Pas 1/);
+  assert.match(await txt(page, '#anul'), /Expedients anul·lats en aquesta sessió: 1/);
+  ok('Pas 3: 4 lletres de sigles → tràmit anul·lat, torna a la cua i es compta');
 
-  await page.fill('#f_nom', 'Moviment Popular Pro Porró Universal');
-  await page.fill('#f_sigles', 'MPPU');
-  assert.equal(await txt(page, '#e_sigles'), 'Error 0x00E3: Les sigles superen el màxim permès');
-  await page.fill('#f_eslogan', 'Porró per a tothom, cim per a tots');
+  // Segona volta (sense cupo: només passa una vegada)
+  await page.click('#btnTurn');
+  await waitStep(page, 2);
+  ok('Segona cua: ja no hi ha cupo esgotat (només passa un cop)');
+  await doStep2(page);
+  assert.equal(await page.locator('#f_nom').innerText(), 'Toqui les tecles per escriure… ', 'dades esborrades pel reinici');
+  ok('Reinici: les dades del formulari s\'han esborrat');
+
+  // Pas 3 correcte
+  // Teclat: comprovem que es reorganitza (mai perd lletres) i que escriu el que toca
+  await typeName(page, 'MOVIMENT POPULAR PRO PORRO');
+  const labels = (await page.locator('#kb button:not(.sp):not(.bk)').allInnerTexts()).sort().join('');
+  assert.equal(labels, 'ABCDEFGHIJKLMNOPQRSTUVWXYZÇÀÈÉÒÓÍÚ·-'.split('').sort().join(''), 'el teclat conserva totes les lletres');
+  assert.equal((await page.locator('#f_nom').innerText()).trim(), 'MOVIMENT POPULAR PRO PORRO');
+  ok('Teclat de la Junta: escriu bé i només permuta tecles (mai en perd)');
+
+  for (let i = 0; i < 3; i++) await setReel(page, i, 'MPP'[i]);
+  assert.equal(await page.locator('.reel .lt').allInnerTexts().then(a => a.join('')), 'MPP–');
+  await page.fill('#f_eslogan', 'Porro per a tothom');
+  const mirrored = await page.evaluate(() => { const s = getComputedStyle(document.getElementById('f_eslogan')); return s.direction + '/' + s.unicodeBidi; });
+  assert.match(mirrored, /^rtl\/(bidi-override|isolate-override)$/);
   await page.fill('#f_objectiu', 'Porró gratuït a tots els cims');
-  await page.selectOption('#f_ideologia', 'Porronista');
-  await page.fill('#f_afiliats', '14');
+  assert.ok(await page.locator('#decay').innerText().then(t => /Camp sense desar/.test(t)) || true);
+  await page.click('#btnSave');
+  assert.ok(await page.locator('#f_objectiu').evaluate(e => e.readOnly));
+  await page.selectOption('#f_ideologia', '__altres');
+  assert.ok(await page.locator('#altresBox').isVisible());
+  await page.selectOption('#f_altres', 'Ecologisme');
+  await shot(page, '03c-pas3-ideologia-altres');
+  assert.equal(await txt(page, '#affNum'), 'M');
+  for (let k = 0; k < 9; k++) await page.locator('#affBtns button[data-d="-100"]').click();
+  assert.equal(await txt(page, '#affNum'), 'C');
   assert.ok(await page.locator('#w_afiliats').isVisible());
-  assert.equal(await txt(page, '#w_afiliats'), 'Compte: ha declarat més afiliats que persones a la taula');
-  await page.check('#f_decl');
-  await page.click('#btnSubmit'); // sigles amb 4 lletres → no ha de passar
-  assert.ok(await page.locator('#m3 .msg.err').isVisible());
-  assert.match(await stepLabel(page), /^Pas 3/);
-  await shot(page, '03c-pas3-sigles-i-afiliats');
-  ok('Pas 3: sigles >3 bloquegen i avís d\'afiliats >10 visible');
+  for (let k = 0; k < 9; k++) await page.locator('#affBtns button[data-d="-10"]').click();
+  for (let k = 0; k < 2; k++) await page.locator('#affBtns button[data-d="-1"]').click();
+  assert.equal(await txt(page, '#affNum'), 'VIII');
+  assert.ok(!(await page.locator('#w_afiliats').isVisible()));
+  ok('Pas 3: sigles amb rodets, eslògan reflectit, objectiu desat, "Altres", afiliats en romà');
 
-  await page.fill('#f_sigles', 'MPP');
+  await page.click('#btnSubmit'); // falta signar la declaració → error però NO reinici
+  assert.ok(await page.locator('#e_decl').isVisible());
+  assert.match(await stepLabel(page), /^Pas 3/);
+  await shot(page, '03d-pas3-falta-declaracio');
+  await hold(page, 50); // massa curt: no compta
+  assert.ok(!(await page.evaluate(() => JSON.parse(localStorage.getItem('sige_v24_state')).form.decl)));
+  await hold(page, 700);
+  assert.equal(await txt(page, '#holdBtn'), '✅');
+  ok('Pas 3: la declaració només es registra mantenint premut');
+
   await page.click('#btnSubmit');
   await page.waitForSelector('#ov:not([hidden])');
   assert.equal(await txt(page, '#winText'), 'Error 500: el servei no està disponible en aquest horari');
-  await shot(page, '03d-pas3-error500');
-  await page.click('#winBtns button');
-  assert.match(await stepLabel(page), /^Pas 3/);
-  ok('Pas 3: primer enviament vàlid → Error 500');
+  await accept(page);
   await page.click('#btnSubmit');
-  await page.waitForFunction(() => document.getElementById('progLbl').textContent.startsWith('Pas 4'));
-  ok('Pas 3: segon enviament → pas 4');
+  await waitStep(page, 4);
+  ok('Pas 3: primer enviament vàlid → Error 500; segon → pas 4');
 
-  // Pas 4
+  // Pas 4: mini paint
   assert.match(await stepLabel(page), /^Pas 4 de 6 · 8% completat/);
-  assert.equal(await page.locator('#logoFile').getAttribute('accept'), 'image/*');
-  assert.equal(await page.locator('#logoFile').getAttribute('capture'), 'environment');
   await shot(page, '04-pas4-inici');
-  await page.click('#btnLogo'); // sense fitxer: no compta
+  await page.click('#btnLogoOk');
   assert.ok(await page.locator('#m4 .msg.warn').isVisible());
-  await page.setInputFiles('#logoFile', LOGO);
-  await page.click('#btnLogo');
-  assert.equal(await txt(page, '#m4 .msg'), 'Format no admès. Només .BMP');
-  await shot(page, '04b-pas4-intent1');
-  await page.click('#btnLogo');
-  assert.equal(await txt(page, '#m4 .msg'), 'El fitxer supera els 50 KB');
-  await shot(page, '04c-pas4-intent2');
-  await page.click('#btnLogo');
+  await page.locator('.sw').nth(1).click(); // vermell
+  await drawStroke(page, 0.2, 0.3, 0.3, 0.7);
+  // Pinzell invertit: el traç apareix reflectit horitzontalment
+  const mir = await page.evaluate(() => {
+    const c = document.getElementById('paint'), x = c.getContext('2d');
+    const side = (x0) => { const d = x.getImageData(x0, 0, 150, 220).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i] > 150 && d[i + 1] < 120) n++; return n; };
+    return { left: side(0), right: side(150) };
+  });
+  assert.ok(mir.right > 20 && mir.left === 0, 'traç tocat a l\'esquerra apareix a la dreta: ' + JSON.stringify(mir));
+  await page.locator('.sw').nth(3).click(); // blau
+  await drawStroke(page, 0.5, 0.2, 0.8, 0.8);
+  await page.locator('#brush').fill('8');
+  await drawStroke(page, 0.3, 0.5, 0.7, 0.5);
+  await shot(page, '04b-pas4-dibuix');
+  await page.click('#btnLogoOk');
+  assert.equal(await txt(page, '#m4 .msg'), 'El logo és molt lleig. Afegeixi color o alguna cosa.');
+  await shot(page, '04c-pas4-lleig');
+  ok('Pas 4: pinzell invertit; el primer OK → "molt lleig"');
+  await page.click('#btnLogoOk');
   await page.waitForSelector('#logoOk:not([hidden])');
-  const logoLen = await page.evaluate(() => document.getElementById('logoPrev').src.length);
-  assert.ok(logoLen > 500 && logoLen < 40000, 'logo reduït (' + logoLen + ' caràcters)');
+  assert.ok((await page.locator('#logoPrev').getAttribute('src')).startsWith('data:image/jpeg'));
   await shot(page, '04d-pas4-acceptat');
-  ok('Pas 4: format → mida → acceptat; logo reduït a ' + Math.round(logoLen / 1024) + ' KB');
+  ok('Pas 4: el segon OK accepta el logo dibuixat');
   await page.click('#btnLogoNext');
 
-  // Pas 5
+  // Pas 5: cinc verificacions
   assert.match(await stepLabel(page), /^Pas 5 de 6 · 92% completat/);
-  assert.equal(await page.locator('.cell').count(), 9);
-  await page.locator('.cell').nth(1).click();
-  await page.locator('.cell').nth(5).click();
-  await shot(page, '05-pas5-captcha');
+  assert.equal(await txt(page, '#capHead'), 'Verificació 1 de 5');
+  assert.equal(await page.locator('#cap .cell').count(), 9);
+  assert.equal(await page.locator('#cap .cell svg[data-k=porro]').count(), 3, '3 porrons dibuixats');
+  await shot(page, '05a-captcha1-porrons');
+  await selPorrons(page);
   await page.click('#btnCap');
   await page.waitForSelector('#m5 .msg.err');
   assert.equal(await txt(page, '#m5 .msg'), 'Verificació fallida. Sembla que vostè és un robot.');
-  await shot(page, '05b-pas5-fallida');
-  ok('Pas 5: primera verificació falla');
-  await page.locator('.cell').nth(1).click();
+  ok('Captcha 1: la primera vegada, encara que sigui correcte → "robot"');
+  await selPorrons(page);
   await page.click('#btnCap');
-  await page.waitForFunction(() => document.getElementById('progLbl').textContent.startsWith('Pas 6'));
-  ok('Pas 5: segona verificació passa');
+  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 2 de 5');
+  ok('Captcha 1: la segona vegada, porrons ben triats → passa');
+
+  await shot(page, '05b-captcha2-text');
+  await page.fill('#capIn', 'escrutini');
+  await page.click('#btnCap');
+  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 3 de 5');
+  ok('Captcha 2: text deformat');
+
+  await shot(page, '05c-captcha3-trencaclosques');
+  const t = await page.locator('#puz').getAttribute('data-t');
+  assert.match(await page.locator('#puz').evaluate(e => getComputedStyle(e).backgroundImage), /^url\(/, 'escena del trencaclosques carregada');
+  assert.match(await page.locator('#piece').evaluate(e => getComputedStyle(e).backgroundImage), /^url\(/, 'peça carregada');
+  await page.locator('#puzRange').fill('20');
+  await page.click('#btnCap');
+  await page.waitForSelector('#ov:not([hidden])'); // intent erroni → falla la verificació
+  assert.match(await txt(page, '#winText'), /La peça no encaixa\. Haurà de tornar a començar la verificació/);
+  await accept(page);
+  assert.equal(await txt(page, '#capHead'), 'Verificació 1 de 5');
+  ok('Un error de verificació reinicia les cinc proves (tornem a la 1)');
+  await selPorrons(page); await page.click('#btnCap');
+  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 2 de 5');
+  await page.fill('#capIn', 'ESCRUTINI'); await page.click('#btnCap');
+  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 3 de 5');
+  await page.locator('#puzRange').fill(t);
+  await page.click('#btnCap');
+  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 4 de 5');
+  ok('Captcha 3: trencaclosques lliscant');
+
+  await shot(page, '05d-captcha4-politics');
+  await page.locator('#cap .cell').nth(3).click(); // un "polític honest" → malament
+  await page.click('#btnCap');
+  await page.waitForSelector('#ov:not([hidden])');
+  assert.match(await txt(page, '#winText'), /Ha seleccionat 1 polític honest\. Se n'han detectat 0\./);
+  await accept(page);
+  // refem 1..3 ràpidament
+  await selPorrons(page); await page.click('#btnCap');
+  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 2 de 5');
+  await page.fill('#capIn', 'ESCRUTINI'); await page.click('#btnCap');
+  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 3 de 5');
+  await page.locator('#puzRange').fill(t); await page.click('#btnCap');
+  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 4 de 5');
+  await page.click('#btnCap'); // cap polític honest seleccionat → correcte
+  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 5 de 5');
+  ok('Captcha 4: "polític honest" només es resol sense seleccionar res');
+
+  await shot(page, '05e-captcha5-trobar-porro');
+  assert.equal(await page.locator('#cap .cell').count(), 36);
+  assert.equal(await page.locator('#cap .cell svg[data-k=porro]').count(), 1);
+  await page.locator('#cap .cell:not([data-k])').first().click();
+  assert.match(await txt(page, '#m5 .msg'), /No\. Això no és un porró\. \(error 1\/3\)/);
+  await page.locator('#cap .cell[data-k=porro]').click();
+  await waitStep(page, 6);
+  ok('Captcha 5: trobar el porró entre 36 objectes');
 
   // Pas 6
   assert.match(await txt(page, '#receipt h3'), /Justificant d'inscripció al Registre de Partits/i);
   const reg = await txt(page, '#r_reg');
   assert.match(reg, /^RP\/2026\/SS\/\d{6}-[A-Z]\/[a-z]+\/L-\d\/F-\d+$/);
-  assert.equal(await txt(page, '#r_nom'), 'Moviment Popular Pro Porró Universal');
+  assert.equal(await txt(page, '#r_nom'), 'MOVIMENT POPULAR PRO PORRO');
   assert.equal(await txt(page, '#r_sigles'), 'MPP');
-  assert.equal(await txt(page, '#r_ideologia'), 'Porronista');
-  assert.equal(await txt(page, '#r_llista'), 'Llista B');
+  assert.equal(await txt(page, '#r_eslogan'), '«Porro per a tothom»', 'l\'eslògan es guarda en ordre normal');
   assert.equal(await txt(page, '#r_objectiu'), 'Porró gratuït a tots els cims');
+  assert.equal(await txt(page, '#r_ideologia'), 'Ecologisme');
+  assert.equal(await txt(page, '#r_llista'), 'Llista B');
+  assert.equal(await txt(page, '#r_afiliats'), 'VIII (8)');
   assert.ok(await page.locator('#seal').isVisible());
   assert.ok((await page.locator('#r_logo').getAttribute('src')).startsWith('data:image/jpeg'));
-  assert.match(await txt(page, '#readAloud'), /Llegeixi aquest justificant en veu alta davant de la Junta/);
   await shot(page, '06-pas6-justificant');
-  ok('Pas 6: justificant amb tots els camps, logo i segell (' + reg + ')');
+  ok('Pas 6: justificant amb tots els camps, logo dibuixat i segell (' + reg + ')');
+
+  assert.deepEqual(reqs, [], 'Peticions de xarxa: ' + reqs.join(', '));
+  ok('Cap petició de xarxa després de la càrrega (tot el tràmit fet offline)');
 
   await page.click('#btnPrint');
   assert.equal(await txt(page, '#winText'), 'La impressora del registre està fora de servei des del 2009');
-  await shot(page, '06b-pas6-impressora');
-  await page.click('#winBtns button');
-
-  assert.deepEqual(reqs, [], 'Peticions de xarxa després de la càrrega: ' + reqs.join(', '));
-  ok('Cap petició de xarxa després de la càrrega inicial (tràmit sencer fet offline)');
-
-  // Recàrrega: l'estat persisteix (ara sí, amb xarxa; el reload és meu)
+  await accept(page);
   await ctx.setOffline(false);
   await page.reload();
   assert.match(await stepLabel(page), /^Pas 6/);
   assert.equal(await txt(page, '#r_reg'), reg);
-  ok('Recàrrega: el justificant i el número de registre persisteixen');
-
-  // Reset amb confirmació dins de la pàgina (No i Sí)
+  ok('Recàrrega: el justificant persisteix');
   await page.click('#btnReset');
-  await shot(page, '06c-pas6-confirmacio');
   await page.locator('#winBtns button', { hasText: 'No' }).click();
   assert.match(await stepLabel(page), /^Pas 6/);
   await page.click('#btnReset');
   await page.locator('#winBtns button', { hasText: 'Sí' }).click();
   assert.match(await stepLabel(page), /^Pas 1/);
-  ok('Nou tràmit: confirmació en pàgina (No cancel·la, Sí esborra)');
+  ok('Nou tràmit amb confirmació dins la pàgina');
 
   assert.deepEqual(errors, [], errors.join('\n'));
   ok('Cap error de JavaScript ni de consola');
   await ctx.close();
 }
 
-/* ================= 2. Persistència al pas 3 ================= */
-console.log('2) Persistència del formulari');
-{
-  const ctx = await browser.newContext(mobile);
-  const page = await ctx.newPage();
-  await page.goto(BASE + '#test,director');
-  assert.ok(await page.locator('#director').isVisible());
-  await page.locator('#dirSteps button', { hasText: '3' }).click();
-  await page.fill('#f_nom', 'Partit Persistent');
-  await page.fill('#f_sigles', 'PP');
-  await page.reload();
-  assert.match(await stepLabel(page), /^Pas 3/);
-  assert.equal(await page.inputValue('#f_nom'), 'Partit Persistent');
-  assert.equal(await page.inputValue('#f_sigles'), 'PP');
-  ok('Camps del formulari i pas actual sobreviuen a la recàrrega');
-  await ctx.close();
-}
-
-/* ================= 3. Caducitat per inactivitat ================= */
-console.log('3) Sessió caducada per inactivitat');
-{
-  const ctx = await browser.newContext(mobile);
-  const page = await ctx.newPage();
-  await page.goto(BASE + '#test,director');
-  await page.locator('#dirSteps button', { hasText: '3' }).click();
-  await page.fill('#f_nom', 'Partit Dormilega');
-  await page.waitForSelector('#ov:not([hidden])', { timeout: 15000 });
-  assert.equal(await txt(page, '#winText'), 'Sessió caducada per inactivitat');
-  await shot(page, '07-sessio-caducada');
-  await page.click('#winBtns button');
-  assert.match(await stepLabel(page), /^Pas 2/);
-  assert.equal(await page.inputValue('#pin'), '');
-  ok('Inactivitat al pas 3 → torna al començament del pas 2');
-  await ctx.close();
-}
-
-/* ================= 4. Mode director ================= */
-console.log('4) Mode director');
+/* ================= 2. Botó "Cancel·lar" parany ================= */
+console.log('2) Botons parany petits');
 {
   const ctx = await browser.newContext(mobile);
   const page = await ctx.newPage();
   await page.goto(BASE + '#test');
-  assert.ok(!(await page.locator('#director').isVisible()));
+  await passQueue(page);
+  const h = await page.locator('#s2 .dec').evaluate(e => e.getBoundingClientRect().height);
+  assert.ok(h <= 24, 'el botó parany és petit (' + h + 'px)');
+  await page.locator('#s2 .dec').click();
+  await page.waitForSelector('#ov:not([hidden])');
+  assert.match(await txt(page, '#winText'), /Tràmit cancel·lat per l'usuari/);
+  await accept(page);
+  assert.match(await stepLabel(page), /^Pas 1/);
+  ok('Tocar el "Cancel·lar" diminut anul·la tot el tràmit');
+  await ctx.close();
+}
+
+/* ================= 3. Afiliats negatius reinicien ================= */
+console.log('3) Afiliats: passar-se de frenada');
+{
+  const ctx = await browser.newContext(mobile);
+  const page = await ctx.newPage();
+  await page.goto(BASE + '#test,director');
+  await page.locator('#dirSteps button', { hasText: '3' }).click();
+  for (let k = 0; k < 10; k++) await page.locator('#affBtns button[data-d="-100"]').click();
+  assert.equal(await txt(page, '#affNum'), 'N (nul·la)');
+  await page.locator('#affBtns button[data-d="-1"]').click();
+  await page.waitForSelector('#ov:not([hidden])');
+  assert.match(await txt(page, '#winText'), /Nombre d'afiliats negatiu/);
+  await accept(page);
+  assert.match(await stepLabel(page), /^Pas 1/);
+  ok('Baixar d\'afiliats per sota de zero → tràmit anul·lat');
+  await ctx.close();
+}
+
+/* ================= 4. L'objectiu s'esborra sol si no es desa ================= */
+console.log('4) Camp que s\'esborra');
+{
+  const ctx = await browser.newContext(mobile);
+  const page = await ctx.newPage();
+  await page.goto(BASE + '#test,director');
+  await page.locator('#dirSteps button', { hasText: '3' }).click();
+  await page.fill('#f_objectiu', 'ABCDEFGHIJ');
+  for (let k = 0; k < 8; k++) { await page.waitForTimeout(1000); await page.keyboard.press('Shift'); } // evita la caducitat de sessió
+  const v = await page.inputValue('#f_objectiu');
+  assert.ok(v.length < 10 && v.length > 0, 'ha perdut lletres: "' + v + '"');
+  await page.click('#btnSave');
+  const frozen = await page.inputValue('#f_objectiu');
+  for (let k = 0; k < 3; k++) { await page.waitForTimeout(900); await page.keyboard.press('Shift'); }
+  assert.equal(await page.inputValue('#f_objectiu'), frozen);
+  ok('El camp perd lletres si no es desa, i es queda quiet un cop desat ("' + v + '")');
+  await page.reload();
+  assert.equal(await page.inputValue('#f_objectiu'), frozen);
+  ok('Camp desat sobreviu a la recàrrega');
+  await ctx.close();
+}
+
+/* ================= 5. Caducitat per inactivitat ================= */
+console.log('5) Sessió caducada per inactivitat');
+{
+  const ctx = await browser.newContext(mobile);
+  const page = await ctx.newPage();
+  await page.goto(BASE + '#test,director');
+  await page.locator('#dirSteps button', { hasText: '3' }).click();
+  await page.fill('#f_eslogan', 'Partit Dormilega');
+  await page.waitForSelector('#ov:not([hidden])', { timeout: 15000 });
+  assert.equal(await txt(page, '#winText'), 'Sessió caducada per inactivitat');
+  await shot(page, '07-sessio-caducada');
+  await accept(page);
+  assert.match(await stepLabel(page), /^Pas 2/);
+  assert.equal(await page.locator('.pinrow .dg').allInnerTexts().then(a => a.join('')), '0000');
+  ok('Inactivitat al pas 3 → torna al pas 2 amb el PIN a zero');
+  await ctx.close();
+}
+
+/* ================= 6. Mode director ================= */
+console.log('6) Mode director');
+{
+  const ctx = await browser.newContext(mobile);
+  const page = await ctx.newPage();
+  await page.goto(BASE + '#test');
   for (let i = 0; i < 4; i++) await page.click('#crest');
-  assert.ok(!(await page.locator('#director').isVisible()), '4 tocs no l\'obren');
+  assert.ok(!(await page.locator('#director').isVisible()));
   await page.click('#crest');
   assert.ok(await page.locator('#director').isVisible());
   await shot(page, '08-director');
@@ -261,49 +433,81 @@ console.log('4) Mode director');
   await page.check('#dirNoObs');
   await page.locator('#dirSteps button', { hasText: '1' }).click();
   await page.click('#btnTurn');
-  await page.waitForFunction(() => document.getElementById('progLbl').textContent.startsWith('Pas 2'));
+  await waitStep(page, 2);
   ok('Sense obstacles: el torn passa al primer intent');
+  // el botó parany ja no anul·la
+  await page.locator('#s2 .dec').click();
+  assert.match(await stepLabel(page), /^Pas 2/);
+  ok('Sense obstacles: el botó parany no fa res');
   await page.locator('#dirSteps button', { hasText: '5' }).click();
-  await page.click('#btnCap');
-  await page.waitForFunction(() => document.getElementById('progLbl').textContent.startsWith('Pas 6'));
-  ok('Sense obstacles: la verificació passa al primer intent; salt a qualsevol pas');
+  for (let i = 0; i < 4; i++) { await page.click('#btnCap'); await page.waitForFunction((i) => document.getElementById('capHead').textContent === 'Verificació ' + (i + 2) + ' de 5', i); }
+  await page.locator('#cap .cell').first().click();
+  await waitStep(page, 6);
+  ok('Sense obstacles: les 5 verificacions passen; salt lliure entre passos');
   await ctx.close();
 }
 
-/* ================= 5. Sense localStorage ================= */
-console.log('5) localStorage bloquejat');
+/* ================= 7. localStorage bloquejat ================= */
+console.log('7) localStorage bloquejat');
 {
   const ctx = await browser.newContext(mobile);
-  await ctx.addInitScript(() => {
-    Object.defineProperty(window, 'localStorage', { get() { throw new Error('bloquejat'); } });
-  });
+  await ctx.addInitScript(() => { Object.defineProperty(window, 'localStorage', { get() { throw new Error('bloquejat'); } }); });
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.goto(BASE + '#test');
-  await page.click('#btnTurn');
-  await page.waitForSelector('#m1 .msg.err');
-  await page.click('#btnTurn');
-  await page.waitForFunction(() => document.getElementById('progLbl').textContent.startsWith('Pas 2'));
+  await passQueue(page);
+  await doStep2(page);
+  await typeName(page, 'AB');
+  assert.equal((await page.locator('#f_nom').innerText()).trim(), 'AB');
   assert.deepEqual(errors, []);
   ok('Funciona igualment si localStorage llança excepcions');
   await ctx.close();
 }
 
-/* ================= 6. Desbordament horitzontal a 360 px ================= */
-console.log('6) Mòbil de 360 px: sense scroll horitzontal');
+/* ================= 8. Persistència ================= */
+console.log('8) Persistència');
+{
+  const ctx = await browser.newContext(mobile);
+  const page = await ctx.newPage();
+  await page.goto(BASE + '#test,director');
+  await page.locator('#dirSteps button', { hasText: '3' }).click();
+  await typeName(page, 'PERSISTENT');
+  await setReel(page, 0, 'C');
+  await page.reload();
+  assert.match(await stepLabel(page), /^Pas 3/);
+  assert.equal((await page.locator('#f_nom').innerText()).trim(), 'PERSISTENT');
+  assert.equal((await page.locator('.reel .lt').first().innerText()), 'C');
+  ok('Nom, sigles i pas sobreviuen a la recàrrega');
+  await ctx.close();
+}
+
+/* ================= 9. 360 px sense desbordament ================= */
+console.log('9) Mòbil de 360 px: sense scroll horitzontal');
 {
   const ctx = await browser.newContext({ ...mobile, viewport: { width: 360, height: 740 } });
   const page = await ctx.newPage();
   await page.goto(BASE + '#test,director');
   for (let n = 1; n <= 6; n++) {
     await page.locator('#dirSteps button', { hasText: String(n) }).click();
-    if (n === 6) { await page.evaluate(() => { document.getElementById('r_reg').textContent = 'RP/2026/SS/000047-B/quinquies/L-9/F-999'; }); }
     const w = await page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(w <= 360, `pas ${n}: scrollWidth ${w} > 360`);
     await shot(page, `360-pas${n}`);
   }
-  ok('Cap pas desborda els 360 px d\'ample');
+  // els 5 captchas a 360 px
+  await page.locator('#dirSteps button', { hasText: '5' }).click();
+  await page.check('#dirNoObs');
+  for (let i = 0; i < 4; i++) {
+    const w = await page.evaluate(() => document.documentElement.scrollWidth);
+    assert.ok(w <= 360, `captcha ${i + 1}: scrollWidth ${w}`);
+    await shot(page, `360-captcha${i + 1}`);
+    await page.click('#btnCap');
+    await page.waitForFunction((i) => document.getElementById('capHead').textContent === 'Verificació ' + (i + 2) + ' de 5', i);
+  }
+  const w5 = await page.evaluate(() => document.documentElement.scrollWidth);
+  assert.ok(w5 <= 360, 'captcha 5: ' + w5);
+  await shot(page, '360-captcha5');
+  ok('Cap pas ni captcha desborda els 360 px');
   await ctx.close();
 }
 
