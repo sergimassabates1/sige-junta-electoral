@@ -69,7 +69,7 @@ async function fillStep3(page, { sig = 'MPP', fourth = '' } = {}) {
   await page.fill('#f_objectiu', 'Porró gratuït a tots els cims');
   await page.click('#btnSave');
   await page.selectOption('#f_ideologia', '__altres');
-  await page.selectOption('#f_altres', 'Ecologisme');
+  await page.selectOption('#f_altres', 'La del grup de WhatsApp de la família');
 }
 async function setAfiliats(page) { // 1000 → 8, només descomptant
   for (let k = 0; k < 9; k++) await page.locator('#affBtns button[data-d="-100"]').click();
@@ -117,21 +117,23 @@ async function drawPorro(page) {
   for (const [x, y] of pts.slice(1)) await page.mouse.move(b.x + b.width * x, b.y + b.height * y, { steps: 4 });
   await page.mouse.up();
 }
-// Passa la verificació i (0-4) de manera correcta
+// Passa la verificació i (0-5) de manera correcta
 async function passCap(page, i) {
   if (i === 0) await fugClick(page);
   if (i === 1) { const n = +(await page.locator('.belt').getAttribute('data-count')); for (let k = 0; k < n; k++) await page.click('#cPlus'); await page.click('#btnCap'); }
   if (i === 2) await holdPour(page, await pourMs(page));
   if (i === 3) { for (let k = 0; k < 5; k++) await page.locator(`.ob[data-i="${k}"]`).click(); await page.click('#btnCap'); }
-  if (i === 4) { await drawPorro(page); await page.click('#btnCap'); }
+  if (i === 4) { await page.waitForSelector('.lamp.g.on'); await page.click('#goBtn'); }
+  if (i === 5) { await drawPorro(page); await page.click('#btnCap'); }
 }
 // Amb "Sense obstacles": passa qualsevol prova amb el gest mínim
 async function passCapFree(page, i) {
   if (i === 0) await page.locator('.fug').click();
   if (i === 2) await holdPour(page, 300);
-  if (i === 1 || i === 3 || i === 4) await page.click('#btnCap');
+  if (i === 4) await page.click('#goBtn');
+  if (i === 1 || i === 3 || i === 5) await page.click('#btnCap');
 }
-const capIs = (page, n) => page.waitForFunction((n) => document.getElementById('capHead').textContent === 'Verificació ' + n + ' de 5', n, { timeout: 15000 });
+const capIs = (page, n) => page.waitForFunction((n) => document.getElementById('capHead').textContent === 'Verificació ' + n + ' de 6', n, { timeout: 15000 });
 
 /* ================= 1. Tràmit complet, amb un reinici pel mig, sense xarxa ================= */
 console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lletres');
@@ -155,8 +157,12 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   await shot(page, '01-pas1-inici');
   await page.click('#btnTurn');
   await page.waitForSelector('#turnWait:not([hidden])');
-  assert.match(await txt(page, '#turnAhead'), /^Persones davant seu: \d+$/);
+  assert.match(await txt(page, '#turnAhead'), /^Persones davant seu: \d{2}\.\d{3}$/);
   await shot(page, '01b-pas1-cua');
+  assert.match(await txt(page, '#turnTime'), /^Espera estimada: 00:03$/);
+  await page.waitForFunction(() => /colat .*\+2 s/.test(document.getElementById('turnNote').textContent));
+  assert.match(await txt(page, '#turnNote'), /Espera reestimada: 00:05/);
+  await shot(page, '01c-pas1-colats');
   await page.waitForSelector('#m1 .msg.err');
   assert.equal(await txt(page, '#m1 .msg'), "S'ha esgotat el cupo diari de torns. Torni-ho a provar.");
   ok('Pas 1: cua amb persones davant, i primer intent → cupo esgotat');
@@ -225,7 +231,7 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   assert.ok(await page.locator('#f_objectiu').evaluate(e => e.readOnly));
   await page.selectOption('#f_ideologia', '__altres');
   assert.ok(await page.locator('#altresBox').isVisible());
-  await page.selectOption('#f_altres', 'Ecologisme');
+  await page.selectOption('#f_altres', 'La del grup de WhatsApp de la família');
   await shot(page, '03c-pas3-ideologia-altres');
   assert.equal(await txt(page, '#affNum'), 'M');
   for (let k = 0; k < 9; k++) await page.locator('#affBtns button[data-d="-100"]').click();
@@ -305,7 +311,7 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
 
   // Pas 5: cinc verificacions noves
   assert.match(await stepLabel(page), /^Pas 5 de 6 · 92% completat/);
-  assert.equal(await txt(page, '#capHead'), 'Verificació 1 de 5');
+  assert.equal(await txt(page, '#capHead'), 'Verificació 1 de 6');
   await shot(page, '05a-captcha1-casella-fugitiva');
   const pos0 = await page.locator('.fug').boundingBox();
   await page.locator('.fug').click();
@@ -328,7 +334,7 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   await page.waitForSelector('#ov:not([hidden])');
   assert.match(await txt(page, '#winText'), /El recompte no coincideix amb el de la cinta\. Haurà de tornar a començar la verificació/);
   await accept(page);
-  assert.equal(await txt(page, '#capHead'), 'Verificació 1 de 5');
+  assert.equal(await txt(page, '#capHead'), 'Verificació 1 de 6');
   ok('Un error de verificació reinicia les cinc proves (tornem a la 1)');
   await passCap(page, 0); await capIs(page, 2);
   await page.waitForTimeout(700);
@@ -359,6 +365,17 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   await capIs(page, 5);
   ok('Captcha 4: ordenar el cicle de vida d\'una promesa electoral');
 
+  await shot(page, '05d3-captcha5-semafor');
+  await page.click('#goBtn'); // massa aviat
+  assert.match(await txt(page, '#m5 .msg'), /Massa aviat.*Intent 1\/3/);
+  await page.waitForTimeout(1100);
+  await page.waitForSelector('.lamp.g.on');
+  await shot(page, '05d4-captcha5-semafor-verd');
+  await page.click('#goBtn');
+  assert.match(await txt(page, '#m5 .msg'), /^Temps de reacció: \d+ ms\./);
+  await capIs(page, 6);
+  ok('Captcha 5: semàfor — massa aviat falla, al verd passa amb el temps de reacció');
+
   await shot(page, '05e-captcha5-dibuix');
   await page.click('#btnCap');
   await page.waitForSelector('#m5 .msg.warn');
@@ -379,7 +396,7 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   assert.equal(await txt(page, '#r_sigles'), 'MPP');
   assert.equal(await txt(page, '#r_eslogan'), '«Porro per a tothom»', 'l\'eslògan es guarda en ordre normal');
   assert.equal(await txt(page, '#r_objectiu'), 'Porró gratuït a tots els cims');
-  assert.equal(await txt(page, '#r_ideologia'), 'Ecologisme');
+  assert.equal(await txt(page, '#r_ideologia'), 'La del grup de WhatsApp de la família');
   assert.equal(await txt(page, '#r_llista'), 'Llista B');
   assert.equal(await txt(page, '#r_afiliats'), 'VIII (8)');
   assert.ok(await page.locator('#seal').isVisible());
@@ -509,8 +526,8 @@ console.log('6) Mode director');
   assert.match(await stepLabel(page), /^Pas 2/);
   ok('Sense obstacles: el botó parany no fa res');
   await page.locator('#dirSteps button', { hasText: '5' }).click();
-  for (let i = 0; i < 4; i++) { await passCapFree(page, i); await capIs(page, i + 2); }
-  await passCapFree(page, 4);
+  for (let i = 0; i < 5; i++) { await passCapFree(page, i); await capIs(page, i + 2); }
+  await passCapFree(page, 5);
   await waitStep(page, 6);
   ok('Sense obstacles: les 5 verificacions passen; salt lliure entre passos');
   await ctx.close();
@@ -591,12 +608,12 @@ console.log('9) Mòbil de 360 px: sense scroll horitzontal');
   // els 5 captchas a 360 px
   await page.locator('#dirSteps button', { hasText: '5' }).click();
   await page.check('#dirNoObs');
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 6; i++) {
     const w = await page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(w <= 360, `captcha ${i + 1}: scrollWidth ${w}`);
     await page.waitForTimeout(i === 1 ? 800 : 100);
     await shot(page, `360-captcha${i + 1}`);
-    if (i < 4) { await passCapFree(page, i); await capIs(page, i + 2); }
+    if (i < 5) { await passCapFree(page, i); await capIs(page, i + 2); }
   }
   // quadrícula del pas 4 a 360 px
   await page.locator('#dirSteps button', { hasText: '4' }).click();

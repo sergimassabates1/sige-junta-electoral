@@ -88,7 +88,7 @@ select[size] option{padding:8px 6px}
 #turnPanel{background:#000;color:#33ff33;font-family:"Courier New",Courier,monospace;padding:12px;margin:12px 0;border:3px inset #999;text-align:center}
 #turnPanel .t1{font-size:24px;font-weight:bold;letter-spacing:2px}
 #turnPanel .t2{font-size:16px;margin-top:6px}
-#turnPanel .t3{font-size:14px;margin-top:6px;color:#ffd400}
+#turnPanel .t3{font-size:19px;font-weight:bold;margin-top:6px;color:#ffd400}
 #turnPanel .t4{font-size:12px;margin-top:6px;color:#ff5a5a;min-height:15px}
 #hourglass{font-size:46px;text-align:center;display:block;animation:flip 2.4s ease-in-out infinite}
 @keyframes flip{0%,40%{transform:rotate(0)}50%,90%{transform:rotate(180deg)}100%{transform:rotate(360deg)}}
@@ -132,7 +132,7 @@ select[size] option{padding:8px 6px}
 /* Afiliats */
 #affNum{font:bold 34px "Times New Roman",serif;letter-spacing:3px;text-align:center;background:#fff;border:2px inset #d8d2b8;padding:6px;min-height:56px;word-break:break-all}
 #affBtns{display:flex;gap:4px;align-items:center;margin-top:5px}
-#affBtns .btn:nth-child(3){min-height:40px;font-size:15px;height:40px;padding:0 12px}
+#affBtns .btn:nth-child(4){min-height:40px;font-size:15px;height:40px;padding:0 12px}
 
 /* Declaració: mantenir premut */
 .hold{display:flex;gap:10px;align-items:center;margin-top:14px}
@@ -198,7 +198,14 @@ select[size] option{padding:8px 6px}
 .ob .n{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:#ddd;color:#fff;text-align:center;line-height:24px;font:bold 14px Verdana,sans-serif}
 .ob[aria-pressed=true]{border-color:#2d5fb5;background:#e2ecff}
 .ob[aria-pressed=true] .n{background:#2d5fb5}
-/* 5 · dibuixar porró */
+/* 5 · semàfor */
+.tl{display:flex;gap:12px;justify-content:center;background:#222;border:3px solid #000;border-radius:26px;padding:10px 18px;width:max-content;margin:0 auto 10px}
+.lamp{display:block;width:34px;height:34px;border-radius:50%;background:#444;border:2px solid #111}
+.lamp.r.on{background:#e02020;box-shadow:0 0 14px #ff4040}
+.lamp.y.on{background:#f1b500;box-shadow:0 0 14px #ffd040}
+.lamp.g.on{background:#25c425;box-shadow:0 0 16px #50ff50}
+#goBtn{width:100%;min-height:64px;font-size:20px;touch-action:none;-webkit-user-select:none;user-select:none}
+/* 6 · dibuixar porró */
 .dcan{display:block;width:100%;max-width:280px;aspect-ratio:280/170;border:2px inset #999;background:#fff;touch-action:none;cursor:crosshair}
 /* Quadrícula del paint */
 #paintBox{position:relative;width:100%;max-width:300px}
@@ -290,8 +297,8 @@ body.dir-open #page{padding-bottom:120px}
           <span id="hourglass" aria-hidden="true">⏳</span>
           <div id="turnPanel" aria-live="polite">
             <div class="t1">TORN A047</div>
-            <div class="t3" id="turnAhead">Persones davant seu: 12</div>
-            <div class="t2" id="turnTime">Espera estimada: 00:10</div>
+            <div class="t3" id="turnAhead">Persones davant seu: 52.317</div>
+            <div class="t2" id="turnTime">Espera estimada: 00:03</div>
             <div class="t4" id="turnNote"></div>
           </div>
         </div>
@@ -342,34 +349,45 @@ body.dir-open #page{padding-bottom:120px}
 
           <label class="lbl" for="f_objectiu">Objectiu principal del partit <span class="req">*</span></label>
           <textarea id="f_objectiu" placeholder="Ex.: Porró gratuït a tots els cims"></textarea>
-          <div class="oline"><span class="hint" id="decay"></span><button type="button" class="btn tiny" id="btnSave">Desar</button></div>
+          <div class="oline"><span class="hint" id="decay"></span><button type="button" class="btn" id="btnSave">Desar</button></div>
           <div class="ferr" id="e_objectiu" hidden></div>
 
           <label class="lbl" for="f_ideologia">Ideologia <span class="req">*</span></label>
           <select id="f_ideologia" size="2">
             <option value="">Seleccioni…</option>
-            <option>Centre-centre</option>
-            <option>Centre una mica a la dreta però no gaire</option>
-            <option>Depèn del dia</option>
             <option>La que digui la meva mare</option>
+            <option>Ni d'esquerres ni de dretes, del PP</option>
+            <option>Centre-centre, però amb molta passió</option>
+            <option>Depèn de qui pagui el cafè</option>
+            <option>Anarquisme amb jerarquia i reunions</option>
+            <option>Comunisme, però amb pis en propietat</option>
+            <option>Liberalisme subvencionat</option>
             <option>Extrem centre</option>
             <option value="__altres">Altres…</option>
           </select>
           <div id="altresBox" hidden>
-            <label class="lbl" for="f_altres">Altres: seleccioni una ideologia reconeguda <span class="req">*</span></label>
+            <label class="lbl" for="f_altres">Altres: seleccioni la que més s'hi aproximi <span class="req">*</span></label>
             <select id="f_altres" size="2">
               <option value="">Seleccioni…</option>
-              <option>Socialdemocràcia</option><option>Liberalisme</option><option>Conservadorisme</option>
-              <option>Democràcia cristiana</option><option>Ecologisme</option><option>Feminisme</option>
-              <option>Republicanisme</option><option>Anarquisme</option><option>Comunisme</option>
-              <option>Nacionalisme</option><option>Populisme</option><option>Federalisme</option>
+              <option>La del grup de WhatsApp de la família</option>
+              <option>Socialdemocràcia (quan toca)</option>
+              <option>Ecologisme amb cotxe gran</option>
+              <option>Conservadorisme progressista</option>
+              <option>Monarquia republicana</option>
+              <option>Federalisme de pis compartit</option>
+              <option>Marxisme de Groucho</option>
+              <option>Populisme de poble petit</option>
+              <option>La que votava el meu avi, més o menys</option>
+              <option>D'esquerres, però sense pujar impostos</option>
+              <option>De dretes, però amb sanitat pública</option>
             </select>
           </div>
           <div class="ferr" id="e_ideologia" hidden></div>
 
-          <span class="lbl">Nombre d'afiliats <i>(en numeració romana, norma UNE-1903; només es pot descomptar)</i></span>
+          <span class="lbl">Nombre d'afiliats <i>(en numeració romana, norma UNE-1903; només es pot descomptar, de 500 en 500 si vol)</i></span>
           <div id="affNum" aria-live="polite">M</div>
           <div id="affBtns">
+            <button type="button" class="btn mini" data-d="-500">−D</button>
             <button type="button" class="btn mini" data-d="-100">−C</button>
             <button type="button" class="btn mini" data-d="-10">−X</button>
             <button type="button" class="btn" data-d="-1">−I</button>
@@ -423,7 +441,7 @@ body.dir-open #page{padding-bottom:120px}
       <fieldset>
         <legend>Pas 5 · Verificació humana</legend>
         <p>Per garantir que vostè no és un robot, completi les proves de verificació.</p>
-        <div class="hint" id="capHead" style="margin:6px 0 4px;color:#555;font-size:11px;font-weight:bold">Verificació 1 de 5</div>
+        <div class="hint" id="capHead" style="margin:6px 0 4px;color:#555;font-size:11px;font-weight:bold">Verificació 1 de 6</div>
         <div id="cap" class="capbox"></div>
         <div id="m5"></div>
         <div class="row act"><button class="btn" id="btnCap" type="button">Verificar</button><button class="btn tiny dec" type="button">Cancel·lar</button></div>
@@ -509,7 +527,7 @@ body.dir-open #page{padding-bottom:120px}
   var CAPTCHA_FAIL_RESTART = 'verificacio';
   var T = TEST
     ? { countdown: 2, inactivity: 6, proc: 150, verify: 150, advance: 600, decay: 4, hold: 300, survey: HASH.indexOf('survey') > -1 ? 1 : 0, surveyRetry: 5, dodges: 1, freeze: true, queue: 3 }
-    : { countdown: 10, inactivity: 60, proc: 1800, verify: 1200, advance: 1200, decay: 6, hold: 3000, survey: 45, surveyRetry: 5, dodges: 3, freeze: false, queue: 12 };
+    : { countdown: 5, inactivity: 60, proc: 1800, verify: 1200, advance: 1200, decay: 12, hold: 2000, survey: 45, surveyRetry: 5, dodges: 3, freeze: false, queue: 12 };
   var KEY = 'sige_v24_state';
   var FAKE_PCT = [3, 14, 67, 8, 92, 100];
   var PIN0 = '0000';
@@ -534,7 +552,7 @@ body.dir-open #page{padding-bottom:120px}
     try {
       var s = JSON.parse(raw);
       if (typeof s.step === 'number' && s.step >= 1 && s.step <= 6) d.step = s.step;
-      if (typeof s.cap === 'number' && s.cap >= 0 && s.cap <= 4) d.cap = s.cap;
+      if (typeof s.cap === 'number' && s.cap >= 0 && s.cap <= 5) d.cap = s.cap;
       if (typeof s.restarts === 'number') d.restarts = s.restarts;
       d.noObs = !!s.noObs;
       ['turn', 'submit', 'logo', 'captcha'].forEach(function (k) { if (s.att && typeof s.att[k] === 'number') d.att[k] = s.att[k]; });
@@ -662,6 +680,7 @@ body.dir-open #page{padding-bottom:120px}
   }
 
   /* ================= PAS 1 · Cua ================= */
+  function dots(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   function fmt(sec) { return '00:' + (sec < 10 ? '0' : '') + sec; }
   function initStep1() {
     setMsg('m1', null); show($('turnWait'), false);
@@ -670,18 +689,20 @@ body.dir-open #page{padding-bottom:120px}
   }
   var turnIv = null;
   $('btnTurn').addEventListener('click', function () {
-    var btn = $('btnTurn'), total = T.countdown * 1000, end = Date.now() + total, bumped = false;
+    var btn = $('btnTurn'), total = T.countdown * 1000, start = Date.now(), bumped = false;
+    var N0 = 50000 + rnd(9000), BUMP = 4000 + rnd(4000);
     btn.disabled = true; setMsg('m1', null); show($('turnWait'), true);
     $('turnNote').textContent = '';
     if (turnIv) clearInterval(turnIv);
     function tick() {
-      var rem = Math.max(0, end - Date.now()), frac = rem / total, left = Math.ceil(rem / 1000);
-      if (!bumped && frac <= 0.4 && rem > 0) { bumped = true; $('turnNote').textContent = "⚠ S'han colat 3 persones."; }
-      var ahead = Math.round(T.queue * frac) + (bumped ? Math.ceil(3 * frac / 0.4) : 0);
-      if (rem <= 0) ahead = 0;
-      $('turnAhead').textContent = 'Persones davant seu: ' + ahead;
+      var f = Math.min(1, (Date.now() - start) / total);
+      if (!bumped && f >= 0.4 && f < 1) { bumped = true; $('turnNote').textContent = "⚠ S'han colat " + dots(BUMP) + " persones. Espera reestimada: 00:05 (+2 s)."; }
+      var ahead = bumped ? (N0 * 0.55 + BUMP) * (1 - (f - 0.4) / 0.6) : N0 * (1 - 0.45 * f / 0.4);
+      if (f >= 1) ahead = 0;
+      var left = Math.max(0, Math.ceil((bumped ? 5 : 3) - f * 5 - 1e-9));
+      $('turnAhead').textContent = 'Persones davant seu: ' + dots(ahead);
       $('turnTime').textContent = 'Espera estimada: ' + fmt(left);
-      return rem <= 0;
+      return f >= 1;
     }
     tick();
     turnIv = setInterval(function () {
@@ -806,7 +827,7 @@ body.dir-open #page{padding-bottom:120px}
     if (S.form.nom.length >= 30) { toast('Nom massa llarg (màxim 30 caràcters)'); return; }
     S.form.nom += ch; save(); renderNom();
     kbCount++;
-    if (obs() && kbCount % 6 === 0) {   // el teclat es "reorganitza" sol
+    if (obs() && kbCount % 10 === 0) {   // el teclat es "reorganitza" sol
       var keys = $('kb').querySelectorAll('button:not(.sp):not(.bk)');
       var a = rnd(keys.length), b = rnd(keys.length);
       if (a === b) b = (a + 1) % keys.length;
@@ -908,7 +929,7 @@ body.dir-open #page{padding-bottom:120px}
     if (!f.objectiu.trim()) bad('objectiu', 'Error 0x0013: El camp «Objectiu principal del partit» és obligatori');
     else if (!f.objSaved) bad('objectiu', "Error 0x0016: El camp «Objectiu principal del partit» no s'ha desat");
     if (!f.ideologia) bad('ideologia', 'Error 0x0014: Ha de seleccionar una ideologia vàlida (i «Seleccioni…» no ho és)');
-    else if (f.ideologia === '__altres' && !f.altres) bad('ideologia', 'Error 0x0017: Ha triat «Altres» però no ha triat cap ideologia reconeguda');
+    else if (f.ideologia === '__altres' && !f.altres) bad('ideologia', 'Error 0x0017: Ha triat «Altres» però no ha triat cap ideologia de la llista d\'altres');
     if (!f.decl) bad('decl', 'Error 0x00F1: Ha de signar la declaració responsable');
     if (errs.length) {
       setMsg('m3', 'err', 'La sol·licitud conté ' + errs.length + (errs.length === 1 ? ' error.' : ' errors.') + ' Revisi els camps marcats.');
@@ -1200,7 +1221,50 @@ body.dir-open #page{padding-bottom:120px}
       },
       check: function () { return $('cap')._check(); }
     },
-    { // 5 · dibuixar un porró (IA oficial)
+    { // 5 · semàfor de la Junta (temps de reacció)
+      auto: true,
+      build: function () {
+        var h = $('cap'), strikes = 0, state = 'cool', tG = 0, goT = 0, slowT = 0;
+        h.innerHTML = head('Premi el botó just quan el semàfor', 'es posi verd (ni abans ni massa tard)') +
+          '<div class="tl" aria-hidden="true"><i class="lamp r"></i><i class="lamp y"></i><i class="lamp g"></i></div>' +
+          '<button type="button" class="btn" id="goBtn">PREMER</button>' +
+          '<div class="hint" id="tlInfo" style="margin-top:4px">Intents: 0/3. Es recomana que tot l\'equip cridi «ara!».</div>';
+        var lr = h.querySelector('.lamp.r'), lg = h.querySelector('.lamp.g'), ly = h.querySelector('.lamp.y');
+        function lamps(c) { lr.classList.toggle('on', c === 'r'); ly.classList.toggle('on', c === 'y'); lg.classList.toggle('on', c === 'g'); }
+        function arm() {
+          state = 'wait'; lamps('r');
+          goT = later(function () {
+            ly.classList.add('on'); // un instant d'ambre per marejar
+            goT = later(function () {
+              state = 'go'; lamps('g'); tG = performance.now();
+              slowT = later(function () { if (state === 'go') fail("Massa lent: el semàfor s'ha tornat a posar en vermell."); }, 1600);
+            }, TEST ? 60 : 300);
+          }, TEST ? 300 : 1500 + rnd(2500));
+        }
+        function fail(msg) {
+          state = 'cool'; strikes++; lamps('r');
+          setMsg('m5', 'warn', msg + ' (Intent ' + strikes + '/3)');
+          $('tlInfo').textContent = 'Intents: ' + strikes + "/3. Es recomana que tot l'equip cridi «ara!».";
+          if (strikes >= 3) { later(function () { capResult(false, 'Tres intents de semàfor fallits.'); }, 700); return; }
+          later(arm, 900);
+        }
+        $('goBtn').addEventListener('pointerdown', function (e) {
+          e.preventDefault();
+          if (state === 'cool' || state === 'done') return;
+          if (!obs()) { state = 'done'; capResult(true); return; }
+          if (state === 'wait') { clearTimeout(goT); fail('Massa aviat! Els robots tampoc tenen paciència.'); return; }
+          var rt = Math.round(performance.now() - tG);
+          clearTimeout(slowT);
+          if (!TEST && rt < 110) { fail('Temps de reacció: ' + rt + " ms. Impossible per a un humà: robot detectat."); return; }
+          state = 'done';
+          setMsg('m5', 'ok', 'Temps de reacció: ' + rt + ' ms. ' + (rt < 250 ? 'Reflexos de pilot de Fórmula 1. Una mica sospitós.' : rt < 450 ? 'Compatible amb un ésser humà.' : 'Lent, però perfectament humà.'));
+          later(function () { capResult(true); }, T.verify * 2);
+        });
+        $('goBtn').addEventListener('contextmenu', function (e) { e.preventDefault(); });
+        arm();
+      }
+    },
+    { // 6 · dibuixar un porró (IA oficial)
       build: function () {
         var h = $('cap'), drawing = false, last = null;
         h.innerHTML = head('Dibuixi un porró', 'la nostra IA el reconeixerà') + '<canvas class="dcan" width="280" height="170" aria-label="Llenç"></canvas>' +
