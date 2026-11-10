@@ -49,12 +49,7 @@ async function doStep2(page, list = 'Llista B', digits = [1, 7, 1, 1]) {
   await page.click('#btnLogin');
   await waitStep(page, 3);
 }
-async function typeName(page, name) {
-  for (const ch of name) {
-    if (ch === ' ') await page.locator('#kb .sp').click();
-    else await page.locator('#kb button', { hasText: new RegExp('^' + ch + '$') }).first().click();
-  }
-}
+async function typeName(page, name) { await page.fill('#f_nom', name); }
 async function setReel(page, i, letter) {
   const n = letter.charCodeAt(0) - 64;
   const btn = page.locator('.reel').nth(i).locator('button');
@@ -68,13 +63,7 @@ async function fillStep3(page, { sig = 'MPP', fourth = '' } = {}) {
   await page.fill('#f_eslogan', 'Porro per a tothom');
   await page.fill('#f_objectiu', 'Porró gratuït a tots els cims');
   await page.click('#btnSave');
-  await page.selectOption('#f_ideologia', '__altres');
-  await page.selectOption('#f_altres', 'La del grup de WhatsApp de la família');
-}
-async function setAfiliats(page) { // 1000 → 8, només descomptant
-  for (let k = 0; k < 9; k++) await page.locator('#affBtns button[data-d="-100"]').click();
-  for (let k = 0; k < 9; k++) await page.locator('#affBtns button[data-d="-10"]').click();
-  for (let k = 0; k < 2; k++) await page.locator('#affBtns button[data-d="-1"]').click();
+  await page.selectOption('#f_ideologia', 'Leo Messi');
 }
 async function hold(page, ms = 600) {
   const b = await page.locator('#holdBtn').boundingBox();
@@ -209,16 +198,16 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   await waitStep(page, 2);
   ok('Segona cua: ja no hi ha cupo esgotat (només passa un cop)');
   await doStep2(page);
-  assert.equal(await page.locator('#f_nom').innerText(), 'Toqui les tecles per escriure… ', 'dades esborrades pel reinici');
+  assert.equal(await page.locator('#f_nom').inputValue(), '', 'dades esborrades pel reinici');
   ok('Reinici: les dades del formulari s\'han esborrat');
 
   // Pas 3 correcte
-  // Teclat: comprovem que es reorganitza (mai perd lletres) i que escriu el que toca
+  // Nom del partit: camp de text normal
+  assert.equal(await page.locator('#f_nom').evaluate(e => e.tagName + '/' + e.type), 'INPUT/text');
+  assert.equal(await page.locator('#kb').count(), 0, 'ja no hi ha teclat propi');
   await typeName(page, 'MOVIMENT POPULAR PRO PORRO');
-  const labels = (await page.locator('#kb button:not(.sp):not(.bk)').allInnerTexts()).sort().join('');
-  assert.equal(labels, 'ABCDEFGHIJKLMNOPQRSTUVWXYZÇÀÈÉÒÓÍÚ·-'.split('').sort().join(''), 'el teclat conserva totes les lletres');
-  assert.equal((await page.locator('#f_nom').innerText()).trim(), 'MOVIMENT POPULAR PRO PORRO');
-  ok('Teclat de la Junta: escriu bé i només permuta tecles (mai en perd)');
+  assert.equal(await page.locator('#f_nom').inputValue(), 'MOVIMENT POPULAR PRO PORRO');
+  ok('Nom del partit: camp de text normal');
 
   for (let i = 0; i < 3; i++) await setReel(page, i, 'MPP'[i]);
   assert.equal(await page.locator('.reel .lt').allInnerTexts().then(a => a.join('')), 'MPP–');
@@ -229,19 +218,13 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   assert.ok(await page.locator('#decay').innerText().then(t => /Camp sense desar/.test(t)) || true);
   await page.click('#btnSave');
   assert.ok(await page.locator('#f_objectiu').evaluate(e => e.readOnly));
-  await page.selectOption('#f_ideologia', '__altres');
-  assert.ok(await page.locator('#altresBox').isVisible());
-  await page.selectOption('#f_altres', 'La del grup de WhatsApp de la família');
-  await shot(page, '03c-pas3-ideologia-altres');
-  assert.equal(await txt(page, '#affNum'), 'M');
-  for (let k = 0; k < 9; k++) await page.locator('#affBtns button[data-d="-100"]').click();
-  assert.equal(await txt(page, '#affNum'), 'C');
-  assert.ok(await page.locator('#w_afiliats').isVisible());
-  for (let k = 0; k < 9; k++) await page.locator('#affBtns button[data-d="-10"]').click();
-  for (let k = 0; k < 2; k++) await page.locator('#affBtns button[data-d="-1"]').click();
-  assert.equal(await txt(page, '#affNum'), 'VIII');
-  assert.ok(!(await page.locator('#w_afiliats').isVisible()));
-  ok('Pas 3: sigles amb rodets, eslògan reflectit, objectiu desat, "Altres", afiliats en romà');
+  const opts = await page.locator('#f_ideologia option').allInnerTexts();
+  assert.ok(opts.includes('Leo Messi') && opts.includes('Depèn de qui pagui la birra') && opts.some(o => /Extrema/.test(o)), 'opcions de broma noves');
+  assert.ok(!opts.some(o => /Centre-centre|Porronista|Altres|cafè|No ho sé/.test(o)), 'opcions retirades: ' + opts.join('|'));
+  assert.equal(await page.locator('#f_altres, #altresBox, #affNum, #affBtns').count(), 0, 'sense «Altres» ni afiliats');
+  await page.selectOption('#f_ideologia', 'Leo Messi');
+  await shot(page, '03c-pas3-ideologia');
+  ok('Pas 3: sigles amb rodets, eslògan reflectit, objectiu desat; ideologies totes de broma (Leo Messi, «birra», Extrema…), sense Altres ni afiliats');
 
   await page.click('#btnSubmit'); // falta signar la declaració → error però NO reinici
   assert.ok(await page.locator('#e_decl').isVisible());
@@ -384,7 +367,12 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   await shot(page, '05e2-captcha5-dibuixat');
   await page.click('#btnCap');
   await page.waitForSelector('#m5 .msg.ok');
-  assert.match(await txt(page, '#m5 .msg'), /^Resultat de la IA: .*porró \d+%.*Verificació superada/);
+  assert.match(await txt(page, '#m5 .msg'), /^Resultat de la IA: .*porró \d+%/);
+  assert.equal(await txt(page, '#btnCap'), 'Continuar »');
+  await shot(page, '05e3-captcha6-veredicte-continuar');
+  await page.waitForTimeout(900);
+  assert.match(await stepLabel(page), /^Pas 5/, 'no avança sol: cal prémer «Continuar»');
+  await page.click('#btnCap');
   await waitStep(page, 6);
   ok('Captcha 5: dibuixar un porró; la "IA" l\'accepta tot i confondre\'l');
 
@@ -396,9 +384,9 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   assert.equal(await txt(page, '#r_sigles'), 'MPP');
   assert.equal(await txt(page, '#r_eslogan'), '«Porro per a tothom»', 'l\'eslògan es guarda en ordre normal');
   assert.equal(await txt(page, '#r_objectiu'), 'Porró gratuït a tots els cims');
-  assert.equal(await txt(page, '#r_ideologia'), 'La del grup de WhatsApp de la família');
+  assert.equal(await txt(page, '#r_ideologia'), 'Leo Messi');
   assert.equal(await txt(page, '#r_llista'), 'Llista B');
-  assert.equal(await txt(page, '#r_afiliats'), 'VIII (8)');
+  assert.equal(await page.locator('#r_afiliats').count(), 0);
   assert.ok(await page.locator('#seal').isVisible());
   assert.ok((await page.locator('#r_logo').getAttribute('src')).startsWith('data:image/jpeg'));
   await shot(page, '06-pas6-justificant');
@@ -443,24 +431,6 @@ console.log('2) Botons parany petits');
   await accept(page);
   assert.match(await stepLabel(page), /^Pas 1/);
   ok('Tocar el "Cancel·lar" diminut anul·la tot el tràmit');
-  await ctx.close();
-}
-
-/* ================= 3. Afiliats negatius reinicien ================= */
-console.log('3) Afiliats: passar-se de frenada');
-{
-  const ctx = await browser.newContext(mobile);
-  const page = await ctx.newPage();
-  await page.goto(BASE + '#test,director');
-  await page.locator('#dirSteps button', { hasText: '3' }).click();
-  for (let k = 0; k < 10; k++) await page.locator('#affBtns button[data-d="-100"]').click();
-  assert.equal(await txt(page, '#affNum'), 'N (nul·la)');
-  await page.locator('#affBtns button[data-d="-1"]').click();
-  await page.waitForSelector('#ov:not([hidden])');
-  assert.match(await txt(page, '#winText'), /Nombre d'afiliats negatiu/);
-  await accept(page);
-  assert.match(await stepLabel(page), /^Pas 1/);
-  ok('Baixar d\'afiliats per sota de zero → tràmit anul·lat');
   await ctx.close();
 }
 
@@ -545,7 +515,7 @@ console.log('7) localStorage bloquejat');
   await passQueue(page);
   await doStep2(page);
   await typeName(page, 'AB');
-  assert.equal((await page.locator('#f_nom').innerText()).trim(), 'AB');
+  assert.equal((await page.locator('#f_nom').inputValue()).trim(), 'AB');
   assert.deepEqual(errors, []);
   ok('Funciona igualment si localStorage llança excepcions');
   await ctx.close();
@@ -562,7 +532,7 @@ console.log('8) Persistència');
   await setReel(page, 0, 'C');
   await page.reload();
   assert.match(await stepLabel(page), /^Pas 3/);
-  assert.equal((await page.locator('#f_nom').innerText()).trim(), 'PERSISTENT');
+  assert.equal((await page.locator('#f_nom').inputValue()).trim(), 'PERSISTENT');
   assert.equal((await page.locator('.reel .lt').first().innerText()), 'C');
   ok('Nom, sigles i pas sobreviuen a la recàrrega');
   await ctx.close();
@@ -576,20 +546,28 @@ console.log('8b) Enquesta de satisfacció');
   await page.goto(BASE + '#test,survey,director');
   await page.locator('#dirSteps button', { hasText: '4' }).click();
   await page.waitForSelector('#ov:not([hidden])', { timeout: 4000 });
-  assert.match(await txt(page, '#winText'), /enquesta de satisfacció/);
+  assert.match(await txt(page, '#winText'), /enquesta de satisfacció[\s\S]*veritat o fals/);
   await page.locator('#winBtns button', { hasText: 'Potser més tard' }).click();
   const t0 = Date.now();
   assert.ok(await page.locator('#ov').isHidden());
   await page.waitForSelector('#ov:not([hidden])', { timeout: 8000 });
   const dt = Date.now() - t0;
   assert.ok(dt >= 4500 && dt <= 6500, 'reapareix als ~5 s (' + dt + ' ms)');
-  await page.locator('#winBtns button', { hasText: 'Potser més tard' }).click();
-  await page.waitForSelector('#ov:not([hidden])', { timeout: 8000 });
-  ok('Enquesta: "Potser més tard" torna a aparèixer als 5 s, cada vegada (' + dt + ' ms)');
-  await page.locator('#winBtns button', { hasText: 'Sí, encantat' }).click();
+  await shot(page, '08b-enquesta-veritat-fals');
+  // Resposta equivocada → nova pregunta; sempre que ho sigui (cap resposta és vàlida a les paradoxes)
+  const ans = async () => await page.locator('#winText').getAttribute('data-ans');
+  let a = await ans(), wrongSeen = false;
+  if (a !== 'any') {
+    await page.locator('#winBtns button', { hasText: a === 'veritat' ? 'Fals' : 'Veritat' }).click();
+    await page.waitForSelector('#ov:not([hidden])');
+    assert.match(await txt(page, '#winText'), /Torni-ho a provar/);
+    wrongSeen = true; a = await ans();
+  }
+  ok('Enquesta: ara és un captcha de veritat/fals; "Potser més tard" torna als 5 s (' + dt + ' ms)' + (wrongSeen ? '; una resposta errònia en demana una altra' : ''));
+  await page.locator('#winBtns button', { hasText: a === 'fals' ? 'Fals' : 'Veritat' }).click();
   await page.waitForTimeout(6500);
-  assert.ok(await page.locator('#ov').isHidden(), 'després d\'acceptar no torna');
-  ok('Enquesta: acceptar-la la fa desaparèixer');
+  assert.ok(await page.locator('#ov').isHidden(), 'després de contestar bé no torna');
+  ok('Enquesta: contestar-la bé la fa desaparèixer');
   await ctx.close();
 }
 

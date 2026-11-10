@@ -94,6 +94,7 @@ select[size] option{padding:8px 6px}
 @keyframes flip{0%,40%{transform:rotate(0)}50%,90%{transform:rotate(180deg)}100%{transform:rotate(360deg)}}
 
 /* PIN: lliscadors */
+.bd #winText,#winText{white-space:pre-line}
 .info{display:inline-block;width:16px;height:16px;padding:0;margin-left:4px;border:1px solid #1a4fb0;border-radius:50%;background:#2d5fb5;color:#fff;font:bold 11px/14px Georgia,serif;text-align:center;vertical-align:middle;cursor:help;touch-action:manipulation}
 .tip{margin:4px 0 6px;padding:6px 8px;border:1px solid #888;background:#ffffe1;box-shadow:2px 2px 0 rgba(0,0,0,.25);font-size:12px;max-width:300px}
 .pinrow{display:flex;align-items:center;gap:8px;margin:3px 0}
@@ -109,15 +110,7 @@ select[size] option{padding:8px 6px}
 #arena .runner.off{opacity:.45}
 
 /* Teclat virtual */
-.fake{min-height:44px;border:2px inset #d8d2b8;background:#fff;padding:10px 6px;font-size:16px;word-break:break-all;color:#000}
-.fake .ph{color:#aaa}
 .caret{display:inline-block;width:2px;height:1em;background:#000;vertical-align:-2px;animation:bl 1s steps(2,start) infinite}
-#kb{display:grid;grid-template-columns:repeat(9,1fr);gap:2px;margin-top:4px;background:#bdb9aa;padding:3px;border:2px outset #fff}
-#kb button{height:38px;padding:0;font:bold 14px Verdana,sans-serif;background:#d4d0c8;border:2px outset #f4f2ec;touch-action:manipulation;color:#000;min-width:0}
-#kb button:active{border-style:inset}
-#kb button.sp{grid-column:span 6;font-size:10px}
-#kb button.bk{grid-column:span 3}
-#kb button.swap{background:#ffd27a}
 
 /* Sigles: rodets */
 #reels{display:flex;gap:10px}
@@ -129,10 +122,6 @@ select[size] option{padding:8px 6px}
 .oline{display:flex;align-items:center;justify-content:space-between;margin-top:3px;gap:6px}
 #f_objectiu[readonly]{background:#e6f2e2}
 
-/* Afiliats */
-#affNum{font:bold 34px "Times New Roman",serif;letter-spacing:3px;text-align:center;background:#fff;border:2px inset #d8d2b8;padding:6px;min-height:56px;word-break:break-all}
-#affBtns{display:flex;gap:4px;align-items:center;margin-top:5px}
-#affBtns .btn:nth-child(4){min-height:40px;font-size:15px;height:40px;padding:0 12px}
 
 /* Declaració: mantenir premut */
 .hold{display:flex;gap:10px;align-items:center;margin-top:14px}
@@ -334,9 +323,8 @@ body.dir-open #page{padding-bottom:120px}
         <legend>Pas 3 · Sol·licitud d'inscripció (Model EL-01)</legend>
         <p class="hint">Els camps marcats amb <span style="color:#c00">*</span> són obligatoris.</p>
         <form id="frm" novalidate autocomplete="off">
-          <span class="lbl">Nom del partit <span class="req">*</span> <i>(teclat homologat de la Junta)</i></span>
-          <div class="fake" id="f_nom" role="textbox" aria-label="Nom del partit"></div>
-          <div id="kb"></div>
+          <label class="lbl" for="f_nom">Nom del partit <span class="req">*</span></label>
+          <input id="f_nom" type="text" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false">
           <div class="ferr" id="e_nom" hidden></div>
 
           <span class="lbl">Sigles <span class="req">*</span> <i>(màxim 3 lletres · Ex.: MPPU)</i></span>
@@ -357,43 +345,23 @@ body.dir-open #page{padding-bottom:120px}
             <option value="">Seleccioni…</option>
             <option>La que digui la meva mare</option>
             <option>Ni d'esquerres ni de dretes, del PP</option>
-            <option>Centre-centre, però amb molta passió</option>
-            <option>Depèn de qui pagui el cafè</option>
+            <option>Leo Messi</option>
+            <option>Depèn de qui pagui la birra</option>
+            <option>Extremadament moderada</option>
+            <option>Extrem centre</option>
             <option>Anarquisme amb jerarquia i reunions</option>
             <option>Comunisme, però amb pis en propietat</option>
             <option>Liberalisme subvencionat</option>
-            <option>Extrem centre</option>
-            <option value="__altres">Altres…</option>
+            <option>La del grup de WhatsApp de la família</option>
+            <option>La que votava el meu avi, més o menys</option>
+            <option>La que doni més canapès</option>
+            <option>La que no m'obligui a anar a reunions</option>
+            <option>Segons com em llevi</option>
+            <option>La que tingui més places d'aparcament</option>
+            <option>La del meu cunyat, que en sap molt</option>
+            <option>Cap, però amb molta passió</option>
           </select>
-          <div id="altresBox" hidden>
-            <label class="lbl" for="f_altres">Altres: seleccioni la que més s'hi aproximi <span class="req">*</span></label>
-            <select id="f_altres" size="2">
-              <option value="">Seleccioni…</option>
-              <option>La del grup de WhatsApp de la família</option>
-              <option>Socialdemocràcia (quan toca)</option>
-              <option>Ecologisme amb cotxe gran</option>
-              <option>Conservadorisme progressista</option>
-              <option>Monarquia republicana</option>
-              <option>Federalisme de pis compartit</option>
-              <option>Marxisme de Groucho</option>
-              <option>Populisme de poble petit</option>
-              <option>La que votava el meu avi, més o menys</option>
-              <option>D'esquerres, però sense pujar impostos</option>
-              <option>De dretes, però amb sanitat pública</option>
-            </select>
-          </div>
           <div class="ferr" id="e_ideologia" hidden></div>
-
-          <span class="lbl">Nombre d'afiliats <i>(en numeració romana, norma UNE-1903; només es pot descomptar, de 500 en 500 si vol)</i></span>
-          <div id="affNum" aria-live="polite">M</div>
-          <div id="affBtns">
-            <button type="button" class="btn mini" data-d="-500">−D</button>
-            <button type="button" class="btn mini" data-d="-100">−C</button>
-            <button type="button" class="btn mini" data-d="-10">−X</button>
-            <button type="button" class="btn" data-d="-1">−I</button>
-            <button type="button" class="btn mini" data-d="reset">↺</button>
-          </div>
-          <div class="fwarn" id="w_afiliats" hidden>Compte: ha declarat més afiliats que persones a la taula</div>
 
           <div class="hold">
             <button type="button" id="holdBtn" aria-label="Declaració responsable">✍️</button>
@@ -465,7 +433,6 @@ body.dir-open #page{padding-bottom:120px}
           <div><dt>Objectiu principal</dt><dd id="r_objectiu"></dd></div>
           <div><dt>Ideologia</dt><dd id="r_ideologia"></dd></div>
           <div><dt>Candidatura</dt><dd id="r_llista"></dd></div>
-          <div><dt>Afiliats declarats</dt><dd id="r_afiliats"></dd></div>
         </dl>
         <svg id="seal" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Segell: Junta Electoral, registrat">
           <defs><path id="arcTop" d="M 100,100 m -68,0 a 68,68 0 1,1 136,0 a 68,68 0 1,1 -136,0"/></defs>
@@ -539,7 +506,7 @@ body.dir-open #page{padding-bottom:120px}
       step: 1, noObs: false, restarts: 0, cap: 0,
       att: { turn: 0, submit: 0, logo: 0, captcha: 0 },
       pin: PIN0, llista: '',
-      form: { nom: '', sig: ['', '', '', ''], eslogan: '', objectiu: '', objSaved: false, ideologia: '', altres: '', afiliats: '1000', decl: false },
+      form: { nom: '', sig: ['', '', '', ''], eslogan: '', objectiu: '', objSaved: false, ideologia: '', decl: false },
       logo: '', logoOk: false, reg: ''
     };
   }
@@ -559,8 +526,7 @@ body.dir-open #page{padding-bottom:120px}
       if (/^\d{4}$/.test(str(s.pin))) d.pin = s.pin;
       d.llista = str(s.llista); d.logo = str(s.logo); d.reg = str(s.reg); d.logoOk = !!s.logoOk;
       if (s.form) {
-        ['nom', 'eslogan', 'objectiu', 'ideologia', 'altres'].forEach(function (k) { d.form[k] = str(s.form[k]); });
-        if (/^\d{1,4}$/.test(str(s.form.afiliats))) d.form.afiliats = s.form.afiliats;
+        ['nom', 'eslogan', 'objectiu', 'ideologia'].forEach(function (k) { d.form[k] = str(s.form[k]); });
         d.form.decl = !!s.form.decl; d.form.objSaved = !!s.form.objSaved;
         if (Array.isArray(s.form.sig)) for (var i = 0; i < 4; i++) d.form.sig[i] = /^[A-Z]$/.test(str(s.form.sig[i])) ? s.form.sig[i] : '';
       }
@@ -605,17 +571,10 @@ body.dir-open #page{padding-bottom:120px}
     if (holdIv) { clearInterval(holdIv); holdIv = null; }
   }
   function rnd(n) { return Math.floor(Math.random() * n); }
-  function roman(n) {
-    if (n <= 0) return 'N (nul·la)';
-    var m = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']], s = '';
-    m.forEach(function (p) { while (n >= p[0]) { s += p[1]; n -= p[0]; } });
-    return s;
-  }
-
   /* ================= Modal estil Windows ================= */
   var modalOpen = false, lastActivity = Date.now();
   function modal(o) {
-    $('winTitle').textContent = o.title; $('winIcon').textContent = o.icon || '⚠️'; $('winText').textContent = o.text;
+    $('winTitle').textContent = o.title; $('winIcon').textContent = o.icon || '⚠️'; $('winText').textContent = o.text; $('winText').removeAttribute('data-ans');
     var box = $('winBtns'); box.innerHTML = '';
     (o.buttons || [{ label: 'Acceptar' }]).forEach(function (b) {
       var btn = document.createElement('button');
@@ -667,16 +626,38 @@ body.dir-open #page{padding-bottom:120px}
     if (T.survey && obs() && S.step >= 2 && S.step <= 4) later(survey, T.survey * 1000);
     $('dirNoObs').checked = S.noObs;
   }
-  function survey() {
+  // Enquesta de satisfacció = una verificació de veritat o fals (apareix cada cop que s'ajorna)
+  var TF = [
+    { q: 'Aquesta Seu Electrònica és molt ràpida i còmoda.', a: false, bad: 'Mentida detectada. Aquí no hi ha cap ésser humà que ho cregui.' },
+    { q: 'Vostè ha llegit els termes i condicions.', a: false, bad: 'Mentida detectada. Només els robots llegeixen els termes i condicions.' },
+    { q: 'Els polítics sempre compleixen el que prometen.', a: false, bad: 'Això no és veritat ni a les enquestes de la Junta.' },
+    { q: "El cupo diari de torns és il·limitat.", a: false, bad: 'Aquest cupo, precisament, ja s\'ha esgotat.' },
+    { q: 'Un porró és un recipient per beure.', a: true, bad: 'Això és un porró, no una gerra de flors. Vostè és de ciutat?' },
+    { q: 'Les 14:00 són després de les 9:00.', a: true, bad: 'La Junta ha comprovat el rellotge: sí, ho són.' },
+    { q: "Per ser un ésser humà cal respirar.", a: true, bad: 'Això ho sap fins un robot. Sospitós.' },
+    { q: 'Aquesta pregunta és falsa.', a: null, bad: '' },
+    { q: 'Si respon «Fals» a aquesta pregunta, vostè no és un robot.', a: null, bad: '' }
+  ];
+  var tfLast = -1;
+  function survey(prefix) {
     if (modalOpen) { later(survey, T.surveyRetry * 1000); return; }
+    var i; do { i = rnd(TF.length); } while (i === tfLast && TF.length > 1); tfLast = i;
+    var q = TF[i];
     modal({
-      title: 'Enquesta de satisfacció', icon: '📋',
-      text: 'Vol participar en una breu enquesta de satisfacció sobre aquesta Seu Electrònica? (Durada estimada: 45 minuts)',
+      title: 'Enquesta de satisfacció · Verificació', icon: '📋',
+      text: (prefix ? prefix + '\n\n' : '') + 'Per participar en l\'enquesta de satisfacció, contesti: veritat o fals?\n\n«' + q.q + '»',
       buttons: [
-        { label: 'Sí, encantat', cb: function () { toast('Gràcies. La seva opinió és irrellevant.'); } },
+        { label: 'Veritat', cb: function () { answerTF(q, true); } },
+        { label: 'Fals', cb: function () { answerTF(q, false); } },
         { label: 'Potser més tard', cb: function () { toast("Li ho tornarem a preguntar d'aquí a " + T.surveyRetry + ' segons.'); later(survey, T.surveyRetry * 1000); } }
       ]
     });
+    $('winText').setAttribute('data-ans', q.a === null ? 'any' : (q.a ? 'veritat' : 'fals'));
+  }
+  function answerTF(q, v) {
+    if (q.a === null) { toast('Paradoxa detectada. Només un humà s\'ho pensaria tant. Gràcies.'); return; }
+    if (v === q.a) { toast('Resposta correcta. La seva opinió continua sent irrellevant.'); return; }
+    survey('✖ ' + q.bad + ' Torni-ho a provar.');
   }
 
   /* ================= PAS 1 · Cua ================= */
@@ -790,51 +771,18 @@ body.dir-open #page{padding-bottom:120px}
   });
 
   /* ================= PAS 3 · Sol·licitud ================= */
-  var KEYS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÇÀÈÉÒÓÍÚ·-'.split('');
-  var kbCount = 0, lastType = Date.now();
+  var lastType = Date.now();
   function initStep3() {
     setMsg('m3', null);
     ['nom', 'sigles', 'eslogan', 'objectiu', 'ideologia', 'decl'].forEach(function (k) { fieldErr(k, ''); });
-    renderNom(); buildKb(); buildReels();
+    $('f_nom').value = S.form.nom; buildReels();
     $('f_eslogan').value = S.form.eslogan;
     $('f_objectiu').value = S.form.objectiu; lockObjectiu(S.form.objSaved);
-    $('f_ideologia').value = S.form.ideologia; $('f_altres').value = S.form.altres; syncAltres();
-    renderAff(); renderHold();
+    $('f_ideologia').value = S.form.ideologia;
+    renderHold();
     $('btnSubmit').disabled = false;
     lastType = Date.now();
     every(decayTick, 1000);
-  }
-  function renderNom() {
-    var el = $('f_nom'); el.innerHTML = '';
-    if (!S.form.nom) { var ph = document.createElement('span'); ph.className = 'ph'; ph.textContent = 'Toqui les tecles per escriure… '; el.appendChild(ph); }
-    else el.appendChild(document.createTextNode(S.form.nom));
-    var c = document.createElement('span'); c.className = 'caret'; el.appendChild(c);
-  }
-  function buildKb() {
-    var kb = $('kb'); kb.innerHTML = ''; kbCount = 0;
-    KEYS.forEach(function (k) {
-      var b = document.createElement('button'); b.type = 'button'; b.textContent = k;
-      b.addEventListener('click', function () { typeKey(b.textContent); });
-      kb.appendChild(b);
-    });
-    var sp = document.createElement('button'); sp.type = 'button'; sp.className = 'sp'; sp.textContent = 'ESPAI';
-    sp.addEventListener('click', function () { typeKey(' '); });
-    var bk = document.createElement('button'); bk.type = 'button'; bk.className = 'bk'; bk.textContent = '⌫'; bk.setAttribute('aria-label', 'Esborrar');
-    bk.addEventListener('click', function () { S.form.nom = S.form.nom.slice(0, -1); save(); renderNom(); });
-    kb.appendChild(sp); kb.appendChild(bk);
-  }
-  function typeKey(ch) {
-    if (S.form.nom.length >= 30) { toast('Nom massa llarg (màxim 30 caràcters)'); return; }
-    S.form.nom += ch; save(); renderNom();
-    kbCount++;
-    if (obs() && kbCount % 10 === 0) {   // el teclat es "reorganitza" sol
-      var keys = $('kb').querySelectorAll('button:not(.sp):not(.bk)');
-      var a = rnd(keys.length), b = rnd(keys.length);
-      if (a === b) b = (a + 1) % keys.length;
-      var t = keys[a].textContent; keys[a].textContent = keys[b].textContent; keys[b].textContent = t;
-      keys[a].classList.add('swap'); keys[b].classList.add('swap');
-      later(function () { keys[a].classList.remove('swap'); keys[b].classList.remove('swap'); }, 700);
-    }
   }
   function buildReels() {
     var box = $('reels'); box.innerHTML = '';
@@ -872,26 +820,8 @@ body.dir-open #page{padding-bottom:120px}
   }
   $('f_objectiu').addEventListener('input', function () { S.form.objectiu = this.value; lastType = Date.now(); save(); });
   $('f_eslogan').addEventListener('input', function () { S.form.eslogan = this.value; save(); });
-  function syncAltres() { show($('altresBox'), S.form.ideologia === '__altres'); }
-  $('f_ideologia').addEventListener('change', function () { S.form.ideologia = this.value; save(); syncAltres(); });
-  $('f_altres').addEventListener('change', function () { S.form.altres = this.value; save(); });
-
-  function renderAff() {
-    var n = parseInt(S.form.afiliats, 10);
-    $('affNum').textContent = roman(n);
-    $('w_afiliats').hidden = !(n > 10);
-  }
-  Array.prototype.forEach.call($('affBtns').querySelectorAll('button'), function (b) {
-    b.addEventListener('click', function () {
-      var d = b.getAttribute('data-d'), n = parseInt(S.form.afiliats, 10);
-      if (d === 'reset') n = 1000; else n += parseInt(d, 10);
-      if (n < 0) {
-        if (obs()) { restart("Error 0x0099: Nombre d'afiliats negatiu. No es poden tenir afiliats de menys."); return; }
-        n = 0;
-      }
-      S.form.afiliats = String(n); save(); renderAff();
-    });
-  });
+  $('f_nom').addEventListener('input', function () { S.form.nom = this.value; save(); });
+  $('f_ideologia').addEventListener('change', function () { S.form.ideologia = this.value; save(); });
 
   // Declaració responsable: s'ha de mantenir premut
   var holdStart = 0;
@@ -929,7 +859,6 @@ body.dir-open #page{padding-bottom:120px}
     if (!f.objectiu.trim()) bad('objectiu', 'Error 0x0013: El camp «Objectiu principal del partit» és obligatori');
     else if (!f.objSaved) bad('objectiu', "Error 0x0016: El camp «Objectiu principal del partit» no s'ha desat");
     if (!f.ideologia) bad('ideologia', 'Error 0x0014: Ha de seleccionar una ideologia vàlida (i «Seleccioni…» no ho és)');
-    else if (f.ideologia === '__altres' && !f.altres) bad('ideologia', 'Error 0x0017: Ha triat «Altres» però no ha triat cap ideologia de la llista d\'altres');
     if (!f.decl) bad('decl', 'Error 0x00F1: Ha de signar la declaració responsable');
     if (errs.length) {
       setMsg('m3', 'err', 'La sol·licitud conté ' + errs.length + (errs.length === 1 ? ' error.' : ' errors.') + ' Revisi els camps marcats.');
@@ -1274,23 +1203,27 @@ body.dir-open #page{padding-bottom:120px}
         clr(); c.strokeStyle = '#111'; c.lineWidth = 3; c.lineCap = 'round'; c.lineJoin = 'round';
         function pt(e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * 280 / r.width, y: (e.clientY - r.top) * 170 / r.height }; }
         cv.addEventListener('pointerdown', function (e) {
-          e.preventDefault(); drawing = true; last = pt(e);
+          e.preventDefault(); if (h._done) return; drawing = true; last = pt(e);
           try { cv.setPointerCapture(e.pointerId); } catch (x) { /* res */ }
           c.beginPath(); c.moveTo(last.x, last.y); c.lineTo(last.x + 0.01, last.y); c.stroke();
         });
         cv.addEventListener('pointermove', function (e) { if (!drawing) return; var p = pt(e); c.beginPath(); c.moveTo(last.x, last.y); c.lineTo(p.x, p.y); c.stroke(); last = p; });
         ['pointerup', 'pointercancel'].forEach(function (ev) { cv.addEventListener(ev, function () { drawing = false; }); });
-        $('dClear').addEventListener('click', clr);
+        $('dClear').addEventListener('click', function () { if (!h._done) clr(); });
         h._check = function () {
+          if (h._done) return true;
+          if (!obs()) return true;
           var d = c.getImageData(0, 0, 280, 170).data, ink = 0, i;
           for (i = 0; i < d.length; i += 4) if (d[i] < 140) ink++;
           if (ink < 250) {
-            if (!obs()) return true;
             setMsg('m5', 'warn', "La IA no veu res. (Els robots tampoc dibuixen, però sí que fan excuses.)"); return 'handled';
           }
           var w = shuffle(['patata', 'cogombre', 'botijo', 'núvol', 'fantasma', 'tomàquet', 'ampolla de lleixiu']), p = 2 + rnd(7), a = 40 + rnd(25), b = 100 - p - a - 2;
-          capNote = 'Resultat de la IA: ' + w[0] + ' ' + a + '%, ' + w[1] + ' ' + b + '%, porró ' + p + "%. Confiança baixa, però s'accepta per llei de mínims.";
-          return true;
+          // Veredicte de la IA i botó «Continuar»
+          h._done = true; $('dClear').hidden = true;
+          setMsg('m5', 'ok', 'Resultat de la IA: ' + w[0] + ' ' + a + '%, ' + w[1] + ' ' + b + '%, porró ' + p + "%. Confiança baixa, però s'accepta per llei de mínims.");
+          $('btnCap').textContent = 'Continuar »';
+          return 'handled';
         };
       },
       check: function () { return $('cap')._check(); }
@@ -1301,7 +1234,7 @@ body.dir-open #page{padding-bottom:120px}
   function renderCap() {
     var c = CAPS[S.cap];
     $('capHead').textContent = 'Verificació ' + (S.cap + 1) + ' de ' + CAPS.length;
-    c.build(); setMsg('m5', null); $('btnCap').disabled = false; show($('btnCap'), !c.auto);
+    c.build(); setMsg('m5', null); $('btnCap').textContent = 'Verificar'; $('btnCap').disabled = false; show($('btnCap'), !c.auto);
   }
   function capResult(ok, failMsg) {
     if (!obs()) ok = true;
@@ -1343,8 +1276,7 @@ body.dir-open #page{padding-bottom:120px}
     });
     t('r_nom', f.nom.trim()); t('r_sigles', f.sig.join(''));
     t('r_eslogan', f.eslogan.trim() ? '«' + f.eslogan.trim() + '»' : ''); t('r_objectiu', f.objectiu.trim());
-    t('r_ideologia', f.ideologia === '__altres' ? f.altres : f.ideologia); t('r_llista', S.llista);
-    var n = parseInt(f.afiliats, 10); t('r_afiliats', roman(n) + ' (' + n + ')');
+    t('r_ideologia', f.ideologia); t('r_llista', S.llista);
     $('r_logo').src = S.logo || DEFAULT_LOGO;
     setMsg('m6', null);
   }
