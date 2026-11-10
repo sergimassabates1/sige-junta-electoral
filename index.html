@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b3d91">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Seu Electrònica · Junta Electoral de Sant Salvador</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#e6dcb8;color:#222;font-family:Verdana,Tahoma,Geneva,sans-serif;font-size:13px;line-height:1.4}
+a{color:#0033cc;text-decoration:underline}
+a:visited{color:#551a8b}
+#page{max-width:640px;margin:0 auto;background:#f6f1de;border-left:1px solid #9c9266;border-right:1px solid #9c9266;min-height:100vh}
+
+/* Capçalera */
+#head{background:linear-gradient(180deg,#5f93e0 0%,#1f56b8 45%,#0b3d91 100%);color:#fff;padding:8px 10px;display:flex;gap:10px;align-items:center;border-bottom:3px solid #062a66}
+#crest{flex:0 0 auto;width:58px;height:62px;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#crest svg{width:100%;height:100%;display:block}
+#head h1{margin:0;font-size:16px;line-height:1.2;text-shadow:1px 1px 0 #062a66;font-weight:bold}
+#head p{margin:3px 0 0;font-size:11px;color:#dbe8ff}
+
+/* Marquee */
+#aviso{background:#ffe400;border-top:1px solid #b09b00;border-bottom:1px solid #b09b00;overflow:hidden;white-space:nowrap;font-weight:bold;color:#7a0000;font-size:12px;padding:4px 0}
+#aviso span{display:inline-block;padding-left:100%;animation:mq 26s linear infinite}
+@keyframes mq{to{transform:translateX(-100%)}}
+
+#crumbs{padding:7px 10px;font-size:11px;background:#ece5c8;border-bottom:1px solid #b9ae82}
+#crumbs a{display:inline-block;padding:3px 0}
+#crumbs b{color:#444}
+
+#main{padding:10px}
+h2{font-size:15px;margin:2px 0 8px;color:#0b3d91;border-bottom:2px solid #0b3d91;padding-bottom:3px}
+p{margin:6px 0}
+
+/* Progrés */
+#prog{margin:0 0 12px}
+#prog .lbl{font-weight:bold;font-size:12px;margin-bottom:3px}
+#prog .bar{height:20px;border:2px inset #fff;background:#fff;padding:1px}
+#prog .fill{height:100%;width:0;background:repeating-linear-gradient(90deg,#0a246a 0 10px,#fff 10px 12px);transition:width .6s}
+
+fieldset{border:2px groove #fff;margin:0 0 12px;padding:8px 10px 12px;background:#faf7ea}
+legend{font-weight:bold;color:#0b3d91;padding:0 6px;font-size:13px}
+label{display:block;font-weight:bold;margin:10px 0 3px}
+label .req{color:#c00}
+.hint{font-weight:normal;color:#555;font-size:11px}
+input[type=text],input[type=password],input[type=number],input[type=tel],select,textarea{width:100%;font-family:inherit;font-size:16px;padding:8px 6px;min-height:44px;border:2px inset #d8d2b8;background:#fff;color:#000;border-radius:0}
+textarea{min-height:76px;resize:vertical}
+input[type=file]{width:100%;font-size:14px;padding:8px 4px;border:2px inset #d8d2b8;background:#fff;min-height:44px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:bold;margin-top:14px}
+.chk input{width:26px;height:26px;flex:0 0 auto;margin:0}
+.btn{display:inline-block;font-family:inherit;font-size:14px;font-weight:bold;color:#000;background:#d4d0c8;border:3px outset #f4f2ec;padding:10px 16px;min-height:46px;cursor:pointer;touch-action:manipulation;border-radius:0}
+.btn:active,.btn.on{border-style:inset;background:#c3bfb6}
+.btn[disabled]{color:#777;cursor:wait;text-shadow:1px 1px 0 #fff}
+.btn.small{font-size:12px;min-height:44px;padding:6px 10px;font-weight:normal}
+.btn.full{width:100%}
+.row{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+
+/* Missatges */
+.msg{margin:10px 0;padding:8px 10px 8px 34px;border:2px solid;position:relative;font-weight:bold;font-size:13px}
+.msg::before{position:absolute;left:8px;top:7px;font-size:17px}
+.msg.err{background:#ffe3e3;border-color:#c00;color:#a00000}.msg.err::before{content:"\274C"}
+.msg.warn{background:#fff6a8;border-color:#b59a00;color:#5a4a00}.msg.warn::before{content:"\26A0\FE0F"}
+.msg.info{background:#e1ecff;border-color:#2d5fb5;color:#0b2f73}.msg.info::before{content:"\2139\FE0F"}
+.msg.ok{background:#e0f5df;border-color:#2c8a2c;color:#14530f}.msg.ok::before{content:"\2705"}
+.ferr{color:#c00;font-weight:bold;font-size:12px;margin-top:3px}
+.fwarn{background:#fff6a8;border:1px solid #b59a00;color:#5a4a00;font-weight:bold;font-size:12px;margin-top:4px;padding:5px 7px}
+input.bad,select.bad,textarea.bad{border-color:#c00 #f99 #f99 #c00;background:#fff3f3}
+
+/* Torn */
+#turnPanel{background:#000;color:#33ff33;font-family:"Courier New",Courier,monospace;padding:12px;margin:12px 0;border:3px inset #999;text-align:center}
+#turnPanel .t1{font-size:24px;font-weight:bold;letter-spacing:2px}
+#turnPanel .t2{font-size:16px;margin-top:6px}
+#hourglass{font-size:46px;text-align:center;display:block;animation:flip 2.4s ease-in-out infinite}
+@keyframes flip{0%,40%{transform:rotate(0)}50%,90%{transform:rotate(180deg)}100%{transform:rotate(360deg)}}
+
+/* Logo */
+.carnet{display:inline-block;background:#fff;border:2px solid #777;padding:6px 6px 3px;box-shadow:2px 2px 0 #aaa;text-align:center}
+.carnet img{display:block;width:120px;height:120px;object-fit:cover;background:#ddd;border:1px solid #999}
+.carnet small{display:block;font-size:9px;color:#666;margin-top:3px;letter-spacing:1px}
+
+/* Captcha */
+#cap{border:2px solid #999;background:#fff;padding:8px;max-width:330px}
+#cap .top{background:#2d5fb5;color:#fff;padding:8px;margin:-8px -8px 8px}
+#cap .top small{display:block;font-size:11px;opacity:.9}
+#cap .top b{font-size:15px}
+#capGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.cell{aspect-ratio:1/1;border:2px solid #fff;background:#eee;padding:0;font-size:46px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;touch-action:manipulation;line-height:1}
+.cell svg{width:72%;height:72%}
+.cell[aria-pressed=true]{border-color:#2d5fb5;background:#cfe0ff}
+.cell[aria-pressed=true]::after{content:"\2713";position:absolute;top:2px;left:3px;width:20px;height:20px;border-radius:50%;background:#2d5fb5;color:#fff;font-size:13px;line-height:20px;text-align:center;font-family:Verdana,sans-serif}
+
+/* Justificant */
+#receipt{background:#fff;border:3px double #0b3d91;padding:14px 12px;position:relative;overflow:hidden}
+#receipt h3{margin:0 0 10px;text-align:center;font-size:19px;line-height:1.25;color:#0b3d91;text-transform:uppercase}
+.regno{font-family:"Courier New",Courier,monospace;font-size:18px;font-weight:bold;text-align:center;border:2px dashed #333;padding:10px 6px;margin:8px 0 14px;background:#fffbe0}
+.regno small{display:block;font-family:Verdana,sans-serif;font-size:11px;font-weight:normal;color:#555}
+.dl{margin:0}
+.dl div{margin:0 0 10px}
+.dl dt{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.5px}
+.dl dd{margin:0;font-size:19px;font-weight:bold;word-wrap:break-word;overflow-wrap:anywhere}
+.dl dd.big{font-size:26px;color:#0b3d91}
+.rwrap{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+#seal{width:170px;height:170px;transform:rotate(-13deg);margin:2px auto 0;display:block;mix-blend-mode:multiply;opacity:.92}
+#readAloud{font-size:17px;font-weight:bold;text-align:center;border-top:2px solid #0b3d91;padding-top:12px;margin-top:10px}
+
+/* Modal estil finestra clàssica */
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:14px;z-index:50}
+#win{width:100%;max-width:380px;background:#d4d0c8;border:3px outset #f4f2ec;box-shadow:4px 4px 0 rgba(0,0,0,.4)}
+#win .tb{background:linear-gradient(90deg,#0a246a,#a6caf0);color:#fff;font-weight:bold;padding:5px 8px;font-size:13px}
+#win .bd{padding:14px 12px;display:flex;gap:12px;align-items:flex-start;font-size:14px}
+#win .ic{font-size:30px;line-height:1}
+#win .bt{padding:0 12px 14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* Peu */
+#foot{border-top:3px double #8a8052;margin-top:16px;padding:12px 10px 22px;text-align:center;font-size:11px;color:#444;background:#ece5c8}
+#counter{display:inline-flex;gap:2px;margin-top:8px;padding:3px;background:#000;border:2px inset #888}
+#counter span{background:#000;color:#ff8a00;font-family:"Courier New",monospace;font-weight:bold;font-size:18px;padding:1px 4px;border:1px solid #442200}
+
+/* Director i toast */
+#director{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(30,30,30,.95);color:#ddd;font-size:11px;padding:6px 8px;border-top:1px solid #777;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;justify-content:center}
+#director b{font-weight:normal;opacity:.7}
+#director .g{display:flex;gap:4px;align-items:center}
+#director button{font-size:13px;min-width:44px;min-height:44px;background:#555;color:#fff;border:1px solid #999;padding:0 8px}
+#director label{display:flex;gap:6px;align-items:center;font-weight:normal;margin:0;color:#ddd}
+#director input{width:22px;height:22px}
+body.dir-open #page{padding-bottom:120px}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#333;color:#fff;padding:8px 14px;font-size:12px;z-index:60;max-width:90%;text-align:center}
+.nouser{-webkit-user-select:none;user-select:none}
+</style>
+</head>
+<body>
+<div id="page">
+
+  <div id="head">
+    <div id="crest" role="img" aria-label="Escut de la Junta Electoral de Sant Salvador">
+      <svg viewBox="0 0 64 68" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4e4e4"/><stop offset="1" stop-color="#8e8e8e"/></linearGradient>
+        </defs>
+        <path d="M32 3 L59 11 V35 C59 52 47 61 32 66 C17 61 5 52 5 35 V11 Z" fill="url(#sg)" stroke="#3a3a3a" stroke-width="2.5"/>
+        <path d="M32 8 L54 14 V35 C54 48 44 56 32 60 C20 56 10 48 10 35 V14 Z" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1"/>
+        <rect x="27" y="14" width="10" height="14" fill="#fff" stroke="#555" stroke-width="1" transform="rotate(-8 32 21)"/>
+        <path d="M17 28 H47 L44 52 H20 Z" fill="#2c4f93" stroke="#1a2f5c" stroke-width="2"/>
+        <rect x="25" y="31" width="14" height="3.5" rx="1.5" fill="#0a1530"/>
+        <rect x="15" y="25" width="34" height="5" fill="#3c63b3" stroke="#1a2f5c" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Seu Electrònica · Junta Electoral de Sant Salvador</h1>
+      <p>SIGE v2.3 · Sistema Integrat de Gestió Electoral</p>
+    </div>
+  </div>
+
+  <div id="aviso"><span>AVÍS: El servei estarà aturat per manteniment de 9:00 a 14:00, de dilluns a diumenge. Disculpin les molèsties.</span></div>
+
+  <div id="crumbs">
+    <a href="#" class="dead">Inici</a> › <a href="#" class="dead">Tràmits</a> › <a href="#" class="dead">Partits polítics</a> › <b>Inscripció al registre</b>
+  </div>
+
+  <div id="main">
+    <h2>Inscripció al Registre de Partits Polítics</h2>
+
+    <div id="prog">
+      <div class="lbl" id="progLbl">Pas 1 de 6 · 3% completat</div>
+      <div class="bar"><div class="fill" id="progFill"></div></div>
+    </div>
+
+    <!-- PAS 1 -->
+    <section id="s1" hidden>
+      <fieldset>
+        <legend>Pas 1 · Cita prèvia</legend>
+        <p>Per iniciar qualsevol tràmit és preceptiu obtenir un torn d'atenció. Prem el botó i esperi pacientment el seu torn.</p>
+        <div id="turnWait" hidden>
+          <span id="hourglass" aria-hidden="true">⏳</span>
+          <div id="turnPanel" aria-live="polite">
+            <div class="t1">TORN A047</div>
+            <div class="t2" id="turnTime">Espera estimada: 00:20</div>
+          </div>
+        </div>
+        <div id="m1"></div>
+        <div class="row"><button class="btn full" id="btnTurn" type="button">Sol·licitar torn</button></div>
+      </fieldset>
+    </section>
+
+    <!-- PAS 2 -->
+    <section id="s2" hidden>
+      <fieldset>
+        <legend>Pas 2 · Identificació</legend>
+        <p>Identifiqui's amb el PIN del seu Carnet de Militant.</p>
+        <p class="hint">Per la seva seguretat, la sessió caduca als 60 segons d'inactivitat.</p>
+        <label for="pin">PIN del Carnet de Militant <span class="req">*</span> <span class="hint">(4 xifres)</span></label>
+        <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="····">
+        <div class="ferr" id="e_pin" hidden></div>
+        <label for="llista">Candidatura <span class="req">*</span></label>
+        <select id="llista">
+          <option value="">Seleccioni…</option>
+          <option value="Llista A">Llista A</option>
+          <option value="Llista B">Llista B</option>
+        </select>
+        <div class="ferr" id="e_llista" hidden></div>
+        <div id="m2"></div>
+        <div class="row"><button class="btn full" id="btnLogin" type="button">Accedir</button></div>
+      </fieldset>
+    </section>
+
+    <!-- PAS 3 -->
+    <section id="s3" hidden>
+      <fieldset>
+        <legend>Pas 3 · Sol·licitud d'inscripció (Model EL-01)</legend>
+        <p class="hint">Els camps marcats amb <span style="color:#c00">*</span> són obligatoris.</p>
+        <form id="frm" novalidate autocomplete="off">
+          <label for="f_nom">Nom del partit <span class="req">*</span></label>
+          <input id="f_nom" type="text" autocomplete="off">
+          <div class="ferr" id="e_nom" hidden></div>
+
+          <label for="f_sigles">Sigles <span class="req">*</span> <span class="hint">(màxim 3 lletres)</span></label>
+          <input id="f_sigles" type="text" placeholder="Ex.: MPPU" autocomplete="off" autocapitalize="characters">
+          <div class="ferr" id="e_sigles" hidden></div>
+
+          <label for="f_eslogan">Eslògan <span class="req">*</span></label>
+          <input id="f_eslogan" type="text" autocomplete="off">
+          <div class="ferr" id="e_eslogan" hidden></div>
+
+          <label for="f_objectiu">Objectiu principal del partit <span class="req">*</span></label>
+          <textarea id="f_objectiu" placeholder="Ex.: Porró gratuït a tots els cims"></textarea>
+          <div class="ferr" id="e_objectiu" hidden></div>
+
+          <label for="f_ideologia">Ideologia <span class="req">*</span></label>
+          <select id="f_ideologia">
+            <option value="">Seleccioni…</option>
+            <option>Centre-centre</option>
+            <option>Centre una mica a la dreta però no gaire</option>
+            <option>Depèn del dia</option>
+            <option>La que digui la meva mare</option>
+            <option>Extrem centre</option>
+            <option>Porronista</option>
+            <option>No ho sé, venia a votar</option>
+          </select>
+          <div class="ferr" id="e_ideologia" hidden></div>
+
+          <label for="f_afiliats">Nombre d'afiliats</label>
+          <input id="f_afiliats" type="number" inputmode="numeric" min="0" step="1">
+          <div class="fwarn" id="w_afiliats" hidden>Compte: ha declarat més afiliats que persones a la taula</div>
+          <div class="ferr" id="e_afiliats" hidden></div>
+
+          <label class="chk" for="f_decl" style="font-weight:bold">
+            <input id="f_decl" type="checkbox">
+            <span>Declaro responsablement que no som un partit de broma <span class="req">*</span></span>
+          </label>
+          <div class="ferr" id="e_decl" hidden></div>
+
+          <div id="m3"></div>
+          <div class="row"><button class="btn full" id="btnSubmit" type="submit">Presentar sol·licitud</button></div>
+        </form>
+      </fieldset>
+    </section>
+
+    <!-- PAS 4 -->
+    <section id="s4" hidden>
+      <fieldset>
+        <legend>Pas 4 · Adjuntar el logo</legend>
+        <p>Adjunti l'emblema del partit. Pot fotografiar-lo directament amb la càmera del terminal.</p>
+        <p><b>Format admès: .BMP · Mida màxima: 50 KB</b></p>
+        <label for="logoFile">Fitxer del logo <span class="req">*</span></label>
+        <input id="logoFile" type="file" accept="image/*" capture="environment">
+        <div id="m4"></div>
+        <div id="logoOk" hidden style="margin-top:10px;text-align:center">
+          <div class="carnet"><img id="logoPrev" alt="Logo del partit"><small>FOTO CARNET · REG. PARTITS</small></div>
+        </div>
+        <div class="row">
+          <button class="btn" id="btnLogo" type="button">Adjuntar logo</button>
+          <button class="btn" id="btnLogoNext" type="button" hidden>Continuar »</button>
+        </div>
+      </fieldset>
+    </section>
+
+    <!-- PAS 5 -->
+    <section id="s5" hidden>
+      <fieldset>
+        <legend>Pas 5 · Verificació humana</legend>
+        <p>Per garantir que vostè no és un robot, completi la verificació.</p>
+        <div id="cap">
+          <div class="top"><small>Seleccioni totes les imatges que contenen un</small><b>porró</b></div>
+          <div id="capGrid"></div>
+        </div>
+        <div id="m5"></div>
+        <div class="row"><button class="btn full" id="btnCap" type="button">Verificar</button></div>
+      </fieldset>
+    </section>
+
+    <!-- PAS 6 -->
+    <section id="s6" hidden>
+      <div id="receipt">
+        <h3>Justificant d'inscripció al Registre de Partits</h3>
+        <div class="regno"><small>Número de registre</small><span id="r_reg">—</span></div>
+        <div class="rwrap">
+          <div class="carnet"><img id="r_logo" alt="Logo del partit"><small>FOTO CARNET</small></div>
+          <dl class="dl" style="flex:1 1 180px;min-width:0">
+            <div><dt>Partit</dt><dd class="big" id="r_nom"></dd></div>
+            <div><dt>Sigles</dt><dd id="r_sigles"></dd></div>
+          </dl>
+        </div>
+        <dl class="dl" style="margin-top:12px">
+          <div><dt>Eslògan</dt><dd id="r_eslogan"></dd></div>
+          <div><dt>Objectiu principal</dt><dd id="r_objectiu"></dd></div>
+          <div><dt>Ideologia</dt><dd id="r_ideologia"></dd></div>
+          <div><dt>Candidatura</dt><dd id="r_llista"></dd></div>
+          <div id="r_afwrap"><dt>Afiliats declarats</dt><dd id="r_afiliats"></dd></div>
+        </dl>
+        <svg id="seal" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Segell: Junta Electoral, registrat">
+          <defs><path id="arcTop" d="M 100,100 m -68,0 a 68,68 0 1,1 136,0 a 68,68 0 1,1 -136,0"/></defs>
+          <circle cx="100" cy="100" r="94" fill="none" stroke="#c0392b" stroke-width="6"/>
+          <circle cx="100" cy="100" r="86" fill="none" stroke="#c0392b" stroke-width="2"/>
+          <circle cx="100" cy="100" r="50" fill="none" stroke="#c0392b" stroke-width="3"/>
+          <text font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="17" fill="#c0392b">
+            <textPath href="#arcTop" startOffset="0" textLength="420" lengthAdjust="spacing">JUNTA ELECTORAL · REGISTRAT · </textPath>
+          </text>
+          <text x="100" y="98" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="15" fill="#c0392b">REGISTRAT</text>
+          <text x="100" y="118" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="13" fill="#c0392b">SS · 2026</text>
+        </svg>
+        <p id="readAloud">Llegeixi aquest justificant en veu alta davant de la Junta perquè la inscripció sigui efectiva.</p>
+      </div>
+      <div id="m6"></div>
+      <div class="row">
+        <button class="btn" id="btnPrint" type="button">Imprimir justificant</button>
+      </div>
+      <div class="row" style="margin-top:26px">
+        <button class="btn small" id="btnReset" type="button">Iniciar un nou tràmit</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="foot">
+    Optimitzat per a Internet Explorer 6.0 a 800×600 · Visitant núm. 000347 · Darrera actualització: 14/03/2004
+    <br>
+    <div id="counter" aria-label="Comptador de visites: 000347"><span>0</span><span>0</span><span>0</span><span>3</span><span>4</span><span>7</span></div>
+  </div>
+</div>
+
+<div id="ov" hidden>
+  <div id="win" role="alertdialog" aria-modal="true" aria-labelledby="winTitle" aria-describedby="winText">
+    <div class="tb" id="winTitle"></div>
+    <div class="bd"><div class="ic" id="winIcon"></div><div id="winText"></div></div>
+    <div class="bt" id="winBtns"></div>
+  </div>
+</div>
+
+<div id="director" hidden>
+  <b>Director</b>
+  <div class="g" id="dirSteps"></div>
+  <label><input type="checkbox" id="dirNoObs"> Sense obstacles</label>
+  <div class="g">
+    <button type="button" id="dirReset">Reiniciar</button>
+    <button type="button" id="dirClose">Tancar</button>
+  </div>
+</div>
+<div id="toast" hidden></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Configuració ---------- */
+  var HASH = (location.hash || '').toLowerCase();
+  var TEST = HASH.indexOf('test') > -1;
+  var T = TEST
+    ? { countdown: 2, inactivity: 6, proc: 150, verify: 150, advance: 200 }
+    : { countdown: 20, inactivity: 60, proc: 1800, verify: 1500, advance: 1200 };
+  var KEY = 'sige_v23_state';
+  var FAKE_PCT = [3, 14, 67, 8, 92, 100];
+
+  /* ---------- Estat i emmagatzematge (amb try/catch) ---------- */
+  function defaults() {
+    return {
+      step: 1, noObs: false,
+      att: { turn: 0, submit: 0, logo: 0, captcha: 0 },
+      pin: '', llista: '',
+      form: { nom: '', sigles: '', eslogan: '', objectiu: '', ideologia: '', afiliats: '', decl: false },
+      logo: '', logoOk: false, reg: ''
+    };
+  }
+  var memStore = null;
+  function loadState() {
+    var d = defaults(), raw = null;
+    try { raw = window.localStorage.getItem(KEY); } catch (e) { raw = memStore; }
+    if (!raw) return d;
+    try {
+      var s = JSON.parse(raw);
+      if (typeof s.step === 'number' && s.step >= 1 && s.step <= 6) d.step = s.step;
+      d.noObs = !!s.noObs;
+      ['turn', 'submit', 'logo', 'captcha'].forEach(function (k) {
+        if (s.att && typeof s.att[k] === 'number') d.att[k] = s.att[k];
+      });
+      ['pin', 'llista', 'logo', 'reg'].forEach(function (k) { if (typeof s[k] === 'string') d[k] = s[k]; });
+      d.logoOk = !!s.logoOk;
+      if (s.form) {
+        Object.keys(d.form).forEach(function (k) {
+          if (k === 'decl') d.form.decl = !!s.form.decl;
+          else if (typeof s.form[k] === 'string') d.form[k] = s.form[k];
+        });
+      }
+    } catch (e) { /* estat corrupte: es comença de nou */ }
+    return d;
+  }
+  var S = loadState();
+  function save() {
+    var raw = JSON.stringify(S);
+    memStore = raw;
+    try { window.localStorage.setItem(KEY, raw); }
+    catch (e) {
+      // Possible quota: es descarta el logo pesat i es reintenta
+      try { var c = JSON.parse(raw); c.logo = ''; window.localStorage.setItem(KEY, JSON.stringify(c)); } catch (e2) { /* sense persistència */ }
+    }
+  }
+
+  /* ---------- Utilitats DOM ---------- */
+  function $(id) { return document.getElementById(id); }
+  function show(el, on) { el.hidden = !on; }
+  function setMsg(id, kind, text) {
+    var el = $(id);
+    el.innerHTML = '';
+    if (!kind) return;
+    var d = document.createElement('div');
+    d.className = 'msg ' + kind;
+    d.setAttribute('role', kind === 'err' ? 'alert' : 'status');
+    d.textContent = text;
+    el.appendChild(d);
+  }
+  function fieldErr(name, text) {
+    var e = $('e_' + name);
+    if (!e) return;
+    e.textContent = text || '';
+    e.hidden = !text;
+    var inp = $('f_' + name) || $(name);
+    if (inp) { if (text) inp.classList.add('bad'); else inp.classList.remove('bad'); }
+  }
+  function toast(t) {
+    var el = $('toast');
+    el.textContent = t; el.hidden = false;
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { el.hidden = true; }, 2200);
+  }
+
+  var timers = [];
+  function later(fn, ms) { var id = setTimeout(fn, ms); timers.push(id); return id; }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; if (turnIv) { clearInterval(turnIv); turnIv = null; } }
+  var turnIv = null;
+
+  /* ---------- Modal estil Windows ---------- */
+  var modalOpen = false;
+  function modal(o) {
+    $('winTitle').textContent = o.title;
+    $('winIcon').textContent = o.icon || '⚠️';
+    $('winText').textContent = o.text;
+    var box = $('winBtns');
+    box.innerHTML = '';
+    (o.buttons || [{ label: 'Acceptar' }]).forEach(function (b) {
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'btn'; btn.textContent = b.label;
+      btn.addEventListener('click', function () { closeModal(); lastActivity = Date.now(); if (b.cb) b.cb(); });
+      box.appendChild(btn);
+    });
+    $('ov').hidden = false; modalOpen = true;
+    var f = box.querySelector('button'); if (f) f.focus();
+  }
+  function closeModal() { $('ov').hidden = true; modalOpen = false; }
+
+  /* ---------- Navegació entre passos ---------- */
+  function goStep(n) {
+    S.step = n;
+    if (n === 6 && !S.reg) S.reg = genReg();
+    save(); render(); window.scrollTo(0, 0);
+  }
+
+  function render() {
+    clearTimers();
+    for (var i = 1; i <= 6; i++) $('s' + i).hidden = (i !== S.step);
+    $('progLbl').textContent = 'Pas ' + S.step + ' de 6 · ' + FAKE_PCT[S.step - 1] + '% completat' + (S.step === 6 ? ' (±3%)' : '');
+    $('progFill').style.width = FAKE_PCT[S.step - 1] + '%';
+    lastActivity = Date.now();
+    if (S.step === 1) initStep1();
+    if (S.step === 2) initStep2();
+    if (S.step === 3) initStep3();
+    if (S.step === 4) initStep4();
+    if (S.step === 5) initStep5();
+    if (S.step === 6) initStep6();
+    syncDirector();
+  }
+
+  /* ---------- PAS 1 · Cita prèvia ---------- */
+  function fmt(sec) { return '00:' + (sec < 10 ? '0' : '') + sec; }
+  function initStep1() {
+    setMsg('m1', null);
+    show($('turnWait'), false);
+    $('btnTurn').disabled = false;
+    $('btnTurn').textContent = S.att.turn > 0 ? 'Sol·licitar torn de nou' : 'Sol·licitar torn';
+  }
+  $('btnTurn').addEventListener('click', function () {
+    var btn = $('btnTurn');
+    btn.disabled = true; setMsg('m1', null);
+    show($('turnWait'), true);
+    var end = Date.now() + T.countdown * 1000;
+    $('turnTime').textContent = 'Espera estimada: ' + fmt(T.countdown);
+    if (turnIv) clearInterval(turnIv);
+    turnIv = setInterval(function () {
+      var left = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+      $('turnTime').textContent = 'Espera estimada: ' + fmt(left);
+      if (left <= 0) {
+        clearInterval(turnIv); turnIv = null;
+        S.att.turn++; save();
+        if (S.att.turn === 1 && !S.noObs) {
+          show($('turnWait'), false);
+          btn.disabled = false; btn.textContent = 'Sol·licitar torn de nou';
+          setMsg('m1', 'err', "S'ha esgotat el cupo diari de torns. Torni-ho a provar.");
+        } else {
+          $('turnTime').textContent = "El seu torn! Passi a finestreta.";
+          later(function () { goStep(2); }, T.advance);
+        }
+      }
+    }, 250);
+  });
+
+  /* ---------- PAS 2 · Identificació ---------- */
+  function initStep2() {
+    setMsg('m2', null); fieldErr('pin', ''); fieldErr('llista', '');
+    $('pin').value = ''; $('llista').value = S.llista;
+    $('btnLogin').disabled = false;
+  }
+  $('pin').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 4); });
+  $('llista').addEventListener('change', function () { S.llista = this.value; save(); });
+  $('btnLogin').addEventListener('click', function () {
+    var pin = $('pin').value, ok = true;
+    fieldErr('pin', ''); fieldErr('llista', '');
+    if (!/^\d{4}$/.test(pin)) { fieldErr('pin', 'Error 0x0042: El PIN ha de tenir exactament 4 xifres'); ok = false; }
+    if (!$('llista').value) { fieldErr('llista', 'Error 0x0043: Seleccioni una candidatura'); ok = false; }
+    if (!ok) return;
+    S.pin = pin; S.llista = $('llista').value; save();
+    var b = $('btnLogin'); b.disabled = true; setMsg('m2', 'info', 'Validant credencials…');
+    later(function () { goStep(3); }, T.proc / 2);
+  });
+
+  /* ---------- PAS 3 · Sol·licitud ---------- */
+  var FIELDS = { nom: 'f_nom', sigles: 'f_sigles', eslogan: 'f_eslogan', objectiu: 'f_objectiu', ideologia: 'f_ideologia', afiliats: 'f_afiliats' };
+  function initStep3() {
+    setMsg('m3', null);
+    Object.keys(FIELDS).forEach(function (k) { $(FIELDS[k]).value = S.form[k]; fieldErr(k, ''); });
+    $('f_decl').checked = S.form.decl; fieldErr('decl', '');
+    liveSigles(); liveAfiliats();
+    $('btnSubmit').disabled = false;
+  }
+  function readForm() {
+    Object.keys(FIELDS).forEach(function (k) { S.form[k] = $(FIELDS[k]).value; });
+    S.form.decl = $('f_decl').checked;
+    save();
+  }
+  function liveSigles() {
+    var v = $('f_sigles').value.trim();
+    fieldErr('sigles', v.length > 3 ? 'Error 0x00E3: Les sigles superen el màxim permès' : '');
+  }
+  function liveAfiliats() {
+    var v = parseFloat($('f_afiliats').value);
+    $('w_afiliats').hidden = !(v > 10);
+  }
+  $('frm').addEventListener('input', function (e) {
+    readForm();
+    if (e.target.id === 'f_sigles') liveSigles();
+    if (e.target.id === 'f_afiliats') liveAfiliats();
+  });
+  $('frm').addEventListener('change', readForm);
+  $('frm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    readForm();
+    var f = S.form, errs = [];
+    function req(k, label, code) {
+      if (!f[k].trim()) { fieldErr(k, 'Error 0x' + code + ': El camp «' + label + '» és obligatori'); errs.push(k); } else fieldErr(k, '');
+    }
+    req('nom', 'Nom del partit', '0010'); req('sigles', 'Sigles', '0011');
+    if (f.sigles.trim().length > 3) { fieldErr('sigles', 'Error 0x00E3: Les sigles superen el màxim permès'); errs.push('sigles'); }
+    req('eslogan', 'Eslògan', '0012'); req('objectiu', 'Objectiu principal del partit', '0013');
+    if (!f.ideologia) { fieldErr('ideologia', 'Error 0x0014: Ha de seleccionar una ideologia vàlida (i «Seleccioni…» no ho és)'); errs.push('ideologia'); } else fieldErr('ideologia', '');
+    var af = f.afiliats.trim();
+    if (af !== '' && !(/^\d+$/.test(af))) { fieldErr('afiliats', "Error 0x0015: El nombre d'afiliats ha de ser un enter positiu"); errs.push('afiliats'); } else fieldErr('afiliats', '');
+    if (!f.decl) { fieldErr('decl', 'Error 0x00F1: Ha de marcar la declaració responsable'); errs.push('decl'); } else fieldErr('decl', '');
+    if (errs.length) {
+      setMsg('m3', 'err', 'La sol·licitud conté ' + errs.length + (errs.length === 1 ? ' error.' : ' errors.') + ' Revisi els camps marcats.');
+      var first = $(FIELDS[errs[0]] || 'f_' + errs[0]);
+      if (first) { first.scrollIntoView({ block: 'center' }); try { first.focus({ preventScroll: true }); } catch (x) { first.focus(); } }
+      return;
+    }
+    setMsg('m3', null);
+    S.att.submit++; save();
+    if (S.att.submit === 1 && !S.noObs) {
+      modal({ title: 'Seu Electrònica - Error', icon: '⛔', text: 'Error 500: el servei no està disponible en aquest horari' });
+      return;
+    }
+    var b = $('btnSubmit'); b.disabled = true; setMsg('m3', 'info', 'Tramitant la sol·licitud… no tanqui el navegador.');
+    later(function () { goStep(4); }, T.proc);
+  });
+
+  /* ---------- PAS 4 · Logo ---------- */
+  var DEFAULT_LOGO = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#e9e3c9"/>' +
+    '<path d="M60 14 L100 26 V62 C100 86 82 98 60 106 C38 98 20 86 20 62 V26 Z" fill="#9a9a9a" stroke="#444" stroke-width="3"/>' +
+    '<path d="M36 46 H84 L80 84 H40 Z" fill="#2c4f93" stroke="#1a2f5c" stroke-width="3"/><rect x="48" y="52" width="24" height="6" rx="3" fill="#0a1530"/></svg>');
+  function initStep4() {
+    setMsg('m4', null);
+    $('logoFile').value = '';
+    var done = S.logoOk && S.logo;
+    show($('logoOk'), !!done);
+    if (done) $('logoPrev').src = S.logo;
+    show($('btnLogoNext'), !!done);
+    show($('btnLogo'), !done);
+    $('btnLogo').disabled = false;
+  }
+  function shrink(file, cb) {
+    var url = null, img = new Image();
+    try { url = URL.createObjectURL(file); } catch (e) { cb(null); return; }
+    img.onload = function () {
+      try {
+        var max = 160, w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+        var k = Math.min(1, max / Math.max(w, h));
+        var c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        var out = c.toDataURL('image/jpeg', 0.8);
+        URL.revokeObjectURL(url); cb(out);
+      } catch (e) { cb(null); }
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); cb(null); };
+    img.src = url;
+  }
+  $('btnLogo').addEventListener('click', function () {
+    var file = $('logoFile').files && $('logoFile').files[0];
+    if (!file) { setMsg('m4', 'warn', 'No s\'ha seleccionat cap fitxer. Premi «Examinar…» o faci la foto primer.'); return; }
+    S.att.logo++; save();
+    if (!S.noObs && S.att.logo === 1) { setMsg('m4', 'err', 'Format no admès. Només .BMP'); return; }
+    if (!S.noObs && S.att.logo === 2) { setMsg('m4', 'err', 'El fitxer supera els 50 KB'); return; }
+    var b = $('btnLogo'); b.disabled = true; setMsg('m4', 'info', 'Processant imatge…');
+    shrink(file, function (data) {
+      S.logo = data || DEFAULT_LOGO; S.logoOk = true; save();
+      b.disabled = false;
+      setMsg('m4', 'ok', data ? 'Fitxer acceptat correctament.' : "Fitxer acceptat (s'ha substituït per un emblema genèric en no poder-se llegir).");
+      $('logoPrev').src = S.logo; show($('logoOk'), true);
+      show($('btnLogoNext'), true); show($('btnLogo'), false);
+    });
+  });
+  $('btnLogoNext').addEventListener('click', function () { goStep(5); });
+
+  /* ---------- PAS 5 · Captcha ---------- */
+  var PORRO_SVG = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M26 18 Q22 30 30 38 Q44 46 46 66 L46 84 Q46 90 54 90 L68 90 Q76 90 76 82 L76 62 Q76 44 60 36 Q52 32 52 24 L56 18 Z" fill="#c9a24a" stroke="#6b4e10" stroke-width="3"/><path d="M82 30 Q96 30 94 44 Q92 54 80 56" fill="none" stroke="#6b4e10" stroke-width="4" stroke-linecap="round"/><ellipse cx="26" cy="18" rx="6" ry="3" fill="#6b4e10"/></svg>';
+  var REGADORA_SVG = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="22" y="40" width="44" height="40" rx="6" fill="#4d9bd6" stroke="#1e4f78" stroke-width="3"/><path d="M66 56 L92 30 L96 36 L68 70" fill="#4d9bd6" stroke="#1e4f78" stroke-width="3" stroke-linejoin="round"/><path d="M22 48 Q8 48 8 62 Q8 74 22 72" fill="none" stroke="#1e4f78" stroke-width="4"/><path d="M30 40 Q44 18 58 40" fill="none" stroke="#1e4f78" stroke-width="4"/></svg>';
+  var CAP_ITEMS = [
+    { e: '🏺' }, { svg: PORRO_SVG, l: 'objecte estrany' }, { e: '🍾' },
+    { e: '🐈' }, { svg: REGADORA_SVG, l: 'regadora' }, { e: '🍼' },
+    { e: '🍶' }, { e: '🥛' }, { e: '🧴' }
+  ];
+  function buildCap() {
+    var g = $('capGrid'); g.innerHTML = '';
+    CAP_ITEMS.forEach(function (it, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'cell nouser'; b.setAttribute('aria-pressed', 'false');
+      b.setAttribute('aria-label', 'Imatge ' + (i + 1));
+      if (it.svg) b.innerHTML = it.svg; else b.textContent = it.e;
+      b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); });
+      g.appendChild(b);
+    });
+  }
+  function initStep5() { buildCap(); setMsg('m5', null); $('btnCap').disabled = false; }
+  $('btnCap').addEventListener('click', function () {
+    var b = $('btnCap'); b.disabled = true; setMsg('m5', 'info', 'Verificant…');
+    S.att.captcha++; save();
+    later(function () {
+      if (S.att.captcha === 1 && !S.noObs) {
+        buildCap(); b.disabled = false;
+        setMsg('m5', 'err', 'Verificació fallida. Sembla que vostè és un robot.');
+      } else {
+        setMsg('m5', 'ok', 'Verificació superada. Benvingut, ésser humà.');
+        later(function () { goStep(6); }, T.advance);
+      }
+    }, T.verify);
+  });
+
+  /* ---------- PAS 6 · Justificant ---------- */
+  function genReg() {
+    function r(n) { return Math.floor(Math.random() * n); }
+    var num = ('000000' + (1 + r(999))).slice(-6);
+    var L = 'ABCDEFGHJKLMNPRSTUVXZ'.charAt(r(21));
+    var suf = ['bis', 'ter', 'quater', 'quinquies'][r(4)];
+    return 'RP/2026/SS/' + num + '-' + L + '/' + suf + '/L-' + (1 + r(9)) + '/F-' + (10 + r(990));
+  }
+  function initStep6() {
+    var f = S.form;
+    function t(id, v) { $(id).textContent = v || '—'; }
+    $('r_reg').innerHTML = ''; (S.reg || '—').split('/').forEach(function (part, i) { if (i) { $('r_reg').appendChild(document.createTextNode('/')); $('r_reg').appendChild(document.createElement('wbr')); } $('r_reg').appendChild(document.createTextNode(part)); }); t('r_nom', f.nom.trim()); t('r_sigles', f.sigles.trim().toUpperCase());
+    t('r_eslogan', f.eslogan.trim() ? '«' + f.eslogan.trim() + '»' : ''); t('r_objectiu', f.objectiu.trim());
+    t('r_ideologia', f.ideologia); t('r_llista', S.llista);
+    t('r_afiliats', f.afiliats.trim()); $('r_afwrap').hidden = !f.afiliats.trim();
+    $('r_logo').src = S.logo || DEFAULT_LOGO;
+    setMsg('m6', null);
+  }
+  $('btnPrint').addEventListener('click', function () {
+    modal({ title: 'Impressió', icon: '🖨️', text: 'La impressora del registre està fora de servei des del 2009' });
+  });
+  $('btnReset').addEventListener('click', function () {
+    modal({
+      title: 'Confirmació', icon: '❓',
+      text: 'Això esborrarà totes les dades del tràmit actual i començarà de nou. Vol continuar?',
+      buttons: [
+        { label: 'Sí, esborrar', cb: function () { var keep = S.noObs; S = defaults(); S.noObs = keep; save(); render(); window.scrollTo(0, 0); } },
+        { label: 'No' }
+      ]
+    });
+  });
+
+  /* ---------- Caducitat de sessió (passos 2 i 3) ---------- */
+  var lastActivity = Date.now();
+  ['pointerdown', 'touchstart', 'keydown', 'input', 'click', 'scroll'].forEach(function (ev) {
+    window.addEventListener(ev, function () { lastActivity = Date.now(); }, { passive: true, capture: true });
+  });
+  setInterval(function () {
+    if (modalOpen || S.noObs || (S.step !== 2 && S.step !== 3)) return;
+    if (Date.now() - lastActivity > T.inactivity * 1000) {
+      lastActivity = Date.now();
+      modal({
+        title: 'Sessió caducada', icon: '⌛',
+        text: 'Sessió caducada per inactivitat',
+        buttons: [{ label: 'Acceptar', cb: function () { goStep(2); } }]
+      });
+    }
+  }, 1000);
+
+  /* ---------- Enllaços decoratius ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('a.dead'), function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); toast('🚧 Pàgina en construcció des del 2004'); });
+  });
+
+  /* ---------- Mode director ---------- */
+  var taps = 0, lastTap = 0;
+  $('crest').addEventListener('click', function () {
+    var n = Date.now();
+    taps = (n - lastTap < 1500) ? taps + 1 : 1; lastTap = n;
+    if (taps >= 5) { taps = 0; toggleDirector(); }
+  });
+  function toggleDirector(force) {
+    var d = $('director');
+    d.hidden = (typeof force === 'boolean') ? !force : !d.hidden;
+    document.body.classList.toggle('dir-open', !d.hidden);
+    syncDirector();
+  }
+  function syncDirector() { $('dirNoObs').checked = S.noObs; }
+  (function () {
+    var box = $('dirSteps');
+    for (var i = 1; i <= 6; i++) (function (n) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = n;
+      b.addEventListener('click', function () { goStep(n); });
+      box.appendChild(b);
+    })(i);
+  })();
+  $('dirNoObs').addEventListener('change', function () { S.noObs = this.checked; save(); });
+  $('dirReset').addEventListener('click', function () { S.att = { turn: 0, submit: 0, logo: 0, captcha: 0 }; S.logoOk = false; save(); toast('Comptadors reiniciats'); render(); });
+  $('dirClose').addEventListener('click', function () { toggleDirector(false); });
+  function checkHash() { if ((location.hash || '').toLowerCase().indexOf('director') > -1) toggleDirector(true); }
+  window.addEventListener('hashchange', checkHash);
+
+  /* ---------- Arrencada ---------- */
+  render();
+  checkHash();
+
+  // Memòria cau fora de línia (opcional: la pàgina funciona igual si falla)
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', function () {
+      try { navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) { /* res */ }
+    });
+  }
+})();
+</script>
+</body>
+</html>
