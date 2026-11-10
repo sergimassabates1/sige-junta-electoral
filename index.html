@@ -149,25 +149,60 @@ select[size] option{padding:8px 6px}
 .carnet small{display:block;font-size:9px;color:#666;margin-top:3px;letter-spacing:1px}
 
 /* Captchas */
-#cap{border:2px solid #999;background:#fff;padding:8px;max-width:330px}
-#cap .top{background:#2d5fb5;color:#fff;padding:8px;margin:-8px -8px 8px}
-#cap .top small{display:block;font-size:11px;opacity:.9}
-#cap .top b{font-size:15px}
+.capbox{border:2px solid #999;background:#fff;padding:8px;max-width:330px}
+.capbox:empty{display:none}
+.capbox .top{background:#2d5fb5;color:#fff;padding:8px;margin:-8px -8px 8px}
+.capbox .top small{display:block;font-size:11px;opacity:.9}
+.capbox .top b{font-size:15px}
 .cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-.cgrid.f6{grid-template-columns:repeat(6,1fr);gap:2px}
 .cell{aspect-ratio:1/1;border:2px solid #fff;background:#eee;padding:0;font-size:42px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;touch-action:manipulation;line-height:1;-webkit-user-select:none;user-select:none}
-.f6 .cell{font-size:24px;border-width:1px}
 .cell svg{width:76%;height:76%}
-.f6 .cell svg{width:84%;height:84%}
 .cell[aria-pressed=true]{border-color:#2d5fb5;background:#cfe0ff}
 .cell[aria-pressed=true]::after{content:"\2713";position:absolute;top:2px;left:3px;width:20px;height:20px;border-radius:50%;background:#2d5fb5;color:#fff;font-size:13px;line-height:20px;text-align:center;font-family:Verdana,sans-serif}
-.cell.no{background:#ffd6d6}
-#capTxt svg{display:block;width:100%;height:auto;background:#f0ead0;border:1px solid #aaa}
-#capTxt input{margin-top:8px}
-#puz{position:relative;width:300px;max-width:100%;height:150px;border:1px solid #666;overflow:hidden;background-size:300px 150px}
-#puz .hole{position:absolute;width:60px;height:60px;background:rgba(0,0,0,.6);box-shadow:inset 0 0 8px #000}
-#puz .piece{position:absolute;width:60px;height:60px;background-size:300px 150px;border:2px solid #fff;box-shadow:0 0 6px #000;left:0}
-#puzRange{width:300px;max-width:100%;margin-top:8px;display:block}
+.capTxt svg{display:block;width:100%;height:auto;background:#f0ead0;border:1px solid #aaa}
+.capTxt input{margin-top:8px}
+.puz{position:relative;width:300px;max-width:100%;height:150px;border:1px solid #666;overflow:hidden;background-size:300px 150px}
+.puz .hole{position:absolute;width:60px;height:60px;background:rgba(0,0,0,.6);box-shadow:inset 0 0 8px #000}
+.puz .piece{position:absolute;width:60px;height:60px;background-size:300px 150px;border:2px solid #fff;box-shadow:0 0 6px #000;left:0}
+.puzRange{width:300px;max-width:100%;margin-top:8px;display:block}
+/* 1 · casella fugitiva */
+.fugArea{position:relative;height:130px;border:1px solid #bbb;background:repeating-linear-gradient(45deg,#f4f4f4 0 8px,#fff 8px 16px);overflow:hidden}
+.fug{position:absolute;display:flex;align-items:center;gap:8px;border:1px solid #c1c1c1;background:#f9f9f9;padding:8px 10px;font:14px Arial,sans-serif;color:#222;box-shadow:0 1px 3px rgba(0,0,0,.3);cursor:pointer;touch-action:manipulation;transition:left .18s,top .18s;max-width:calc(100% - 8px);text-align:left}
+.fb{flex:0 0 auto;width:24px;height:24px;border:2px solid #c1c1c1;background:#fff;display:inline-block;position:relative}
+.fug.on .fb{background:#2d8a2d;border-color:#2d8a2d}
+.fug.on .fb::after{content:"\2713";position:absolute;inset:0;color:#fff;font-size:18px;line-height:20px;text-align:center}
+/* 2 · cinta de porrons */
+.belt{position:relative;height:74px;overflow:hidden;border:2px solid #555;border-bottom:8px solid #444;background:repeating-linear-gradient(90deg,#d9d6c8 0 14px,#cfcbbb 14px 28px)}
+.bi{position:absolute;top:8px;left:100%;width:52px;height:52px;display:flex;align-items:center;justify-content:center;font-size:36px;line-height:1}
+.bi svg{width:100%;height:100%}
+@keyframes beltmove{from{left:100%}to{left:-64px}}
+.stepper{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.stepper output{min-width:34px;text-align:center;font:bold 22px Verdana,sans-serif}
+.stepper .btn:not(.tiny){min-width:44px}
+/* 3 · abocar el porró */
+.pour{position:relative;height:150px;margin-bottom:8px;overflow:hidden;background:#f3efe0;border:1px solid #bbb}
+.pporro{position:absolute;left:34px;top:-30px;width:96px;height:96px;transform-origin:50% 60%;transition:transform .25s}
+.pour.pouring .pporro{transform:rotate(80deg)}
+.pporro svg{width:100%;height:100%}
+.stream{position:absolute;left:130px;top:60px;width:4px;height:80px;background:#e8b923;opacity:0;transition:opacity .1s}
+.pour.pouring .stream{opacity:.9}
+.glass{position:absolute;left:112px;bottom:8px;width:46px;height:70px;border:3px solid #555;border-top:0;border-radius:0 0 6px 6px;background:rgba(255,255,255,.6)}
+.liq{position:absolute;left:0;right:0;bottom:0;height:0;background:#e8b923;box-shadow:inset 0 6px 0 rgba(255,255,255,.7)}
+.mark{position:absolute;left:-12px;right:-12px;height:0;border-top:3px dashed #1f8a1f;pointer-events:none}
+#pourBtn{width:100%;min-height:52px;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+/* 4 · ordenar promesa */
+.ord{display:flex;flex-direction:column;gap:5px}
+.ob{display:flex;align-items:center;gap:8px;text-align:left;border:2px solid #aaa;background:#f4f4f4;padding:8px;font:13px Arial,sans-serif;color:#111;touch-action:manipulation;cursor:pointer}
+.ob .n{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:#ddd;color:#fff;text-align:center;line-height:24px;font:bold 14px Verdana,sans-serif}
+.ob[aria-pressed=true]{border-color:#2d5fb5;background:#e2ecff}
+.ob[aria-pressed=true] .n{background:#2d5fb5}
+/* 5 · dibuixar porró */
+.dcan{display:block;width:100%;max-width:280px;aspect-ratio:280/170;border:2px inset #999;background:#fff;touch-action:none;cursor:crosshair}
+/* Quadrícula del paint */
+#paintBox{position:relative;width:100%;max-width:300px}
+#gridOv{position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;background-image:linear-gradient(to right,rgba(40,60,160,.4) 1px,transparent 1px),linear-gradient(to bottom,rgba(40,60,160,.4) 1px,transparent 1px);background-size:calc(100% / 15) calc(100% / 11)}
+#gridOv[hidden]{display:none}
+#gridPanel[hidden]{display:none}
 
 /* Justificant */
 #receipt{background:#fff;border:3px double #0b3d91;padding:14px 12px;position:relative;overflow:hidden}
@@ -356,10 +391,16 @@ body.dir-open #page{padding-bottom:120px}
       <fieldset>
         <legend>Pas 4 · Dibuixar el logo</legend>
         <p>Dibuixi l'emblema del partit amb el pinzell oficial de la Junta.</p>
-        <p class="hint">Pinzell calibrat per a persones esquerranes (invertit). Pols no inclòs.</p>
+        <p class="hint">Pinzell calibrat per a persones esquerranes (invertit). Pols no inclòs. Quadrícula disponible, prèvia verificació humana.</p>
         <div id="paintWrap">
-          <canvas id="paint" width="300" height="220"></canvas>
-          <div class="palette"><span id="pal" style="display:contents"></span><input type="range" id="brush" min="1" max="12" value="2" aria-label="Gruix"></div>
+          <div id="paintBox"><canvas id="paint" width="300" height="220"></canvas><div id="gridOv" hidden></div></div>
+          <div class="palette"><span id="pal" style="display:contents"></span><input type="range" id="brush" min="1" max="12" value="2" aria-label="Gruix"><button type="button" class="btn tiny" id="btnGrid">Quadrícula: no</button></div>
+          <div id="gridPanel" hidden>
+            <div class="hint" style="margin:8px 0 4px">L'activació de la quadrícula requereix verificació humana (art. 14 bis).</div>
+            <div id="gridCap" class="capbox"></div>
+            <div id="mG"></div>
+            <div class="row act"><button class="btn" id="btnGridOk" type="button">Verificar</button><button class="btn tiny" id="btnGridNo" type="button">Deixar-ho</button></div>
+          </div>
         </div>
         <div id="m4"></div>
         <div id="logoOk" hidden style="margin-top:10px;text-align:center">
@@ -380,7 +421,7 @@ body.dir-open #page{padding-bottom:120px}
         <legend>Pas 5 · Verificació humana</legend>
         <p>Per garantir que vostè no és un robot, completi les proves de verificació.</p>
         <div class="hint" id="capHead" style="margin:6px 0 4px;color:#555;font-size:11px;font-weight:bold">Verificació 1 de 5</div>
-        <div id="cap"></div>
+        <div id="cap" class="capbox"></div>
         <div id="m5"></div>
         <div class="row act"><button class="btn" id="btnCap" type="button">Verificar</button><button class="btn tiny dec" type="button">Cancel·lar</button></div>
       </fieldset>
@@ -464,8 +505,8 @@ body.dir-open #page{padding-bottom:120px}
   // Si un error de verificació (pas 5) ha de reiniciar només la verificació ('verificacio') o tot el tràmit ('tramit')
   var CAPTCHA_FAIL_RESTART = 'verificacio';
   var T = TEST
-    ? { countdown: 2, inactivity: 6, proc: 150, verify: 150, advance: 200, decay: 4, hold: 300, survey: 0, freeze: true, queue: 3 }
-    : { countdown: 10, inactivity: 60, proc: 1800, verify: 1200, advance: 1200, decay: 6, hold: 3000, survey: 45, freeze: false, queue: 12 };
+    ? { countdown: 2, inactivity: 6, proc: 150, verify: 150, advance: 600, decay: 4, hold: 300, survey: HASH.indexOf('survey') > -1 ? 1 : 0, surveyRetry: 5, dodges: 1, freeze: true, queue: 3 }
+    : { countdown: 10, inactivity: 60, proc: 1800, verify: 1200, advance: 1200, decay: 6, hold: 3000, survey: 45, surveyRetry: 5, dodges: 3, freeze: false, queue: 12 };
   var KEY = 'sige_v24_state';
   var FAKE_PCT = [3, 14, 67, 8, 92, 100];
   var PIN0 = '0000';
@@ -593,6 +634,8 @@ body.dir-open #page{padding-bottom:120px}
     $('anul').hidden = !S.restarts;
     $('anul').textContent = 'Expedients anul·lats en aquesta sessió: ' + S.restarts;
     lastActivity = Date.now();
+    if (S.step !== 5) $('cap').innerHTML = '';
+    if (S.step !== 4) $('gridCap').innerHTML = '';
     if (S.step === 1) initStep1();
     if (S.step === 2) initStep2();
     if (S.step === 3) initStep3();
@@ -603,13 +646,13 @@ body.dir-open #page{padding-bottom:120px}
     $('dirNoObs').checked = S.noObs;
   }
   function survey() {
-    if (modalOpen) return;
+    if (modalOpen) { later(survey, T.surveyRetry * 1000); return; }
     modal({
       title: 'Enquesta de satisfacció', icon: '📋',
       text: 'Vol participar en una breu enquesta de satisfacció sobre aquesta Seu Electrònica? (Durada estimada: 45 minuts)',
       buttons: [
         { label: 'Sí, encantat', cb: function () { toast('Gràcies. La seva opinió és irrellevant.'); } },
-        { label: 'Potser més tard', cb: function () { toast('Li ho tornarem a preguntar.'); } }
+        { label: 'Potser més tard', cb: function () { toast("Li ho tornarem a preguntar d'aquí a " + T.surveyRetry + ' segons.'); later(survey, T.surveyRetry * 1000); } }
       ]
     });
   }
@@ -908,8 +951,23 @@ body.dir-open #page{padding-bottom:120px}
   });
   paint.addEventListener('pointermove', function (e) { if (!drawing) return; var p = pt(e); stroke(lastPt, p); lastPt = p; });
   ['pointerup', 'pointercancel'].forEach(function (ev) { paint.addEventListener(ev, function () { drawing = false; }); });
+  /* Quadrícula: activar-la exigeix superar una prova de verificació humana */
+  var gridOn = false, gridCap = null;
+  function setGrid(on) { gridOn = on; show($('gridOv'), on); $('btnGrid').textContent = 'Quadrícula: ' + (on ? 'sí' : 'no'); }
+  function gridAsk() { gridCap = MINI[rnd(MINI.length)]; gridCap.build($('gridCap')); setMsg('mG', null); show($('gridPanel'), true); }
+  $('btnGrid').addEventListener('click', function () {
+    if (gridOn) { setGrid(false); return; }
+    if (!obs()) { setGrid(true); return; }
+    gridAsk();
+  });
+  $('btnGridOk').addEventListener('click', function () {
+    var r = gridCap.check($('gridCap'));
+    if (r === true) { show($('gridPanel'), false); $('gridCap').innerHTML = ''; setGrid(true); toast('Quadrícula activada. Gràcies per demostrar que és humà.'); return; }
+    gridAsk(); setMsg('mG', 'err', r + ' Se li ofereix una nova prova.');
+  });
+  $('btnGridNo').addEventListener('click', function () { show($('gridPanel'), false); $('gridCap').innerHTML = ''; });
   function initStep4() {
-    setMsg('m4', null);
+    setMsg('m4', null); setGrid(false); show($('gridPanel'), false);
     var done = S.logoOk && S.logo;
     show($('paintWrap'), !done); show($('paintBtns'), !done); show($('logoOk'), !!done); show($('btnLogoNext'), !!done);
     if (done) $('logoPrev').src = S.logo; else clearPaint();
@@ -940,7 +998,6 @@ body.dir-open #page{padding-bottom:120px}
   var SVG_JUG = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M30 20 Q24 20 24 28 L24 80 Q24 92 36 92 H58 Q70 92 70 80 V28 Q70 20 64 20 Z" fill="#c8753c" stroke="#4a2410" stroke-width="2.5"/><path d="M70 34 Q92 34 92 56 Q92 76 70 76" fill="none" stroke="#4a2410" stroke-width="6"/><ellipse cx="47" cy="20" rx="17" ry="4" fill="#7a3f17" stroke="#4a2410" stroke-width="2"/></svg>';
   var SVG_WATER = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="22" y="40" width="44" height="40" rx="6" fill="#4d9bd6" stroke="#1e4f78" stroke-width="3"/><path d="M66 56 L92 30 L96 36 L68 70" fill="#4d9bd6" stroke="#1e4f78" stroke-width="3" stroke-linejoin="round"/><path d="M22 48 Q8 48 8 62 Q8 74 22 72" fill="none" stroke="#1e4f78" stroke-width="4"/><path d="M30 40 Q44 18 58 40" fill="none" stroke="#1e4f78" stroke-width="4"/></svg>';
 
-  var CAP_PORRO = 'porro';
   var sceneSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1a3a"/><stop offset="1" stop-color="#4b6bb8"/></linearGradient></defs>' +
     '<rect width="300" height="150" fill="url(#g)"/><circle cx="44" cy="34" r="16" fill="#f7f1c9"/>' +
     '<g fill="#fff"><circle cx="100" cy="20" r="1.5"/><circle cx="140" cy="40" r="1.2"/><circle cx="210" cy="16" r="1.6"/><circle cx="270" cy="30" r="1.3"/><circle cx="170" cy="12" r="1.1"/></g>' +
@@ -963,33 +1020,25 @@ body.dir-open #page{padding-bottom:120px}
   function head(small, big) { return '<div class="top"><small>' + small + '</small><b>' + big + '</b></div>'; }
   function toggleCell(b) { b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); }); }
 
-  var CAPS = [
-    { // 1 · porrons
-      build: function () {
-        var items = [
-          { h: SVG_JUG }, { h: porro('#8b1e2d'), k: 'porro' }, { h: SVG_WINE },
-          { h: '🐈' }, { h: porro(null), k: 'porro' }, { h: SVG_WATER },
-          { h: '🏺' }, { h: porro('#e8b923', '#cfe8cf'), k: 'porro' }, { h: '🍾' }
-        ];
-        $('cap').innerHTML = head('Seleccioni totes les imatges que contenen un', 'porró') + '<div class="cgrid"></div>';
-        var g = $('cap').querySelector('.cgrid');
-        items.forEach(function (it, i) {
-          var b = document.createElement('button'); b.type = 'button'; b.className = 'cell'; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', 'Imatge ' + (i + 1));
-          if (it.k) b.setAttribute('data-k', it.k);
-          b.innerHTML = it.h; toggleCell(b); g.appendChild(b);
+  /* ---- Proves petites: s'usen per activar la quadrícula del paint (pas 4) ---- */
+  var MINI = [
+    { // polítics honestos (la resposta és no marcar-ne cap)
+      build: function (h) {
+        var items = ['🦈', '🐍', '🦊', '🤡', '🐀', '🦆', '🦜', '🐂', '🐷'];
+        h.innerHTML = head('Seleccioni totes les imatges que contenen un', 'polític honest') + '<div class="cgrid"></div><div class="hint" style="margin-top:6px">(Pot ser que no n\'hi hagi cap.)</div>';
+        var g = h.querySelector('.cgrid');
+        items.forEach(function (e, i) {
+          var b = document.createElement('button'); b.type = 'button'; b.className = 'cell'; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', 'Candidat ' + (i + 1)); b.textContent = e;
+          toggleCell(b); g.appendChild(b);
         });
       },
-      check: function () {
-        if (obs() && S.att.captcha === 0) {
-          S.att.captcha = 1; save(); setMsg('m5', 'err', 'Verificació fallida. Sembla que vostè és un robot.'); CAPS[0].build(); return 'handled';
-        }
-        var ok = true;
-        Array.prototype.forEach.call($('cap').querySelectorAll('.cell'), function (c) { if ((c.getAttribute('aria-pressed') === 'true') !== (c.getAttribute('data-k') === 'porro')) ok = false; });
-        return ok ? true : 'Això no eren tots (ni només) els porrons.';
+      check: function (h) {
+        var n = h.querySelectorAll('.cell[aria-pressed=true]').length;
+        return n === 0 ? true : 'Ha seleccionat ' + n + ' polític' + (n > 1 ? 's' : '') + ' honest' + (n > 1 ? 's' : '') + ". Se n'han detectat 0.";
       }
     },
-    { // 2 · text deformat
-      build: function () {
+    { // text deformat
+      build: function (h) {
         var word = 'ESCRUTINI', R = seeded(11), svg = '<svg viewBox="0 0 300 90" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Text deformat">';
         var fonts = ['Georgia,serif', '"Courier New",monospace', 'Impact,Haettenschweiler,sans-serif', 'Verdana,sans-serif'], cols = ['#3a2a6b', '#8b1e2d', '#1d5b3a', '#6b4a10', '#222'];
         for (var i = 0; i < 7; i++) svg += '<path d="M' + Math.round(R() * 60) + ' ' + Math.round(10 + R() * 70) + ' Q' + Math.round(100 + R() * 100) + ' ' + Math.round(R() * 90) + ' ' + Math.round(240 + R() * 60) + ' ' + Math.round(10 + R() * 70) + '" stroke="' + cols[i % 5] + '" stroke-width="' + (1 + R() * 1.5).toFixed(1) + '" fill="none" opacity=".7"/>';
@@ -998,52 +1047,178 @@ body.dir-open #page{padding-bottom:120px}
           svg += '<text x="' + x + '" y="' + y.toFixed(0) + '" font-size="' + fs + '" font-weight="bold" font-family=\'' + fonts[Math.floor(R() * 4)] + '\' fill="' + cols[Math.floor(R() * 5)] + '" transform="rotate(' + rot + ' ' + x + ' ' + y.toFixed(0) + ')">' + ch + '</text>';
         });
         svg += '<path d="M0 ' + Math.round(30 + R() * 30) + ' L300 ' + Math.round(30 + R() * 30) + '" stroke="#c00" stroke-width="2" opacity=".6"/></svg>';
-        $('cap').innerHTML = head('Escrigui el text que veu a la imatge', 'sense errors, si us plau') + '<div id="capTxt">' + svg + '<input type="text" id="capIn" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" aria-label="Text de la imatge"></div>';
+        h.innerHTML = head('Escrigui el text que veu a la imatge', 'sense errors, si us plau') + '<div class="capTxt">' + svg + '<input type="text" class="capIn" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" aria-label="Text de la imatge"></div>';
       },
-      check: function () { return lev(normTxt($('capIn').value), 'ESCRUTINI') <= 1 ? true : 'Això no és el que posava la imatge.'; }
+      check: function (h) { return lev(normTxt(h.querySelector('.capIn').value), 'ESCRUTINI') <= 1 ? true : 'Això no és el que posava la imatge.'; }
     },
-    { // 3 · trencaclosques lliscant
-      build: function () {
-        $('cap').innerHTML = head('Arrossegui el control fins que la peça encaixi', 'al seu forat') +
-          '<div id="puz" data-t="' + PUZ_T + '" style="background-image:' + SCENE + '"><div class="hole" style="left:' + PUZ_T + 'px;top:' + PUZ_Y + 'px"></div>' +
-          '<div class="piece" id="piece" style="top:' + PUZ_Y + 'px;background-image:' + SCENE + ';background-position:-' + PUZ_T + 'px -' + PUZ_Y + 'px"></div></div>' +
-          '<input type="range" id="puzRange" min="0" max="240" value="0" aria-label="Posició de la peça">';
-        $('puzRange').addEventListener('input', function () { $('piece').style.left = this.value + 'px'; });
+    { // trencaclosques lliscant
+      build: function (h) {
+        h.innerHTML = head('Arrossegui el control fins que la peça encaixi', 'al seu forat') +
+          '<div class="puz" style="background-image:' + SCENE + '"><div class="hole" style="left:' + PUZ_T + 'px;top:' + PUZ_Y + 'px"></div>' +
+          '<div class="piece" style="top:' + PUZ_Y + 'px;background-image:' + SCENE + ';background-position:-' + PUZ_T + 'px -' + PUZ_Y + 'px"></div></div>' +
+          '<input type="range" class="puzRange" min="0" max="240" value="0" aria-label="Posició de la peça">';
+        var r = h.querySelector('.puzRange'), p = h.querySelector('.piece');
+        r.addEventListener('input', function () { p.style.left = r.value + 'px'; });
       },
-      check: function () { return Math.abs(parseInt($('puzRange').value, 10) - PUZ_T) <= 7 ? true : 'La peça no encaixa.'; }
-    },
-    { // 4 · polítics honestos
-      build: function () {
-        var items = ['🦈', '🐍', '🦊', '🤡', '🐀', '🦆', '🦜', '🐂', '🐷'];
-        $('cap').innerHTML = head('Seleccioni totes les imatges que contenen un', 'polític honest') + '<div class="cgrid"></div><div class="hint" style="margin-top:6px">(Pot ser que no n\'hi hagi cap.)</div>';
-        var g = $('cap').querySelector('.cgrid');
-        items.forEach(function (e, i) {
-          var b = document.createElement('button'); b.type = 'button'; b.className = 'cell'; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', 'Candidat ' + (i + 1)); b.textContent = e;
-          toggleCell(b); g.appendChild(b);
-        });
-      },
-      check: function () {
-        var n = $('cap').querySelectorAll('.cell[aria-pressed=true]').length;
-        return n === 0 ? true : 'Ha seleccionat ' + n + ' polític' + (n > 1 ? 's' : '') + ' honest' + (n > 1 ? 's' : '') + ". Se n'han detectat 0.";
-      }
-    },
-    { // 5 · on és el porró?
+      check: function (h) { return Math.abs(parseInt(h.querySelector('.puzRange').value, 10) - PUZ_T) <= 7 ? true : 'La peça no encaixa.'; }
+    }
+  ];
+
+  /* ---- Les 5 verificacions del pas 5 ---- */
+  var capNote = '';
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = rnd(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+  var CAPS = [
+    { // 1 · "No sóc un robot": la casella fuig
       auto: true,
       build: function () {
-        var noise = ['🍷', '🍺', '🍻', '🥂', '🍾', '🥃', '🍸', '🍹', '🥤', '🍼', '🧃', '🍵', '☕', '🥛', '🍶', '🧴', '🏺', '🐈'], N = 36, target = rnd(N), strikes = 0;
-        $('cap').innerHTML = head('Trobi el porró', 'entre tots aquests objectes') + '<div class="cgrid f6"></div>';
-        var g = $('cap').querySelector('.cgrid');
-        for (var i = 0; i < N; i++) (function (i) {
-          var b = document.createElement('button'); b.type = 'button'; b.className = 'cell'; b.setAttribute('aria-label', 'Objecte ' + (i + 1));
-          if (i === target) { b.innerHTML = porro('#8b1e2d'); b.setAttribute('data-k', 'porro'); } else b.textContent = noise[rnd(noise.length)];
-          b.addEventListener('click', function () {
-            if (i === target || !obs()) { capResult(true); return; }
-            strikes++; b.classList.add('no'); b.disabled = true;
-            if (strikes >= 3) capResult(false, 'Tres objectes equivocats.'); else setMsg('m5', 'warn', "No. Això no és un porró. (error " + strikes + '/3)');
-          });
-          g.appendChild(b);
-        })(i);
+        var h = $('cap'), dodges = 0, busy = false;
+        var need = obs() ? (S.att.captcha === 0 ? T.dodges : 1) : 0;
+        var LABELS = ['No sóc un robot', 'Jo? Un robot? Mai.', 'No sóc un robot (de veritat)', 'Sóc humà. Em fa mal el cap.'];
+        var MSGS = ["Ep! S'ha mogut. La casella no vol ser marcada per qualsevol.", 'Gairebé. Insisteixi: els humans són persistents.', 'Ara sí… potser.'];
+        h.innerHTML = head('Confirmi que no és un robot', 'marqui la casella') +
+          '<div class="fugArea"><button type="button" class="fug" role="checkbox" aria-checked="false" aria-label="No sóc un robot"><i class="fb"></i><span>' + LABELS[0] + '</span></button></div>';
+        var area = h.querySelector('.fugArea'), f = h.querySelector('.fug'), lab = f.querySelector('span');
+        f.style.left = '10px'; f.style.top = '40px';
+        function place() {
+          var aw = area.clientWidth - f.offsetWidth - 8, ah = area.clientHeight - f.offsetHeight - 8;
+          f.style.left = (4 + rnd(Math.max(1, aw))) + 'px'; f.style.top = (4 + rnd(Math.max(1, ah))) + 'px';
+        }
+        f.addEventListener('click', function () {
+          if (busy) return;
+          if (dodges < need) { dodges++; lab.textContent = LABELS[dodges % LABELS.length]; setMsg('m5', 'warn', MSGS[(dodges - 1) % MSGS.length]); place(); return; }
+          busy = true; f.classList.add('on'); f.setAttribute('aria-checked', 'true'); setMsg('m5', 'info', 'Verificant…');
+          later(function () {
+            if (obs() && S.att.captcha === 0) {
+              S.att.captcha = 1; save(); setMsg('m5', 'err', 'Verificació fallida. Sembla que vostè és un robot.'); CAPS[0].build(); return;
+            }
+            capResult(true);
+          }, T.verify * 2);
+        });
       }
+    },
+    { // 2 · cinta transportadora de porrons
+      build: function () {
+        var h = $('cap'), n, total = 3 + rnd(3), others = [SVG_JUG, SVG_WINE, SVG_WATER, '🍾', '🏺', '🐈', '🍺', '🧴'], seq = [], i;
+        for (i = 0; i < total; i++) seq.push(null);
+        for (i = 0, n = 4 + rnd(3); i < n; i++) seq.push(others[rnd(others.length)]);
+        shuffle(seq);
+        var gap = TEST ? 0.12 : 0.6, dur = TEST ? 0.6 : 3.6, count = 0, val = 0;
+        h.innerHTML = head('Quants porrons ha vist passar', 'per la cinta transportadora?') +
+          '<div class="belt" data-count="' + total + '" data-total-ms="' + Math.round((dur + gap * seq.length) * 1000) + '"></div>' +
+          '<div class="stepper"><button type="button" class="btn" id="cMinus" aria-label="Menys">−</button><output id="cVal" aria-live="polite">0</output><button type="button" class="btn" id="cPlus" aria-label="Més">+</button>' +
+          '<button type="button" class="btn tiny" id="cReplay">Tornar a veure</button></div>' +
+          '<div class="hint" style="margin-top:4px">Cinta homologada per la Junta. Ni els porrons ni la cinta són reals.</div>';
+        var belt = h.querySelector('.belt');
+        function run() {
+          belt.innerHTML = '';
+          seq.forEach(function (it, k) {
+            var d = document.createElement('div'); d.className = 'bi'; d.innerHTML = it === null ? porro(['#8b1e2d', null, '#e8b923'][k % 3], k % 2 ? '#cfe8cf' : '#d7ecf5') : (it.charAt(0) === '<' ? it : '<span>' + it + '</span>');
+            d.style.animation = 'beltmove ' + dur + 's linear ' + (k * gap).toFixed(2) + 's 1 both';
+            belt.appendChild(d);
+          });
+        }
+        run();
+        $('cMinus').addEventListener('click', function () { val = Math.max(0, val - 1); $('cVal').textContent = val; });
+        $('cPlus').addEventListener('click', function () { val = Math.min(20, val + 1); $('cVal').textContent = val; });
+        $('cReplay').addEventListener('click', run);
+        h._check = function () { return val === total ? true : 'El recompte no coincideix amb el de la cinta.'; };
+      },
+      check: function () { return $('cap')._check(); }
+    },
+    { // 3 · abocar el porró
+      auto: true,
+      build: function () {
+        var h = $('cap'), rate = 34, target = 50 + rnd(36), tol = 8, strikes = 0, t0 = 0, holding = false, locked = false, level = 0;
+        h.innerHTML = head('Serveixi un got de cervesa', 'fins a la ratlla verda') +
+          '<div class="pour" data-target="' + target + '" data-rate="' + rate + '"><div class="pporro">' + porro('#d8a31a') + '</div><div class="stream"></div>' +
+          '<div class="glass"><div class="liq"></div><div class="mark" style="bottom:' + target + '%"></div></div></div>' +
+          '<button type="button" class="btn" id="pourBtn">Mantingui premut per abocar</button><div class="hint" id="pourInfo" style="margin-top:4px">Intents: 0/3. Ni una gota de més, ni de menys.</div>';
+        var pour = h.querySelector('.pour'), liq = h.querySelector('.liq'), btn = $('pourBtn');
+        function cur() { return holding ? Math.min(100, rate * (Date.now() - t0) / 1000) : level; }
+        function frame() { if (!holding) return; liq.style.height = cur() + '%'; raf = requestAnimationFrame(frame); }
+        function end() {
+          if (!holding) return;
+          var v = cur(); holding = false; level = v; locked = true;
+          if (raf) { cancelAnimationFrame(raf); raf = 0; }
+          pour.classList.remove('pouring'); liq.style.height = v + '%';
+          if (v < 3) { locked = false; level = 0; liq.style.height = '0%'; setMsg('m5', 'warn', 'Ha de mantenir premut el botó mentre aboca.'); return; }
+          if (!obs() || Math.abs(v - target) <= tol) { setMsg('m5', 'ok', 'Perfecte. Ni una gota perduda.'); later(function () { capResult(true); }, T.verify); return; }
+          strikes++;
+          setMsg('m5', 'warn', (v >= 100 ? "Ha vessat! Ara el bar és una piscina. " : v > target ? 'Massa ple: més escuma que got. ' : 'Poca cosa: això és un dit de cervesa. ') + '(Intent ' + strikes + '/3)');
+          $('pourInfo').textContent = 'Intents: ' + strikes + '/3. Ni una gota de més, ni de menys.';
+          if (strikes >= 3) { later(function () { capResult(false, 'Tres gots mal servits.'); }, 700); return; }
+          later(function () { level = 0; liq.style.height = '0%'; locked = false; }, 900);
+        }
+        btn.addEventListener('pointerdown', function (e) {
+          e.preventDefault(); if (locked || holding) return;
+          holding = true; t0 = Date.now(); pour.classList.add('pouring'); setMsg('m5', null);
+          try { btn.setPointerCapture(e.pointerId); } catch (x) { /* res */ }
+          frame();
+        });
+        ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (ev) { btn.addEventListener(ev, end); });
+        btn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+      }
+    },
+    { // 4 · cicle de vida d'una promesa electoral
+      build: function () {
+        var h = $('cap'), steps = ['Es fa la promesa: «Baixarem els impostos»', 'Es guanyen les eleccions', 'Es forma un pacte de govern', '«Ara no toca: la situació és complexa»', 'Es torna a prometre a les properes eleccions'];
+        var order = shuffle([0, 1, 2, 3, 4]);
+        while (order.every(function (v, i) { return v === i; })) shuffle(order);
+        h.innerHTML = head("Ordeni el cicle de vida", "d'una promesa electoral") + '<div class="ord"></div><div class="hint" style="margin-top:6px">Premi els fets per ordre. Torni a prémer un per treure\'l.</div>';
+        var box = h.querySelector('.ord'), picked = [];
+        function paintNums() {
+          Array.prototype.forEach.call(box.children, function (b) {
+            var p = picked.indexOf(parseInt(b.getAttribute('data-i'), 10));
+            b.querySelector('.n').textContent = p < 0 ? '' : String(p + 1); b.setAttribute('aria-pressed', p < 0 ? 'false' : 'true');
+          });
+        }
+        order.forEach(function (idx) {
+          var b = document.createElement('button'); b.type = 'button'; b.className = 'ob'; b.setAttribute('data-i', String(idx)); b.setAttribute('aria-pressed', 'false');
+          b.innerHTML = '<b class="n"></b><span></span>'; b.querySelector('span').textContent = steps[idx];
+          b.addEventListener('click', function () {
+            var p = picked.indexOf(idx); if (p < 0) picked.push(idx); else picked.splice(p, 1); paintNums();
+          });
+          box.appendChild(b);
+        });
+        h._check = function () {
+          if (!obs()) return true;
+          if (picked.length < 5) { setMsg('m5', 'warn', 'Falten fets per ordenar (' + picked.length + '/5).'); return 'handled'; }
+          return picked.every(function (v, i) { return v === i; }) ? true : "Aquest no és l'ordre habitual de les promeses electorals.";
+        };
+      },
+      check: function () { return $('cap')._check(); }
+    },
+    { // 5 · dibuixar un porró (IA oficial)
+      build: function () {
+        var h = $('cap'), drawing = false, last = null;
+        h.innerHTML = head('Dibuixi un porró', 'la nostra IA el reconeixerà') + '<canvas class="dcan" width="280" height="170" aria-label="Llenç"></canvas>' +
+          '<div class="row" style="margin-top:6px"><button type="button" class="btn tiny" id="dClear">Esborrar</button><span class="hint">Amb el dit. Amb ganes.</span></div>';
+        var cv = h.querySelector('.dcan'), c = cv.getContext('2d');
+        function clr() { c.fillStyle = '#fff'; c.fillRect(0, 0, 280, 170); }
+        clr(); c.strokeStyle = '#111'; c.lineWidth = 3; c.lineCap = 'round'; c.lineJoin = 'round';
+        function pt(e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * 280 / r.width, y: (e.clientY - r.top) * 170 / r.height }; }
+        cv.addEventListener('pointerdown', function (e) {
+          e.preventDefault(); drawing = true; last = pt(e);
+          try { cv.setPointerCapture(e.pointerId); } catch (x) { /* res */ }
+          c.beginPath(); c.moveTo(last.x, last.y); c.lineTo(last.x + 0.01, last.y); c.stroke();
+        });
+        cv.addEventListener('pointermove', function (e) { if (!drawing) return; var p = pt(e); c.beginPath(); c.moveTo(last.x, last.y); c.lineTo(p.x, p.y); c.stroke(); last = p; });
+        ['pointerup', 'pointercancel'].forEach(function (ev) { cv.addEventListener(ev, function () { drawing = false; }); });
+        $('dClear').addEventListener('click', clr);
+        h._check = function () {
+          var d = c.getImageData(0, 0, 280, 170).data, ink = 0, i;
+          for (i = 0; i < d.length; i += 4) if (d[i] < 140) ink++;
+          if (ink < 250) {
+            if (!obs()) return true;
+            setMsg('m5', 'warn', "La IA no veu res. (Els robots tampoc dibuixen, però sí que fan excuses.)"); return 'handled';
+          }
+          var w = shuffle(['patata', 'cogombre', 'botijo', 'núvol', 'fantasma', 'tomàquet', 'ampolla de lleixiu']), p = 2 + rnd(7), a = 40 + rnd(25), b = 100 - p - a - 2;
+          capNote = 'Resultat de la IA: ' + w[0] + ' ' + a + '%, ' + w[1] + ' ' + b + '%, porró ' + p + "%. Confiança baixa, però s'accepta per llei de mínims.";
+          return true;
+        };
+      },
+      check: function () { return $('cap')._check(); }
     }
   ];
 
@@ -1057,7 +1232,7 @@ body.dir-open #page{padding-bottom:120px}
     if (!obs()) ok = true;
     if (ok) {
       S.cap++; save();
-      if (S.cap >= CAPS.length) { setMsg('m5', 'ok', 'Verificació superada. Benvingut, ésser humà.'); show($('btnCap'), false); later(function () { goStep(6); }, T.advance); }
+      if (S.cap >= CAPS.length) { setMsg('m5', 'ok', (capNote ? capNote + ' ' : '') + 'Verificació superada. Benvingut, ésser humà.'); capNote = ''; show($('btnCap'), false); later(function () { goStep(6); }, T.advance); }
       else { renderCap(); setMsg('m5', 'ok', 'Verificació superada (' + S.cap + '/' + CAPS.length + '). Continuem.'); }
       return;
     }

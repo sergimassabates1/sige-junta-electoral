@@ -90,7 +90,48 @@ async function drawStroke(page, fx, fy, tx, ty) {
   await page.mouse.move(b.x + b.width * tx, b.y + b.height * ty, { steps: 4 });
   await page.mouse.up();
 }
-const selPorrons = async (page) => { for (const c of await page.locator('#cap .cell[data-k=porro]').all()) await c.click(); };
+const MINI_TXT = 'ESCRUTINI';
+// Resol la prova petita de la quadrícula (és aleatòria): `wrong` per fallar-la a posta
+async function miniCap(page, wrong) {
+  const box = page.locator('#gridCap');
+  if (await box.locator('.capIn').count()) await box.locator('.capIn').fill(wrong ? 'QQQQQ' : MINI_TXT);
+  else if (await box.locator('.puzRange').count()) {
+    const left = await box.locator('.hole').evaluate(e => parseInt(e.style.left, 10));
+    await box.locator('.puzRange').fill(String(wrong ? 10 : left));
+  } else if (wrong) await box.locator('.cell').first().click();
+}
+const fugClick = async (page) => { for (let k = 0; k < 6; k++) { await page.locator('.fug').click(); if (await page.locator('.fug.on').count()) return; } };
+async function holdPour(page, ms) {
+  const b = await page.locator('#pourBtn').boundingBox();
+  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+  await page.mouse.down(); await page.waitForTimeout(ms); await page.mouse.up();
+}
+const pourMs = async (page, delta = 0) => {
+  const p = page.locator('.pour'); const t = +(await p.getAttribute('data-target')), r = +(await p.getAttribute('data-rate'));
+  return t / r * 1000 + delta;
+};
+async function drawPorro(page) {
+  const b = await page.locator('.dcan').boundingBox();
+  const pts = [[.35, .9], [.25, .55], [.38, .3], [.4, .1], [.55, .1], [.57, .3], [.7, .55], [.62, .9], [.35, .9]];
+  await page.mouse.move(b.x + b.width * pts[0][0], b.y + b.height * pts[0][1]); await page.mouse.down();
+  for (const [x, y] of pts.slice(1)) await page.mouse.move(b.x + b.width * x, b.y + b.height * y, { steps: 4 });
+  await page.mouse.up();
+}
+// Passa la verificació i (0-4) de manera correcta
+async function passCap(page, i) {
+  if (i === 0) await fugClick(page);
+  if (i === 1) { const n = +(await page.locator('.belt').getAttribute('data-count')); for (let k = 0; k < n; k++) await page.click('#cPlus'); await page.click('#btnCap'); }
+  if (i === 2) await holdPour(page, await pourMs(page));
+  if (i === 3) { for (let k = 0; k < 5; k++) await page.locator(`.ob[data-i="${k}"]`).click(); await page.click('#btnCap'); }
+  if (i === 4) { await drawPorro(page); await page.click('#btnCap'); }
+}
+// Amb "Sense obstacles": passa qualsevol prova amb el gest mínim
+async function passCapFree(page, i) {
+  if (i === 0) await page.locator('.fug').click();
+  if (i === 2) await holdPour(page, 300);
+  if (i === 1 || i === 3 || i === 4) await page.click('#btnCap');
+}
+const capIs = (page, n) => page.waitForFunction((n) => document.getElementById('capHead').textContent === 'Verificació ' + n + ' de 5', n, { timeout: 15000 });
 
 /* ================= 1. Tràmit complet, amb un reinici pel mig, sense xarxa ================= */
 console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lletres');
@@ -207,6 +248,24 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   // Pas 4: mini paint
   assert.match(await stepLabel(page), /^Pas 4 de 6 · 8% completat/);
   await shot(page, '04-pas4-inici');
+  // Quadrícula: només s'activa superant una prova humana
+  assert.ok(!(await page.locator('#gridOv').isVisible()));
+  await page.click('#btnGrid');
+  await page.waitForSelector('#gridCap .top');
+  await shot(page, '04a-pas4-quadricula-captcha');
+  await miniCap(page, true); await page.click('#btnGridOk');
+  assert.match(await txt(page, '#mG .msg'), /nova prova/);
+  assert.ok(!(await page.locator('#gridOv').isVisible()), 'error → la quadrícula no s\'activa');
+  await miniCap(page, false); await page.click('#btnGridOk');
+  await page.waitForSelector('#gridOv:not([hidden])');
+  assert.equal(await txt(page, '#btnGrid'), 'Quadrícula: sí');
+  await shot(page, '04a2-pas4-quadricula-activa');
+  ok('Pas 4: la quadrícula exigeix una prova humana (error → no s\'activa; correcte → s\'activa)');
+  await page.click('#btnGrid');
+  assert.ok(!(await page.locator('#gridOv').isVisible()));
+  await page.click('#btnGrid'); await miniCap(page, false); await page.click('#btnGridOk');
+  await page.waitForSelector('#gridOv:not([hidden])');
+  ok('Pas 4: desactivar és lliure; tornar-la a activar demana una altra prova');
   await page.click('#btnLogoOk');
   assert.ok(await page.locator('#m4 .msg.warn').isVisible());
   await page.locator('.sw').nth(1).click(); // vermell
@@ -234,73 +293,73 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   ok('Pas 4: el segon OK accepta el logo dibuixat');
   await page.click('#btnLogoNext');
 
-  // Pas 5: cinc verificacions
+  // Pas 5: cinc verificacions noves
   assert.match(await stepLabel(page), /^Pas 5 de 6 · 92% completat/);
   assert.equal(await txt(page, '#capHead'), 'Verificació 1 de 5');
-  assert.equal(await page.locator('#cap .cell').count(), 9);
-  assert.equal(await page.locator('#cap .cell svg[data-k=porro]').count(), 3, '3 porrons dibuixats');
-  await shot(page, '05a-captcha1-porrons');
-  await selPorrons(page);
-  await page.click('#btnCap');
+  await shot(page, '05a-captcha1-casella-fugitiva');
+  const pos0 = await page.locator('.fug').boundingBox();
+  await page.locator('.fug').click();
+  assert.equal(await page.locator('.fug.on').count(), 0, 'la casella fuig el primer toc');
+  assert.match(await txt(page, '#m5 .msg'), /S'ha mogut/);
+  ok('Captcha 1: la casella "No sóc un robot" fuig abans de deixar-se marcar');
+  await fugClick(page);
   await page.waitForSelector('#m5 .msg.err');
   assert.equal(await txt(page, '#m5 .msg'), 'Verificació fallida. Sembla que vostè és un robot.');
-  ok('Captcha 1: la primera vegada, encara que sigui correcte → "robot"');
-  await selPorrons(page);
-  await page.click('#btnCap');
-  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 2 de 5');
-  ok('Captcha 1: la segona vegada, porrons ben triats → passa');
+  ok('Captcha 1: la primera vegada, encara que la marqui bé → "robot"');
+  await fugClick(page);
+  await capIs(page, 2);
 
-  await shot(page, '05b-captcha2-text');
-  await page.fill('#capIn', 'escrutini');
+  await page.waitForSelector('.belt .bi');
+  await shot(page, '05b-captcha2-cinta');
+  assert.ok((await page.locator('.belt .bi').count()) >= 7);
+  assert.equal(await page.locator('.belt .bi svg[data-k=porro]').count(), +(await page.locator('.belt').getAttribute('data-count')), 'els porrons de la cinta són els que compta');
+  await page.click('#cPlus'); await page.click('#cPlus'); await page.click('#cMinus'); // 1 (mai coincideix: hi ha 3-5)
   await page.click('#btnCap');
-  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 3 de 5');
-  ok('Captcha 2: text deformat');
-
-  await shot(page, '05c-captcha3-trencaclosques');
-  const t = await page.locator('#puz').getAttribute('data-t');
-  assert.match(await page.locator('#puz').evaluate(e => getComputedStyle(e).backgroundImage), /^url\(/, 'escena del trencaclosques carregada');
-  assert.match(await page.locator('#piece').evaluate(e => getComputedStyle(e).backgroundImage), /^url\(/, 'peça carregada');
-  await page.locator('#puzRange').fill('20');
-  await page.click('#btnCap');
-  await page.waitForSelector('#ov:not([hidden])'); // intent erroni → falla la verificació
-  assert.match(await txt(page, '#winText'), /La peça no encaixa\. Haurà de tornar a començar la verificació/);
+  await page.waitForSelector('#ov:not([hidden])');
+  assert.match(await txt(page, '#winText'), /El recompte no coincideix amb el de la cinta\. Haurà de tornar a començar la verificació/);
   await accept(page);
   assert.equal(await txt(page, '#capHead'), 'Verificació 1 de 5');
   ok('Un error de verificació reinicia les cinc proves (tornem a la 1)');
-  await selPorrons(page); await page.click('#btnCap');
-  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 2 de 5');
-  await page.fill('#capIn', 'ESCRUTINI'); await page.click('#btnCap');
-  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 3 de 5');
-  await page.locator('#puzRange').fill(t);
-  await page.click('#btnCap');
-  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 4 de 5');
-  ok('Captcha 3: trencaclosques lliscant');
+  await passCap(page, 0); await capIs(page, 2);
+  await page.waitForTimeout(700);
+  await page.click('#cReplay');
+  await passCap(page, 1); await capIs(page, 3);
+  ok('Captcha 2: comptar els porrons de la cinta transportadora');
 
-  await shot(page, '05d-captcha4-politics');
-  await page.locator('#cap .cell').nth(3).click(); // un "polític honest" → malament
-  await page.click('#btnCap');
-  await page.waitForSelector('#ov:not([hidden])');
-  assert.match(await txt(page, '#winText'), /Ha seleccionat 1 polític honest\. Se n'han detectat 0\./);
-  await accept(page);
-  // refem 1..3 ràpidament
-  await selPorrons(page); await page.click('#btnCap');
-  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 2 de 5');
-  await page.fill('#capIn', 'ESCRUTINI'); await page.click('#btnCap');
-  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 3 de 5');
-  await page.locator('#puzRange').fill(t); await page.click('#btnCap');
-  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 4 de 5');
-  await page.click('#btnCap'); // cap polític honest seleccionat → correcte
-  await page.waitForFunction(() => document.getElementById('capHead').textContent === 'Verificació 5 de 5');
-  ok('Captcha 4: "polític honest" només es resol sense seleccionar res');
+  await shot(page, '05c-captcha3-abocar');
+  await holdPour(page, Math.max(200, await pourMs(page, -900))); // massa poc
+  assert.match(await txt(page, '#m5 .msg'), /Intent 1\/3/);
+  await page.waitForTimeout(1200); // el got es buida
+  await shot(page, '05c2-captcha3-abocar-ple');
+  await passCap(page, 2); await capIs(page, 4);
+  ok('Captcha 3: abocar el porró fins a la ratlla (un error = un intent, no reinici)');
 
-  await shot(page, '05e-captcha5-trobar-porro');
-  assert.equal(await page.locator('#cap .cell').count(), 36);
-  assert.equal(await page.locator('#cap .cell svg[data-k=porro]').count(), 1);
-  await page.locator('#cap .cell:not([data-k])').first().click();
-  assert.match(await txt(page, '#m5 .msg'), /No\. Això no és un porró\. \(error 1\/3\)/);
-  await page.locator('#cap .cell[data-k=porro]').click();
+  await shot(page, '05d-captcha4-promesa');
+  assert.equal(await page.locator('.ob').count(), 5);
+  await page.locator('.ob[data-i="0"]').click(); await page.locator('.ob[data-i="1"]').click();
+  await page.click('#btnCap');
+  await page.waitForSelector('#m5 .msg.warn');
+  assert.match(await txt(page, '#m5 .msg'), /Falten fets per ordenar \(2\/5\)/);
+  await page.locator('.ob[data-i="1"]').click(); // el treu
+  assert.equal((await txt(page, '.ob[data-i="0"] .n')).trim(), '1');
+  await page.locator('.ob[data-i="1"]').click();
+  await shot(page, '05d2-captcha4-promesa-triats');
+  for (const k of [2, 3, 4]) await page.locator(`.ob[data-i="${k}"]`).click();
+  await page.click('#btnCap');
+  await capIs(page, 5);
+  ok('Captcha 4: ordenar el cicle de vida d\'una promesa electoral');
+
+  await shot(page, '05e-captcha5-dibuix');
+  await page.click('#btnCap');
+  await page.waitForSelector('#m5 .msg.warn');
+  assert.match(await txt(page, '#m5 .msg'), /La IA no veu res/);
+  await drawPorro(page);
+  await shot(page, '05e2-captcha5-dibuixat');
+  await page.click('#btnCap');
+  await page.waitForSelector('#m5 .msg.ok');
+  assert.match(await txt(page, '#m5 .msg'), /^Resultat de la IA: .*porró \d+%.*Verificació superada/);
   await waitStep(page, 6);
-  ok('Captcha 5: trobar el porró entre 36 objectes');
+  ok('Captcha 5: dibuixar un porró; la "IA" l\'accepta tot i confondre\'l');
 
   // Pas 6
   assert.match(await txt(page, '#receipt h3'), /Justificant d'inscripció al Registre de Partits/i);
@@ -440,8 +499,8 @@ console.log('6) Mode director');
   assert.match(await stepLabel(page), /^Pas 2/);
   ok('Sense obstacles: el botó parany no fa res');
   await page.locator('#dirSteps button', { hasText: '5' }).click();
-  for (let i = 0; i < 4; i++) { await page.click('#btnCap'); await page.waitForFunction((i) => document.getElementById('capHead').textContent === 'Verificació ' + (i + 2) + ' de 5', i); }
-  await page.locator('#cap .cell').first().click();
+  for (let i = 0; i < 4; i++) { await passCapFree(page, i); await capIs(page, i + 2); }
+  await passCapFree(page, 4);
   await waitStep(page, 6);
   ok('Sense obstacles: les 5 verificacions passen; salt lliure entre passos');
   await ctx.close();
@@ -482,6 +541,31 @@ console.log('8) Persistència');
   await ctx.close();
 }
 
+/* ================= 8b. Enquesta: "Potser més tard" torna als 5 s ================= */
+console.log('8b) Enquesta de satisfacció');
+{
+  const ctx = await browser.newContext(mobile);
+  const page = await ctx.newPage();
+  await page.goto(BASE + '#test,survey,director');
+  await page.locator('#dirSteps button', { hasText: '4' }).click();
+  await page.waitForSelector('#ov:not([hidden])', { timeout: 4000 });
+  assert.match(await txt(page, '#winText'), /enquesta de satisfacció/);
+  await page.locator('#winBtns button', { hasText: 'Potser més tard' }).click();
+  const t0 = Date.now();
+  assert.ok(await page.locator('#ov').isHidden());
+  await page.waitForSelector('#ov:not([hidden])', { timeout: 8000 });
+  const dt = Date.now() - t0;
+  assert.ok(dt >= 4500 && dt <= 6500, 'reapareix als ~5 s (' + dt + ' ms)');
+  await page.locator('#winBtns button', { hasText: 'Potser més tard' }).click();
+  await page.waitForSelector('#ov:not([hidden])', { timeout: 8000 });
+  ok('Enquesta: "Potser més tard" torna a aparèixer als 5 s, cada vegada (' + dt + ' ms)');
+  await page.locator('#winBtns button', { hasText: 'Sí, encantat' }).click();
+  await page.waitForTimeout(6500);
+  assert.ok(await page.locator('#ov').isHidden(), 'després d\'acceptar no torna');
+  ok('Enquesta: acceptar-la la fa desaparèixer');
+  await ctx.close();
+}
+
 /* ================= 9. 360 px sense desbordament ================= */
 console.log('9) Mòbil de 360 px: sense scroll horitzontal');
 {
@@ -497,16 +581,21 @@ console.log('9) Mòbil de 360 px: sense scroll horitzontal');
   // els 5 captchas a 360 px
   await page.locator('#dirSteps button', { hasText: '5' }).click();
   await page.check('#dirNoObs');
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     const w = await page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(w <= 360, `captcha ${i + 1}: scrollWidth ${w}`);
+    await page.waitForTimeout(i === 1 ? 800 : 100);
     await shot(page, `360-captcha${i + 1}`);
-    await page.click('#btnCap');
-    await page.waitForFunction((i) => document.getElementById('capHead').textContent === 'Verificació ' + (i + 2) + ' de 5', i);
+    if (i < 4) { await passCapFree(page, i); await capIs(page, i + 2); }
   }
-  const w5 = await page.evaluate(() => document.documentElement.scrollWidth);
-  assert.ok(w5 <= 360, 'captcha 5: ' + w5);
-  await shot(page, '360-captcha5');
+  // quadrícula del pas 4 a 360 px
+  await page.locator('#dirSteps button', { hasText: '4' }).click();
+  await page.uncheck('#dirNoObs');
+  await page.click('#btnGrid');
+  await page.waitForSelector('#gridCap .top');
+  const wg = await page.evaluate(() => document.documentElement.scrollWidth);
+  assert.ok(wg <= 360, 'prova de la quadrícula: ' + wg);
+  await shot(page, '360-pas4-quadricula');
   ok('Cap pas ni captcha desborda els 360 px');
   await ctx.close();
 }
