@@ -94,6 +94,8 @@ select[size] option{padding:8px 6px}
 @keyframes flip{0%,40%{transform:rotate(0)}50%,90%{transform:rotate(180deg)}100%{transform:rotate(360deg)}}
 
 /* PIN: lliscadors */
+.info{display:inline-block;width:16px;height:16px;padding:0;margin-left:4px;border:1px solid #1a4fb0;border-radius:50%;background:#2d5fb5;color:#fff;font:bold 11px/14px Georgia,serif;text-align:center;vertical-align:middle;cursor:help;touch-action:manipulation}
+.tip{margin:4px 0 6px;padding:6px 8px;border:1px solid #888;background:#ffffe1;box-shadow:2px 2px 0 rgba(0,0,0,.25);font-size:12px;max-width:300px}
 .pinrow{display:flex;align-items:center;gap:8px;margin:3px 0}
 .pinrow .dg{width:32px;height:38px;line-height:34px;font:bold 24px "Courier New",monospace;text-align:center;background:#000;color:#ff8a00;border:2px inset #888}
 .pinrow input[type=range]{flex:1;min-width:0;height:12px;-webkit-appearance:none;appearance:none;background:#b8b49f;border:1px inset #666;margin:6px 0}
@@ -304,7 +306,8 @@ body.dir-open #page{padding-bottom:120px}
         <legend>Pas 2 · Identificació</legend>
         <p>Identifiqui's amb el PIN del seu Carnet de Militant.</p>
         <p class="hint">Per la seva seguretat, la sessió caduca als 60 segons d'inactivitat.</p>
-        <span class="lbl">PIN del Carnet de Militant <span class="req">*</span> <i>(regli les 4 xifres)</i></span>
+        <span class="lbl">PIN del Carnet de Militant <span class="req">*</span> <i>(regli les 4 xifres)</i> <button type="button" class="info" id="pinInfo" aria-label="Informació sobre el PIN" aria-expanded="false" aria-controls="pinTip">i</button></span>
+        <div id="pinTip" class="tip" role="tooltip" hidden>ℹ️ Ajuda: el PIN del Carnet de Militant és <b>1711</b> (17/11, la data de naixement del titular).</div>
         <div id="pinRows"></div>
         <div class="ferr" id="e_pin" hidden></div>
         <span class="lbl">Candidatura <span class="req">*</span> <i>(toqui-la quan pugui)</i></span>
@@ -510,6 +513,7 @@ body.dir-open #page{padding-bottom:120px}
   var KEY = 'sige_v24_state';
   var FAKE_PCT = [3, 14, 67, 8, 92, 100];
   var PIN0 = '0000';
+  var PIN_OK = '1711';
 
   /* ================= Estat i emmagatzematge ================= */
   function defaults() {
@@ -696,7 +700,7 @@ body.dir-open #page{padding-bottom:120px}
 
   /* ================= PAS 2 · Identificació ================= */
   function initStep2() {
-    setMsg('m2', null); fieldErr('pin', ''); fieldErr('llista', '');
+    setMsg('m2', null); fieldErr('pin', ''); fieldErr('llista', ''); show($('pinTip'), false);
     $('btnLogin').disabled = false;
     buildPin(); initArena();
   }
@@ -751,8 +755,15 @@ body.dir-open #page{padding-bottom:120px}
       r.el.disabled = true;
     });
   }
+  $('pinInfo').addEventListener('click', function () {
+    var tip = $('pinTip'), open = tip.hidden;
+    tip.hidden = !open; this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
   $('btnLogin').addEventListener('click', function () {
-    if (!S.llista) { fieldErr('llista', 'Error 0x0043: Seleccioni una candidatura'); return; }
+    var pinBad = obs() && S.pin !== PIN_OK;
+    fieldErr('pin', pinBad ? 'Error 0x0041: PIN del Carnet de Militant incorrecte.' : '');
+    fieldErr('llista', S.llista ? '' : 'Error 0x0043: Seleccioni una candidatura');
+    if (pinBad || !S.llista) return;
     var b = $('btnLogin'); b.disabled = true; setMsg('m2', 'info', 'Validant credencials…');
     later(function () { goStep(3); }, T.proc / 2);
   });

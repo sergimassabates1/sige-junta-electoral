@@ -43,7 +43,7 @@ async function passQueue(page) {
   if (await page.locator('#m1 .msg.err').count()) { await page.click('#btnTurn'); }
   await waitStep(page, 2);
 }
-async function doStep2(page, list = 'Llista B', digits = [3, 1, 4, 1]) {
+async function doStep2(page, list = 'Llista B', digits = [1, 7, 1, 1]) {
   for (let i = 0; i < 4; i++) await page.locator('.pinrow input').nth(i).fill(String(digits[i]));
   await page.locator(`#arena .runner[data-v="${list}"]`).click();
   await page.click('#btnLogin');
@@ -171,10 +171,20 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   assert.equal(await page.locator('.pinrow .dg').allInnerTexts().then(a => a.join('')), '3141');
   await page.locator('#arena .runner[data-v="Llista B"]').click();
   assert.match(await txt(page, '#arena .runner.chosen'), /Llista B/);
+  await page.click('#btnLogin');
+  assert.match(await txt(page, '#e_pin'), /PIN del Carnet de Militant incorrecte/);
+  assert.match(await stepLabel(page), /^Pas 2/);
+  ok('Pas 2: un PIN erroni (3141) no deixa passar');
+  assert.ok(await page.locator('#pinTip').isHidden());
+  await page.click('#pinInfo');
+  assert.match(await txt(page, '#pinTip'), /1711/);
+  await shot(page, '02a-pas2-tooltip-pin');
+  for (let i = 0; i < 4; i++) await page.locator('.pinrow input').nth(i).fill(String([1, 7, 1, 1][i]));
+  assert.equal(await page.locator('.pinrow .dg').allInnerTexts().then(a => a.join('')), '1711');
   await shot(page, '02b-pas2-completat');
   await page.click('#btnLogin');
   await waitStep(page, 3);
-  ok('Pas 2: PIN amb lliscadors i candidatura triada');
+  ok('Pas 2: el tooltip "i" mostra el PIN 1711; amb 1711 s\'accedeix');
 
   // Pas 3, primera volta: sigles de 4 lletres → tràmit anul·lat
   await fillStep3(page, { sig: 'MPP', fourth: 'A' });
