@@ -276,9 +276,10 @@ console.log('1) Recorregut complet (offline, #test)');
   assert.equal(await txt(page, '#p_vestit'), me.vestit);
   assert.equal(await txt(page, '#p_salut'), me.salut);
   assert.ok(await page.locator('#p_bromaBox').isVisible() && /six seven/i.test(await txt(page, '#p_broma')));
-  assert.equal((await txt(page, '#p_photo')).trim(), me.ic, 'sense foto, es veu l\'emoji del personatge');
+  await page.waitForFunction(() => { const i = document.querySelector('#p_photo img'); return i && i.complete && i.naturalWidth > 0; });
+  assert.match(await page.locator('#p_photo img').getAttribute('src'), /tung-tung-sahur\.jpg$/, 'la il·lustració es veu fins i tot sense connexió (memòria cau)');
   await shot(page, '04-pas4-perfil');
-  ok('Pas 4: perfil del personatge amb les seves dades i la broma reservada');
+  ok('Pas 4: perfil del personatge amb la il·lustració de la carta (offline), les seves dades i la broma reservada');
 
   assert.deepEqual(reqs, [], 'Peticions de xarxa: ' + reqs.join(', '));
   ok('Cap petició de xarxa després de la càrrega (tot fet offline)');
@@ -315,7 +316,7 @@ console.log('2) Foto del perfil');
   await ctx.close();
 }
 
-/* ================= 3. Els 14 personatges entren amb el seu nom llatí ================= */
+/* ================= 3. Els 15 personatges entren amb el seu nom llatí ================= */
 console.log('3) Tots els personatges');
 {
   const ctx = await browser.newContext(mobile);
@@ -329,9 +330,11 @@ console.log('3) Tots els personatges');
     assert.equal(await txt(page, '#p_user'), c.especie);
     assert.equal(await txt(page, '#p_tipus'), c.tipus);
     assert.equal(await page.locator('#p_bromaBox').isVisible(), !!c.broma);
+    await page.waitForFunction(() => { const i = document.querySelector('#p_photo img'); return i && i.complete && i.naturalWidth > 0; });
+    assert.ok((await page.locator('#p_photo img').getAttribute('src')).endsWith(c.especie.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.jpg'));
   }
-  assert.equal(CHARS.length, 14);
-  ok('Els 14 personatges entren amb el seu nom en llatí i veuen el seu perfil');
+  assert.equal(CHARS.length, 15);
+  ok('Els 15 personatges entren amb el seu nom en llatí i veuen el seu perfil amb la il·lustració de la seva carta');
   await page.locator('#dirSteps button', { hasText: '2' }).click();
   await login(page, 'Dora Emu'); // una errada d'un caràcter: s'accepta
   await waitStep(page, 3);

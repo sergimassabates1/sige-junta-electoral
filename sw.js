@@ -1,7 +1,22 @@
 /* Service worker senzill: memòria cau per funcionar sense connexió.
    Si falla, index.html funciona igualment (és autònom). */
-var CACHE = 'sige-v29-2';
-var ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
+var CACHE = 'sige-v30-1';
+var ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png',
+  './personatges/argentinus-matecus.jpg',
+  './personatges/crisis-dels-quarantus.jpg',
+  './personatges/dora-emus.jpg',
+  './personatges/ducattis-divorciatus.jpg',
+  './personatges/expatus-conolianatus.jpg',
+  './personatges/manolus-eldelbarus.jpg',
+  './personatges/mister-worldwidus-falsificatus.jpg',
+  './personatges/patinetus-classicus.jpg',
+  './personatges/pulseritus-patrioticus.jpg',
+  './personatges/rastafarus-rototomus.jpg',
+  './personatges/securatus-ferroviarius.jpg',
+  './personatges/titanus-mandibulus.jpg',
+  './personatges/tung-tung-sahur.jpg',
+  './personatges/voleyus-maresmensis.jpg',
+  './personatges/xokus-brutejus.jpg'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(

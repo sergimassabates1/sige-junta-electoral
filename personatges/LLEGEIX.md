@@ -1,7 +1,7 @@
 # Fotos dels personatges
 
-Si poses una foto aquí amb el nom exacte d'aquesta llista (format .jpg, quadrada va millor), surt al perfil del personatge. Si no n'hi ha, es veu l'emoji.
-
+Cada perfil mostra la il·lustració de la seva carta del Dixit (retallada de `cartes-dixit/png/`, 450×526 px).
+Per canviar-ne una, substitueix el fitxer amb el mateix nom. Si en falta una, el perfil mostra l'emoji.
 
 | Personatge | Nom d'usuari | Fitxer |
 |---|---|---|
@@ -19,3 +19,4 @@ Si poses una foto aquí amb el nom exacte d'aquesta llista (format .jpg, quadrad
 | L'expat | Expatus Conolianatus | `expatus-conolianatus.jpg` |
 | L'argentí del mate | Argentinus matecus | `argentinus-matecus.jpg` |
 | El nen del patinet elèctric | Patinetus Classicus | `patinetus-classicus.jpg` |
+| El Pitbull fals | Mister Worldwidus falsificatus | `mister-worldwidus-falsificatus.jpg` |
