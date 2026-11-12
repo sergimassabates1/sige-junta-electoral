@@ -212,6 +212,8 @@ select[size] option{padding:8px 6px}
 .dl dd.big{font-size:26px;color:#0b3d91}
 .rwrap{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
 #seal{width:170px;height:170px;transform:rotate(-13deg);margin:2px auto 0;display:block;mix-blend-mode:multiply;opacity:.92}
+#s4 .dl dd{font-size:15px;font-weight:normal;line-height:1.4}
+#s4 .dl dd.big{font-size:24px;font-weight:bold}
 #readAloud{font-size:17px;font-weight:bold;text-align:center;border-top:2px solid #0b3d91;padding-top:12px;margin-top:10px}
 
 #ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:14px;z-index:50}
@@ -234,6 +236,15 @@ select[size] option{padding:8px 6px}
 body.dir-open #page{padding-bottom:120px}
 #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#333;color:#fff;padding:8px 14px;font-size:12px;z-index:60;max-width:90%;text-align:center}
 .nouser{-webkit-user-select:none;user-select:none}
+
+/* Captcha: porró a la boca */
+.dragA{position:relative;width:100%;max-width:300px;height:200px;border:1px solid #bbb;background:linear-gradient(#fdfcf5,#efe9d3);overflow:hidden;touch-action:none}
+.mouth{position:absolute;width:52px;height:52px;font-size:42px;line-height:52px;text-align:center;transition:left .2s,top .2s;-webkit-user-select:none;user-select:none}
+.dporro{position:absolute;width:64px;height:64px;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;z-index:2}
+.dporro svg{width:100%;height:100%;pointer-events:none}
+/* Foto del perfil */
+.carnet .photo{position:relative;width:120px;height:120px;background:#ddd;border:1px solid #999;display:grid;place-items:center;font-size:64px;line-height:1;overflow:hidden}
+.carnet .photo img{width:100%;height:100%;object-fit:cover;display:block}
 </style>
 </head>
 <body>
@@ -261,16 +272,16 @@ body.dir-open #page{padding-bottom:120px}
 
   <div id="crumbs">
     <span id="fsz">Mida: <a href="#" class="dead">A</a><a href="#" class="dead">A</a><a href="#" class="dead">A</a></span>
-    <a href="#" class="dead">Inici</a> › <a href="#" class="dead">Tràmits</a> › <a href="#" class="dead">Partits polítics</a> › <b>Inscripció al registre</b>
+    <a href="#" class="dead">Inici</a> › <a href="#" class="dead">Tràmits</a> › <a href="#" class="dead">Registre de personatges</a> › <b>Identificació</b>
   </div>
 
   <div id="ad"><span>★ NOVETAT! Instal·li la Barra d'Eines Electoral™ — 100% gratuïta! ★</span><button type="button" id="adX" aria-label="Tancar">x</button></div>
 
   <div id="main">
-    <h2>Inscripció al Registre de Partits Polítics</h2>
+    <h2>Accés al Registre de Personatges</h2>
 
     <div id="prog">
-      <div class="lbl" id="progLbl">Pas 1 de 6 · 3% completat</div>
+      <div class="lbl" id="progLbl">Pas 1 de 4 · 3% completat</div>
       <div class="bar"><div class="fill" id="progFill"></div></div>
       <div id="anul" hidden></div>
     </div>
@@ -298,18 +309,16 @@ body.dir-open #page{padding-bottom:120px}
     <section id="s2" hidden>
       <fieldset>
         <legend>Pas 2 · Identificació</legend>
-        <p>Identifiqui's amb el PIN del seu Carnet de Militant.</p>
+        <p>Identifiqui's amb el nom d'usuari i la contrasenya del seu personatge.</p>
         <p class="hint">Per la seva seguretat, la sessió caduca als 60 segons d'inactivitat.</p>
-        <span class="lbl">PIN del Carnet de Militant <span class="req">*</span> <i>(regli les 4 xifres)</i> <button type="button" class="info" id="pinInfo" aria-label="Informació sobre el PIN" aria-expanded="false" aria-controls="pinTip">i</button></span>
-        <div id="pinTip" class="tip" role="tooltip" hidden>ℹ️ Ajuda: el PIN del Carnet de Militant és <b>1711</b> (17/11, la data de naixement del titular).</div>
+        <label class="lbl" for="f_user">Nom d'usuari <span class="req">*</span> <button type="button" class="info" id="userInfo" aria-label="Informació sobre el nom d'usuari" aria-expanded="false" aria-controls="userTip">i</button></label>
+        <div id="userTip" class="tip" role="tooltip" hidden>ℹ️ Ajuda: el nom d'usuari és el nom de l'espècie en llatí del seu personatge.</div>
+        <input id="f_user" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <div class="ferr" id="e_user" hidden></div>
+        <span class="lbl">Contrasenya <span class="req">*</span> <i>(regli les 4 xifres)</i> <button type="button" class="info" id="pinInfo" aria-label="Informació sobre la contrasenya" aria-expanded="false" aria-controls="pinTip">i</button></span>
+        <div id="pinTip" class="tip" role="tooltip" hidden>ℹ️ Ajuda: la contrasenya és <b>1711</b> (17/11, la data de naixement del director).</div>
         <div id="pinRows"></div>
         <div class="ferr" id="e_pin" hidden></div>
-        <span class="lbl">Candidatura <span class="req">*</span> <i>(toqui-la quan pugui)</i></span>
-        <div id="arena">
-          <button class="btn runner" type="button" data-v="Llista A">Llista A</button>
-          <button class="btn runner" type="button" data-v="Llista B">Llista B</button>
-        </div>
-        <div class="ferr" id="e_llista" hidden></div>
         <div id="m2"></div>
         <div class="row act"><button class="btn" id="btnLogin" type="button">Accedir</button><button class="btn tiny dec" type="button">Cancel·lar</button></div>
       </fieldset>
@@ -318,128 +327,47 @@ body.dir-open #page{padding-bottom:120px}
     <!-- PAS 3 -->
     <section id="s3" hidden>
       <fieldset>
-        <legend>Pas 3 · Sol·licitud d'inscripció (Model EL-01)</legend>
-        <p class="hint">Els camps marcats amb <span style="color:#c00">*</span> són obligatoris.</p>
-        <form id="frm" novalidate autocomplete="off">
-          <label class="lbl" for="f_nom">Nom del partit <span class="req">*</span></label>
-          <input id="f_nom" type="text" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false">
-          <div class="ferr" id="e_nom" hidden></div>
-
-          <span class="lbl">Sigles <span class="req">*</span> <i>(màxim 3 lletres · Ex.: MPPU)</i></span>
-          <div id="reels"></div>
-          <div class="ferr" id="e_sigles" hidden></div>
-
-          <label class="lbl" for="f_eslogan">Eslògan <span class="req">*</span> <i>(es mostra en format reflectit)</i></label>
-          <input id="f_eslogan" class="mirror" type="text" autocomplete="off" autocapitalize="off">
-          <div class="ferr" id="e_eslogan" hidden></div>
-
-
-          <label class="lbl" for="f_ideologia">Ideologia <span class="req">*</span></label>
-          <select id="f_ideologia" size="2">
-            <option value="">Seleccioni…</option>
-            <option>La que digui la meva mare</option>
-            <option>Leo Messi</option>
-            <option>Depèn de qui pagui la birra</option>
-            <option>Extremadament moderada</option>
-            <option>La del grup de WhatsApp de la família</option>
-            <option>La que doni més canapès</option>
-            <option>La que no m'obligui a anar a reunions</option>
-            <option>Segons com em llevi</option>
-            <option>La que tingui més places d'aparcament</option>
-            <option>La del meu cunyat, que en sap molt</option>
-            <option>Cap, però amb molta passió</option>
-          </select>
-          <div class="ferr" id="e_ideologia" hidden></div>
-
-          <div class="hold">
-            <button type="button" id="holdBtn" aria-label="Declaració responsable">✍️</button>
-            <span id="holdTxt">Mantingui premut el segell 3 s per declarar responsablement que no som un partit de broma <span class="req" style="color:#c00">*</span></span>
-          </div>
-          <div class="ferr" id="e_decl" hidden></div>
-
-          <div id="m3"></div>
-          <div class="row act"><button class="btn" id="btnSubmit" type="submit">Presentar sol·licitud</button><button class="btn tiny dec" type="button">Cancel·lar</button></div>
-        </form>
-      </fieldset>
-    </section>
-
-    <!-- PAS 4 -->
-    <section id="s4" hidden>
-      <fieldset>
-        <legend>Pas 4 · Dibuixar el logo</legend>
-        <p>Dibuixi l'emblema del partit amb el pinzell oficial de la Junta.</p>
-        <p class="hint">Pinzell calibrat per a persones esquerranes (invertit). Pols no inclòs. Quadrícula disponible, prèvia verificació humana.</p>
-        <div id="paintWrap">
-          <div id="paintBox"><canvas id="paint" width="300" height="220"></canvas><div id="gridOv" hidden></div></div>
-          <div class="palette"><span id="pal" style="display:contents"></span><input type="range" id="brush" min="1" max="12" value="2" aria-label="Gruix"><button type="button" class="btn tiny" id="btnGrid">Quadrícula: no</button></div>
-          <div id="gridPanel" hidden>
-            <div class="hint" style="margin:8px 0 4px">L'activació de la quadrícula requereix verificació humana (art. 14 bis).</div>
-            <div id="gridCap" class="capbox"></div>
-            <div id="mG"></div>
-            <div class="row act"><button class="btn" id="btnGridOk" type="button">Verificar</button><button class="btn tiny" id="btnGridNo" type="button">Deixar-ho</button></div>
-          </div>
-        </div>
-        <div id="m4"></div>
-        <div id="logoOk" hidden style="margin-top:10px;text-align:center">
-          <div class="carnet"><img id="logoPrev" alt="Logo del partit"><small>FOTO CARNET · REG. PARTITS</small></div>
-        </div>
-        <div class="row act" id="paintBtns">
-          <button class="btn" id="btnLogoOk" type="button">OK</button>
-          <button class="btn tiny" id="btnClear" type="button">Esborrar</button>
-          <button class="btn tiny dec" type="button">Cancel·lar</button>
-        </div>
-        <div class="row"><button class="btn" id="btnLogoNext" type="button" hidden>Continuar »</button></div>
-      </fieldset>
-    </section>
-
-    <!-- PAS 5 -->
-    <section id="s5" hidden>
-      <fieldset>
-        <legend>Pas 5 · Verificació humana</legend>
+        <legend>Pas 3 · Verificació humana</legend>
         <p>Per garantir que vostè no és un robot, completi les proves de verificació.</p>
-        <div class="hint" id="capHead" style="margin:6px 0 4px;color:#555;font-size:11px;font-weight:bold">Verificació 1 de 6</div>
+        <div class="hint" id="capHead" style="margin:6px 0 4px;color:#555;font-size:11px;font-weight:bold">Verificació 1 de 7</div>
         <div id="cap" class="capbox"></div>
         <div id="m5"></div>
         <div class="row act"><button class="btn" id="btnCap" type="button">Verificar</button><button class="btn tiny dec" type="button">Cancel·lar</button></div>
       </fieldset>
     </section>
 
-    <!-- PAS 6 -->
-    <section id="s6" hidden>
+    <!-- PAS 4 -->
+    <section id="s4" hidden>
       <div id="receipt">
-        <h3>Justificant d'inscripció al Registre de Partits</h3>
-        <div class="regno"><small>Número de registre</small><span id="r_reg">—</span></div>
+        <h3>Perfil d'usuari verificat</h3>
+        <div class="regno"><small>Usuari</small><span id="p_user">—</span></div>
         <div class="rwrap">
-          <div class="carnet"><img id="r_logo" alt="Logo del partit"><small>FOTO CARNET</small></div>
+          <div class="carnet"><div class="photo" id="p_photo"></div><small>FOTO DEL PERFIL</small></div>
           <dl class="dl" style="flex:1 1 180px;min-width:0">
-            <div><dt>Partit</dt><dd class="big" id="r_nom"></dd></div>
-            <div><dt>Sigles</dt><dd id="r_sigles"></dd></div>
+            <div><dt>Personatge</dt><dd class="big" id="p_tipus"></dd></div>
+            <div><dt>Edat</dt><dd id="p_edat"></dd></div>
           </dl>
         </div>
         <dl class="dl" style="margin-top:12px">
-          <div><dt>Eslògan</dt><dd id="r_eslogan"></dd></div>
-          <div><dt>Ideologia</dt><dd id="r_ideologia"></dd></div>
-          <div><dt>Candidatura</dt><dd id="r_llista"></dd></div>
+          <div><dt>Va vestit</dt><dd id="p_vestit"></dd></div>
+          <div><dt>Saluda</dt><dd id="p_salut"></dd></div>
+          <div id="p_bromaBox" hidden><dt>Dada reservada</dt><dd id="p_broma"></dd></div>
         </dl>
-        <svg id="seal" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Segell: Junta Electoral, registrat">
+        <svg id="seal" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Segell: Junta Electoral, verificat">
           <defs><path id="arcTop" d="M 100,100 m -68,0 a 68,68 0 1,1 136,0 a 68,68 0 1,1 -136,0"/></defs>
           <circle cx="100" cy="100" r="94" fill="none" stroke="#c0392b" stroke-width="6"/>
           <circle cx="100" cy="100" r="86" fill="none" stroke="#c0392b" stroke-width="2"/>
           <circle cx="100" cy="100" r="50" fill="none" stroke="#c0392b" stroke-width="3"/>
           <text font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="17" fill="#c0392b">
-            <textPath href="#arcTop" startOffset="0" textLength="420" lengthAdjust="spacing">JUNTA ELECTORAL · REGISTRAT · </textPath>
+            <textPath href="#arcTop" startOffset="0" textLength="420" lengthAdjust="spacing">JUNTA ELECTORAL · VERIFICAT · </textPath>
           </text>
-          <text x="100" y="98" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="15" fill="#c0392b">REGISTRAT</text>
+          <text x="100" y="98" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="15" fill="#c0392b">VERIFICAT</text>
           <text x="100" y="118" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="13" fill="#c0392b">SS · 2026</text>
         </svg>
-        <p id="readAloud">Llegeixi aquest justificant en veu alta davant de la Junta perquè la inscripció sigui efectiva.</p>
-      </div>
-      <div id="m6"></div>
-      <div class="row">
-        <button class="btn" id="btnPrint" type="button">Imprimir justificant</button>
+        <p id="readAloud">Aquest perfil és confidencial. No l'ensenyi a ningú.</p>
       </div>
       <div class="row" style="margin-top:26px">
-        <button class="btn small" id="btnReset" type="button">Iniciar un nou tràmit</button>
+        <button class="btn small" id="btnReset" type="button">Tancar la sessió</button>
       </div>
     </section>
   </div>
@@ -477,25 +405,139 @@ body.dir-open #page{padding-bottom:120px}
   /* ================= Configuració ================= */
   var HASH = (location.hash || '').toLowerCase();
   var TEST = HASH.indexOf('test') > -1;
-  // Si un error de verificació (pas 5) ha de reiniciar només la verificació ('verificacio') o tot el tràmit ('tramit')
+  // Si un error de verificació (pas 3) ha de reiniciar només la verificació ('verificacio') o tot el tràmit ('tramit')
   var CAPTCHA_FAIL_RESTART = 'verificacio';
   var T = TEST
-    ? { countdown: 2, inactivity: 6, proc: 150, verify: 150, advance: 600, hold: 300, survey: HASH.indexOf('survey') > -1 ? 1 : 0, surveyRetry: 5, dodges: 1, freeze: true, queue: 3 }
-    : { countdown: 5, inactivity: 60, proc: 1800, verify: 1200, advance: 1200, hold: 2000, survey: 45, surveyRetry: 5, dodges: 3, freeze: false, queue: 12 };
-  var KEY = 'sige_v24_state';
-  var FAKE_PCT = [3, 14, 67, 8, 92, 100];
-  var PIN0 = '0000';
+    ? { countdown: 2, inactivity: 6, proc: 150, verify: 150, advance: 600, survey: HASH.indexOf('survey') > -1 ? 1 : 0, surveyRetry: 5, dodges: 2, freeze: true, queue: 3 }
+    : { countdown: 5, inactivity: 60, proc: 1800, verify: 1200, advance: 1200, survey: 45, surveyRetry: 5, dodges: 10, freeze: false, queue: 12 };
+  var KEY = 'sige_v28_state';
+  var FAKE_PCT = [3, 24, 88, 100];
   var PIN_OK = '1711';
+
+  /* ================= Els personatges (els mateixos de l'artifact) ================= */
+  var CHARS = [
+ {
+  "ic": "🚆",
+  "tipus": "El segurata del tren",
+  "especie": "Securatus ferroviarius",
+  "edat": 44,
+  "vestit": "Uniforme fosc, armilla groga fluorescent, walkie, porra i una pistola que tots esperem que sigui de fogueig. Cap rapat i un tatuatge del seu número preferit: el 88.",
+  "salut": "«¡Voy a tope, jefe de equipo!», alçant el walkie."
+ },
+ {
+  "ic": "🟢",
+  "tipus": "El rastafari",
+  "especie": "Rastafarus Rototomus",
+  "edat": 29,
+  "vestit": "Samarreta ampla, sandàlies i collarets. Pell robusta, ulls migoberts i vermells i somriure permanent. Les rastes li arriben al cul i s'ha ajuntat la rasta del cabell amb la rasta del cul, com si fossin dos avatars follant.",
+  "salut": "«Yaman!», i xoca el puny amb tothom, molt a poc a poc.",
+  "broma": "La broma final: ja no sap què vol dir estirar o pentinar cap amunt, perquè hi ha dos amunts."
+ },
+ {
+  "ic": "🎮",
+  "tipus": "El streamer",
+  "especie": "Xokus brutejus",
+  "edat": 33,
+  "vestit": "Auriculars de teleoperador, amb el micro de pal, enganxats amb celo. Una llauna de Monster a la mà i un cadàver al congelador: en particular, el del pollastre a la brasa que ahir no es va poder menjar.",
+  "salut": "«Háblame en español, ehhhhh.»"
+ },
+ {
+  "ic": "📿",
+  "tipus": "El de la pulserita",
+  "especie": "Pulseritus patrioticus",
+  "edat": 35,
+  "vestit": "Vestit rosa i camisa blanca, cabell rinxolat, la pulserita de la bandera d'Espanya i un somriure d'orella a orella, amb unes dents blanques nuclears. Moreno com un moble de roure envernissat. Molt actiu a les altes hores de la matinada.",
+  "salut": "«Bueno, ¿cómo están los máquinas? Lo primero de todo… ¡un saludo!», i xoca la mà fortíssim a cadascú."
+ },
+ {
+  "ic": "🍺",
+  "tipus": "El borratxo de bar",
+  "especie": "Manolus Eldelbarus",
+  "edat": 52,
+  "vestit": "Camisa mig oberta sobre una samarreta interior tacada, amb el pèl canós del pit sortint per sobre. Una cervesa a la mà a les 9 del matí. Bigoti frondós, groc del tabac.",
+  "salut": "«Eh… o no, eh? Eh, eh.»"
+ },
+ {
+  "ic": "🏐",
+  "tipus": "El del BSC",
+  "especie": "Voleyus maresmensis",
+  "edat": 24,
+  "vestit": "Banyador apretat, ulleres de sol de ciclista i sorra fins als genolls. Sempre porta una venda compressiva al colze d'una lesió que ja s'està curant.",
+  "salut": "«Porto xarxa?», i passa una pilota imaginària de volei a tothom."
+ },
+ {
+  "ic": "🐱",
+  "tipus": "Gat còsmic",
+  "especie": "Dora Emus",
+  "edat": 112,
+  "vestit": "Gat còsmic de cos blau i panxa blanca. Butxaca a lo cangur d'on treu un casquet volador, que utilitza com a mètode de transport per sobre de la porta màgica, per alguna raó.",
+  "salut": "«El casquet volador!!»",
+  "broma": "Ningú no diu el nom. La gent ha de pensar «és Doraemon?» només amb el casquet volador, la butxaca i la porta màgica."
+ },
+ {
+  "ic": "🏋️",
+  "tipus": "La crossfitera",
+  "especie": "Crisis dels quarantus",
+  "edat": 18,
+  "vestit": "Malles Nike Pro, top esportiu i rellotge Garmin. Bidó de proteïna a la mà i un kit de xeringues perquè és diabètica. Té pèl al pit per la testosterona.",
+  "salut": "Fa un burpee.",
+  "broma": "Diu que és diabètica, però es punxa per ser més forta: està fortíssima."
+ },
+ {
+  "ic": "🤙",
+  "tipus": "El del six seven",
+  "especie": "Tung Tung Sahur",
+  "edat": 17,
+  "vestit": "Dessuadora oversize, cadena, gorra al revés i unes bambes enormes. Molt alt i molt prim, amb el flequillo tapant-li un ull, el mòbil enganxat a la mà amb TikTok en bucle i els ulls vermells de tant scroll.",
+  "salut": "«Tung, tung, tung, sahur!», picant el terra amb un bat imaginari.",
+  "broma": "Té el cap rebentat per TikTok. La broma final és el «six seven»: acaba dient «six seven!» amb el gest de balança amb les mans."
+ },
+ {
+  "ic": "🎧",
+  "tipus": "El raver",
+  "especie": "Titanus mandibulus",
+  "edat": 26,
+  "vestit": "Ulleres de sol encara que sigui a l'ombra, armilla reflectant, polseres de festival i ronyonera. Pupil·les com a plats i tres xiclets a la boca.",
+  "salut": "«Quin dia és?», marcant el ritme amb la mà en alt."
+ },
+ {
+  "ic": "🏍️",
+  "tipus": "El divorciat amb moto",
+  "especie": "Ducattis Divorciatus",
+  "edat": 49,
+  "vestit": "Jaqueta de cuir, casc a la mà, ulleres d'aviador, samarreta ajustada i Axe Chocolate. Pit depilat, bronzejat a lo Donald Trump, més entrades que les entrades que van vendre Oques Grasses a la gira final i un tupè que vol ser cabell.",
+  "salut": "«MariCarme, si us plau, vull veure els meus fills!», amb el casc a la mà."
+ },
+ {
+  "ic": "🥂",
+  "tipus": "L'expat",
+  "especie": "Expatus Conolianatus",
+  "edat": 45,
+  "vestit": "Pell rosada i el mòbil sempre obert amb un pis de l'Idealista: «Beautiful loft in Barcelona, 60 m², 3000 €/month, expenses included!».",
+  "salut": "«Hello! Nice place! Is it for rent? I pay double. Do you speak English?», i planta una banderola al mig de la sala."
+ },
+ {
+  "ic": "🧉",
+  "tipus": "L'argentí del mate",
+  "especie": "Argentinus matecus",
+  "edat": 30,
+  "vestit": "Mate a una mà i el termo sota l'altre braç, samarreta de la selecció argentina i xancletes amb mitjons. Barba de tres dies i el cabell ple de gomina.",
+  "salut": "«Hola, ¿cómo estás?» I, sense esperar resposta, es respon ell mateix: «Bien, bien, ¿vos? Ah, bien también, qué bueno, che. Mirá, yo hoy me levanté temprano, me tomé unos mates en el balcón, ¿viste? Con la yerba que me trajo mi vieja de Rosario, porque acá no hay manera de conseguir una yerba decente, boludo. Después fui a la panadería y le pregunté al chabón si tenía medialunas y me dijo que no sabía qué eran, ¡no sabía qué eran!, así que imaginate. Después caminé hasta acá, que está lejísimo, ¿vos viste lo lejos que está? Pero bueno, la verdad es que Barcelona me encanta, la gente es muy amable, aunque hablan un idioma que no entiendo ni medio, pero me las arreglo, ¿viste? Y vos, ¿cómo estás? Ah, ya me lo dijiste. Bien. Qué bueno, che.»"
+ },
+ {
+  "ic": "🛴",
+  "tipus": "El nen del patinet elèctric",
+  "especie": "Patinetus Classicus",
+  "edat": 19,
+  "vestit": "Patinet elèctric, xandall, gorra i ronyonera Gucci de quadres. Degradat amb la ratlla afaitada a la cella i ulleres de sol encara que sigui de nit.",
+  "salut": "«¿Tiene segarro, amego?»",
+  "broma": "Sense dir-ho: és el que et trobes al polígon de Mataró quan surts de festa, demanant cigarret a la porta del Classic."
+ }
+];
 
   /* ================= Estat i emmagatzematge ================= */
   function defaults() {
-    return {
-      step: 1, noObs: false, restarts: 0, cap: 0,
-      att: { turn: 0, submit: 0, logo: 0, captcha: 0 },
-      pin: PIN0, llista: '',
-      form: { nom: '', sig: ['', '', '', ''], eslogan: '', ideologia: '', decl: false },
-      logo: '', logoOk: false, reg: ''
-    };
+    return { step: 1, noObs: false, restarts: 0, cap: 0, att: { turn: 0, captcha: 0 }, user: '' };
   }
   var memStore = null;
   function str(v) { return typeof v === 'string' ? v : ''; }
@@ -505,18 +547,11 @@ body.dir-open #page{padding-bottom:120px}
     if (!raw) return d;
     try {
       var s = JSON.parse(raw);
-      if (typeof s.step === 'number' && s.step >= 1 && s.step <= 6) d.step = s.step;
-      if (typeof s.cap === 'number' && s.cap >= 0 && s.cap <= 5) d.cap = s.cap;
+      if (typeof s.step === 'number' && s.step >= 1 && s.step <= 4) d.step = s.step;
+      if (typeof s.cap === 'number' && s.cap >= 0 && s.cap <= 6) d.cap = s.cap;
       if (typeof s.restarts === 'number') d.restarts = s.restarts;
-      d.noObs = !!s.noObs;
-      ['turn', 'submit', 'logo', 'captcha'].forEach(function (k) { if (s.att && typeof s.att[k] === 'number') d.att[k] = s.att[k]; });
-      if (/^\d{4}$/.test(str(s.pin))) d.pin = s.pin;
-      d.llista = str(s.llista); d.logo = str(s.logo); d.reg = str(s.reg); d.logoOk = !!s.logoOk;
-      if (s.form) {
-        ['nom', 'eslogan', 'ideologia'].forEach(function (k) { d.form[k] = str(s.form[k]); });
-        d.form.decl = !!s.form.decl;
-        if (Array.isArray(s.form.sig)) for (var i = 0; i < 4; i++) d.form.sig[i] = /^[A-Z]$/.test(str(s.form.sig[i])) ? s.form.sig[i] : '';
-      }
+      d.noObs = !!s.noObs; d.user = str(s.user);
+      ['turn', 'captcha'].forEach(function (k) { if (s.att && typeof s.att[k] === 'number') d.att[k] = s.att[k]; });
     } catch (e) { /* estat corrupte: es comença de nou */ }
     return d;
   }
@@ -524,8 +559,7 @@ body.dir-open #page{padding-bottom:120px}
   function save() {
     var raw = JSON.stringify(S);
     memStore = raw;
-    try { window.localStorage.setItem(KEY, raw); }
-    catch (e) { try { var c = JSON.parse(raw); c.logo = ''; window.localStorage.setItem(KEY, JSON.stringify(c)); } catch (e2) { /* sense persistència */ } }
+    try { window.localStorage.setItem(KEY, raw); } catch (e) { /* sense persistència */ }
   }
   function obs() { return !S.noObs; }
 
@@ -574,14 +608,25 @@ body.dir-open #page{padding-bottom:120px}
   }
   function closeModal() { $('ov').hidden = true; modalOpen = false; }
 
-  /* ================= Navegació i reinici ================= */
-  function goStep(n) {
-    S.step = n;
-    if (n === 6 && !S.reg) S.reg = genReg();
-    save(); render(); window.scrollTo(0, 0);
+  /* ================= Modal estil Windows ================= */
+  var modalOpen = false, lastActivity = Date.now();
+  function modal(o) {
+    $('winTitle').textContent = o.title; $('winIcon').textContent = o.icon || '⚠️'; $('winText').textContent = o.text; $('winText').removeAttribute('data-ans');
+    var box = $('winBtns'); box.innerHTML = '';
+    (o.buttons || [{ label: 'Acceptar' }]).forEach(function (b) {
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'btn'; btn.textContent = b.label;
+      btn.addEventListener('click', function () { closeModal(); lastActivity = Date.now(); if (b.cb) b.cb(); });
+      box.appendChild(btn);
+    });
+    $('ov').hidden = false; modalOpen = true;
+    var f = box.querySelector('button'); if (f) f.focus();
   }
-  // Un error greu anul·la tot el tràmit: s'esborren les dades, es torna a la cua.
-  // Els comptadors d'obstacles únics (cupo, error 500, "és lleig", robot) NO es reinicien.
+  function closeModal() { $('ov').hidden = true; modalOpen = false; }
+
+  /* ================= Navegació i reinici ================= */
+  function goStep(n) { S.step = n; save(); render(); window.scrollTo(0, 0); }
+  // Un error greu anul·la tot el tràmit: es torna a la cua. Els obstacles d'un sol cop (cupo, robot) NO es reinicien.
   function restart(reason) {
     if (!obs()) { toast(reason); return false; }
     var att = S.att, n = S.restarts + 1;
@@ -596,21 +641,18 @@ body.dir-open #page{padding-bottom:120px}
 
   function render() {
     clearTimers();
-    for (var i = 1; i <= 6; i++) $('s' + i).hidden = (i !== S.step);
-    $('progLbl').textContent = 'Pas ' + S.step + ' de 6 · ' + FAKE_PCT[S.step - 1] + '% completat' + (S.step === 6 ? ' (±3%)' : '');
+    for (var i = 1; i <= 4; i++) $('s' + i).hidden = (i !== S.step);
+    $('progLbl').textContent = 'Pas ' + S.step + ' de 4 · ' + FAKE_PCT[S.step - 1] + '% completat' + (S.step === 4 ? ' (±3%)' : '');
     $('progFill').style.width = FAKE_PCT[S.step - 1] + '%';
     $('anul').hidden = !S.restarts;
     $('anul').textContent = 'Expedients anul·lats en aquesta sessió: ' + S.restarts;
     lastActivity = Date.now();
-    if (S.step !== 5) $('cap').innerHTML = '';
-    if (S.step !== 4) $('gridCap').innerHTML = '';
+    if (S.step !== 3) $('cap').innerHTML = '';
     if (S.step === 1) initStep1();
     if (S.step === 2) initStep2();
     if (S.step === 3) initStep3();
     if (S.step === 4) initStep4();
-    if (S.step === 5) initStep5();
-    if (S.step === 6) initStep6();
-    if (T.survey && obs() && S.step >= 2 && S.step <= 4) later(survey, T.survey * 1000);
+    if (T.survey && obs() && (S.step === 2 || S.step === 3)) later(survey, T.survey * 1000);
     $('dirNoObs').checked = S.noObs;
   }
   // Enquesta de satisfacció = una verificació de veritat o fals (apareix cada cop que s'ajorna)
@@ -687,226 +729,62 @@ body.dir-open #page{padding-bottom:120px}
     }, 250);
   });
 
-  /* ================= PAS 2 · Identificació ================= */
+  /* ================= PAS 2 · Identificació (usuari = nom en llatí del personatge) ================= */
+  function lev(a, b) {
+    var d = [], i, j;
+    for (i = 0; i <= a.length; i++) { d[i] = [i]; }
+    for (j = 1; j <= b.length; j++) d[0][j] = j;
+    for (i = 1; i <= a.length; i++) for (j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    return d[a.length][b.length];
+  }
+  function normU(s) { return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/^ | $/g, ''); }
+  function slugOf(c) { return normU(c.especie).replace(/ /g, '-'); }
+  function charBySlug(sl) { for (var i = 0; i < CHARS.length; i++) if (slugOf(CHARS[i]) === sl) return CHARS[i]; return null; }
+  // Accepta l'usuari amb una errada d'un caràcter (mòbil, accents, majúscules)
+  function findChar(txt) {
+    var n = normU(txt), best = null, bd = 99;
+    if (!n) return null;
+    CHARS.forEach(function (c) { var d = lev(n, normU(c.especie)); if (d < bd) { bd = d; best = c; } });
+    return bd <= 1 ? best : null;
+  }
+  var pw = '0000';
   function initStep2() {
-    setMsg('m2', null); fieldErr('pin', ''); fieldErr('llista', ''); show($('pinTip'), false);
-    $('btnLogin').disabled = false;
-    buildPin(); initArena();
+    setMsg('m2', null); fieldErr('user', ''); fieldErr('pin', ''); show($('userTip'), false); show($('pinTip'), false);
+    $('btnLogin').disabled = false; $('f_user').value = ''; pw = '0000';
+    buildPin();
   }
   function buildPin() {
     var box = $('pinRows'); box.innerHTML = '';
     for (var i = 0; i < 4; i++) (function (i) {
       var row = document.createElement('div'); row.className = 'pinrow';
-      var dg = document.createElement('div'); dg.className = 'dg'; dg.textContent = S.pin.charAt(i);
-      var r = document.createElement('input'); r.type = 'range'; r.min = 0; r.max = 9; r.step = 1; r.value = S.pin.charAt(i);
-      r.setAttribute('aria-label', 'Xifra ' + (i + 1) + ' del PIN');
+      var dg = document.createElement('div'); dg.className = 'dg'; dg.textContent = pw.charAt(i);
+      var r = document.createElement('input'); r.type = 'range'; r.min = 0; r.max = 9; r.step = 1; r.value = pw.charAt(i);
+      r.setAttribute('aria-label', 'Xifra ' + (i + 1) + ' de la contrasenya');
       r.addEventListener('input', function () {
-        var a = S.pin.split(''); a[i] = r.value; S.pin = a.join(''); dg.textContent = r.value; save();
+        var a = pw.split(''); a[i] = r.value; pw = a.join(''); dg.textContent = r.value;
       });
       row.appendChild(dg); row.appendChild(r); box.appendChild(row);
     })(i);
   }
-  var runners = [];
-  function initArena() {
-    var a = $('arena'), W = a.clientWidth, H = a.clientHeight;
-    runners = [];
-    Array.prototype.forEach.call(a.querySelectorAll('.runner'), function (b, i) {
-      b.classList.remove('chosen', 'off'); b.textContent = b.getAttribute('data-v'); b.disabled = false;
-      var r = { el: b, x: 16 + i * (W - 128), y: 18 + i * 60, vx: (i ? -1 : 1) * (70 + rnd(30)), vy: (i ? 1 : -1) * (50 + rnd(30)), w: 96, h: 44 };
-      runners.push(r); b.style.transform = 'translate(' + r.x + 'px,' + r.y + 'px)';
-      b.onclick = function () { chooseList(b.getAttribute('data-v')); };
-    });
-    if (S.llista) { markChosen(); return; }
-    if (T.freeze || !obs()) return;
-    var last = 0;
-    function loop(ts) {
-      var dt = last ? Math.min(0.05, (ts - last) / 1000) : 0; last = ts;
-      runners.forEach(function (r) {
-        r.x += r.vx * dt; r.y += r.vy * dt;
-        if (r.x < 0) { r.x = 0; r.vx = Math.abs(r.vx); } else if (r.x + r.w > W) { r.x = W - r.w; r.vx = -Math.abs(r.vx); }
-        if (r.y < 0) { r.y = 0; r.vy = Math.abs(r.vy); } else if (r.y + r.h > H) { r.y = H - r.h; r.vy = -Math.abs(r.vy); }
-        r.el.style.transform = 'translate(' + r.x.toFixed(1) + 'px,' + r.y.toFixed(1) + 'px)';
-      });
-      raf = requestAnimationFrame(loop);
-    }
-    raf = requestAnimationFrame(loop);
+  function tipToggle(btn, tip) {
+    btn.addEventListener('click', function () { var open = tip.hidden; tip.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); });
   }
-  function chooseList(v) {
-    if (S.llista) return;
-    S.llista = v; save(); fieldErr('llista', ''); markChosen();
-  }
-  function markChosen() {
-    if (raf) { cancelAnimationFrame(raf); raf = 0; }
-    runners.forEach(function (r) {
-      var on = r.el.getAttribute('data-v') === S.llista;
-      r.el.classList.toggle('chosen', on); r.el.classList.toggle('off', !on);
-      if (on) r.el.textContent = '✓ ' + r.el.getAttribute('data-v');
-      r.el.disabled = true;
-    });
-  }
-  $('pinInfo').addEventListener('click', function () {
-    var tip = $('pinTip'), open = tip.hidden;
-    tip.hidden = !open; this.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
+  tipToggle($('userInfo'), $('userTip')); tipToggle($('pinInfo'), $('pinTip'));
   $('btnLogin').addEventListener('click', function () {
-    var pinBad = obs() && S.pin !== PIN_OK;
-    fieldErr('pin', pinBad ? 'Error 0x0041: PIN del Carnet de Militant incorrecte.' : '');
-    fieldErr('llista', S.llista ? '' : 'Error 0x0043: Seleccioni una candidatura');
-    if (pinBad || !S.llista) return;
-    var b = $('btnLogin'); b.disabled = true; setMsg('m2', 'info', 'Validant credencials…');
+    var ch = findChar($('f_user').value);
+    fieldErr('user', ''); fieldErr('pin', '');
+    if (obs()) {
+      var bad = false;
+      if (!ch) { fieldErr('user', 'Error 0x0041: Usuari desconegut al Registre de Personatges.'); bad = true; }
+      if (pw !== PIN_OK) { fieldErr('pin', 'Error 0x0042: Contrasenya incorrecta.'); bad = true; }
+      if (bad) return;
+    } else if (!ch) ch = CHARS[0];
+    S.user = slugOf(ch); save();
+    $('btnLogin').disabled = true; setMsg('m2', 'info', 'Validant credencials…');
     later(function () { goStep(3); }, T.proc / 2);
   });
 
-  /* ================= PAS 3 · Sol·licitud ================= */
-  function initStep3() {
-    setMsg('m3', null);
-    ['nom', 'sigles', 'eslogan', 'ideologia', 'decl'].forEach(function (k) { fieldErr(k, ''); });
-    $('f_nom').value = S.form.nom; buildReels();
-    $('f_eslogan').value = S.form.eslogan;
-    $('f_ideologia').value = S.form.ideologia;
-    renderHold();
-    $('btnSubmit').disabled = false;
-  }
-  function buildReels() {
-    var box = $('reels'); box.innerHTML = '';
-    for (var i = 0; i < 4; i++) (function (i) {
-      var r = document.createElement('div'); r.className = 'reel';
-      var up = document.createElement('button'); up.type = 'button'; up.className = 'btn mini'; up.textContent = '▲'; up.setAttribute('aria-label', 'Lletra ' + (i + 1) + ' amunt');
-      var lt = document.createElement('div'); lt.className = 'lt';
-      var dn = document.createElement('button'); dn.type = 'button'; dn.className = 'btn mini'; dn.textContent = '▼'; dn.setAttribute('aria-label', 'Lletra ' + (i + 1) + ' avall');
-      function paint() { lt.textContent = S.form.sig[i] || '–'; }
-      function step(d) {
-        var c = S.form.sig[i], n = c ? c.charCodeAt(0) - 64 : 0;   // 0 = buit, 1..26 = A..Z
-        n = (n + d + 27) % 27; S.form.sig[i] = n ? String.fromCharCode(64 + n) : ''; save(); paint();
-      }
-      up.addEventListener('click', function () { step(1); }); dn.addEventListener('click', function () { step(-1); });
-      paint(); r.appendChild(up); r.appendChild(lt); r.appendChild(dn); box.appendChild(r);
-    })(i);
-  }
-  $('f_eslogan').addEventListener('input', function () { S.form.eslogan = this.value; save(); });
-  $('f_nom').addEventListener('input', function () { S.form.nom = this.value; save(); });
-  $('f_ideologia').addEventListener('change', function () { S.form.ideologia = this.value; save(); });
-
-  // Declaració responsable: s'ha de mantenir premut
-  var holdStart = 0;
-  function renderHold() {
-    var ok = S.form.decl, b = $('holdBtn');
-    b.style.setProperty('--p', ok ? '100%' : '0%'); b.textContent = ok ? '✅' : '✍️';
-    $('holdTxt').firstChild.textContent = ok ? 'Declaració registrada. Ja no hi ha volta enrere. ' : 'Mantingui premut el segell ' + Math.round(T.hold / 1000 * 10) / 10 + ' s per declarar responsablement que no som un partit de broma ';
-  }
-  function holdEnd() { if (holdIv) { clearInterval(holdIv); holdIv = null; } if (!S.form.decl) $('holdBtn').style.setProperty('--p', '0%'); }
-  $('holdBtn').addEventListener('pointerdown', function (e) {
-    e.preventDefault(); if (S.form.decl) return;
-    holdStart = Date.now(); if (holdIv) clearInterval(holdIv);
-    var need = obs() ? T.hold : 200;
-    holdIv = setInterval(function () {
-      var p = Math.min(1, (Date.now() - holdStart) / need);
-      $('holdBtn').style.setProperty('--p', Math.round(p * 100) + '%');
-      if (p >= 1) { clearInterval(holdIv); holdIv = null; S.form.decl = true; save(); renderHold(); fieldErr('decl', ''); }
-    }, 40);
-  });
-  ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { $('holdBtn').addEventListener(ev, holdEnd); });
-  $('holdBtn').addEventListener('contextmenu', function (e) { e.preventDefault(); });
-
-  $('frm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var f = S.form, errs = [];
-    ['nom', 'sigles', 'eslogan', 'ideologia', 'decl'].forEach(function (k) { fieldErr(k, ''); });
-    function bad(k, msg) { fieldErr(k, msg); errs.push(k); }
-    if (f.sig[3]) {
-      if (restart('Error 0x00E3: Les sigles superen el màxim permès.')) return;
-      bad('sigles', 'Error 0x00E3: Les sigles superen el màxim permès');
-    }
-    if (!f.nom.trim()) bad('nom', 'Error 0x0010: El camp «Nom del partit» és obligatori');
-    if (!f.sig.join('') && !f.sig[3]) bad('sigles', 'Error 0x0011: El camp «Sigles» és obligatori');
-    if (!f.eslogan.trim()) bad('eslogan', 'Error 0x0012: El camp «Eslògan» és obligatori');
-    if (!f.ideologia) bad('ideologia', 'Error 0x0014: Ha de seleccionar una ideologia vàlida (i «Seleccioni…» no ho és)');
-    if (!f.decl) bad('decl', 'Error 0x00F1: Ha de signar la declaració responsable');
-    if (errs.length) {
-      setMsg('m3', 'err', 'La sol·licitud conté ' + errs.length + (errs.length === 1 ? ' error.' : ' errors.') + ' Revisi els camps marcats.');
-      var t = $('e_' + errs[0]); if (t) t.scrollIntoView({ block: 'center' });
-      return;
-    }
-    setMsg('m3', null);
-    S.att.submit++; save();
-    if (S.att.submit === 1 && obs()) {
-      modal({ title: 'Seu Electrònica - Error', icon: '⛔', text: 'Error 500: el servei no està disponible en aquest horari' });
-      return;
-    }
-    var b = $('btnSubmit'); b.disabled = true; setMsg('m3', 'info', 'Tramitant la sol·licitud… no tanqui el navegador.');
-    later(function () { goStep(4); }, T.proc);
-  });
-
-  /* ================= PAS 4 · Dibuixar el logo ================= */
-  var DEFAULT_LOGO = 'data:image/svg+xml;utf8,' + encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#e9e3c9"/>' +
-    '<path d="M60 14 L100 26 V62 C100 86 82 98 60 106 C38 98 20 86 20 62 V26 Z" fill="#9a9a9a" stroke="#444" stroke-width="3"/>' +
-    '<path d="M36 46 H84 L80 84 H40 Z" fill="#2c4f93" stroke="#1a2f5c" stroke-width="3"/><rect x="48" y="52" width="24" height="6" rx="3" fill="#0a1530"/></svg>');
-  var paint = $('paint'), pctx = paint.getContext('2d'), drawing = false, lastPt = null, drew = false, brushColor = '#000000';
-  var COLORS = ['#000000', '#c0392b', '#f1c40f', '#2c6fbb', '#2e8b3a', '#e85d9a'];
-  (function () {
-    var pal = $('pal');
-    COLORS.forEach(function (c, i) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'sw' + (i === 0 ? ' sel' : ''); b.style.background = c; b.setAttribute('aria-label', 'Color ' + (i + 1));
-      b.addEventListener('click', function () {
-        brushColor = c; Array.prototype.forEach.call(pal.children, function (x) { x.classList.remove('sel'); }); b.classList.add('sel');
-      });
-      pal.appendChild(b);
-    });
-  })();
-  function clearPaint() {
-    pctx.fillStyle = '#ffffff'; pctx.fillRect(0, 0, paint.width, paint.height); drew = false;
-  }
-  function pt(e) {
-    var r = paint.getBoundingClientRect();
-    var x = (e.clientX - r.left) * paint.width / r.width, y = (e.clientY - r.top) * paint.height / r.height;
-    if (obs()) { x = paint.width - x; x += (Math.random() - 0.5) * 3; y += (Math.random() - 0.5) * 3; }
-    return { x: x, y: y };
-  }
-  function stroke(a, b) {
-    pctx.strokeStyle = brushColor; pctx.fillStyle = brushColor; pctx.lineWidth = parseInt($('brush').value, 10); pctx.lineCap = 'round'; pctx.lineJoin = 'round';
-    pctx.beginPath(); pctx.moveTo(a.x, a.y); pctx.lineTo(b.x, b.y); pctx.stroke(); drew = true;
-  }
-  paint.addEventListener('pointerdown', function (e) {
-    e.preventDefault(); drawing = true; lastPt = pt(e);
-    try { paint.setPointerCapture(e.pointerId); } catch (x) { /* res */ }
-    stroke(lastPt, { x: lastPt.x + 0.01, y: lastPt.y });
-  });
-  paint.addEventListener('pointermove', function (e) { if (!drawing) return; var p = pt(e); stroke(lastPt, p); lastPt = p; });
-  ['pointerup', 'pointercancel'].forEach(function (ev) { paint.addEventListener(ev, function () { drawing = false; }); });
-  /* Quadrícula: activar-la exigeix superar una prova de verificació humana */
-  var gridOn = false, gridCap = null;
-  function setGrid(on) { gridOn = on; show($('gridOv'), on); $('btnGrid').textContent = 'Quadrícula: ' + (on ? 'sí' : 'no'); }
-  function gridAsk() { gridCap = MINI[rnd(MINI.length)]; gridCap.build($('gridCap')); setMsg('mG', null); show($('gridPanel'), true); }
-  $('btnGrid').addEventListener('click', function () {
-    if (gridOn) { setGrid(false); return; }
-    if (!obs()) { setGrid(true); return; }
-    gridAsk();
-  });
-  $('btnGridOk').addEventListener('click', function () {
-    var r = gridCap.check($('gridCap'));
-    if (r === true) { show($('gridPanel'), false); $('gridCap').innerHTML = ''; setGrid(true); toast('Quadrícula activada. Gràcies per demostrar que és humà.'); return; }
-    gridAsk(); setMsg('mG', 'err', r + ' Se li ofereix una nova prova.');
-  });
-  $('btnGridNo').addEventListener('click', function () { show($('gridPanel'), false); $('gridCap').innerHTML = ''; });
-  function initStep4() {
-    setMsg('m4', null); setGrid(false); show($('gridPanel'), false);
-    var done = S.logoOk && S.logo;
-    show($('paintWrap'), !done); show($('paintBtns'), !done); show($('logoOk'), !!done); show($('btnLogoNext'), !!done);
-    if (done) $('logoPrev').src = S.logo; else clearPaint();
-  }
-  $('btnClear').addEventListener('click', function () { clearPaint(); setMsg('m4', null); });
-  $('btnLogoOk').addEventListener('click', function () {
-    if (!drew) { setMsg('m4', 'warn', 'El llenç està en blanc. Dibuixi alguna cosa.'); return; }
-    S.att.logo++; save();
-    if (obs() && S.att.logo === 1) { setMsg('m4', 'err', 'El logo és molt lleig. Afegeixi color o alguna cosa.'); return; }
-    S.logo = paint.toDataURL('image/jpeg', 0.85); S.logoOk = true; save();
-    $('logoPrev').src = S.logo; setMsg('m4', 'ok', 'Logo acceptat. (Amb reserves.)');
-    show($('paintWrap'), false); show($('paintBtns'), false); show($('logoOk'), true); show($('btnLogoNext'), true);
-  });
-  $('btnLogoNext').addEventListener('click', function () { goStep(5); });
-
-  /* ================= PAS 5 · Cinc verificacions ================= */
+  /* ================= PAS 3 · Set verificacions ================= */
   function porroInner(liquid, glass) {
     // Porró: cos arrodonit (en pera), coll curt amb boca acampanada i un broc llarg i fi a l'espatlla
     return '<path d="M55 50 L87 12 L93 17 L68 62 Z" fill="' + glass + '" stroke="#245" stroke-width="2.5" stroke-linejoin="round"/>' +
@@ -917,90 +795,23 @@ body.dir-open #page{padding-bottom:120px}
       '<path d="M30 70 Q30 62 36 58" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/>';
   }
   function porro(liquid, glass) { return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" data-k="porro">' + porroInner(liquid, glass || '#d7ecf5') + '</svg>'; }
-  var SVG_WINE = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M43 6 H57 V12 H55 V34 Q70 42 70 58 V90 Q70 95 65 95 H35 Q30 95 30 90 V58 Q30 42 45 34 V12 H43 Z" fill="#2f6b3a" stroke="#123" stroke-width="2.5" stroke-linejoin="round"/><rect x="34" y="62" width="32" height="20" fill="#f4ecd0" stroke="#123" stroke-width="1.5"/><rect x="43" y="6" width="14" height="6" fill="#a33" stroke="#123" stroke-width="2"/></svg>';
-  var SVG_JUG = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M30 20 Q24 20 24 28 L24 80 Q24 92 36 92 H58 Q70 92 70 80 V28 Q70 20 64 20 Z" fill="#c8753c" stroke="#4a2410" stroke-width="2.5"/><path d="M70 34 Q92 34 92 56 Q92 76 70 76" fill="none" stroke="#4a2410" stroke-width="6"/><ellipse cx="47" cy="20" rx="17" ry="4" fill="#7a3f17" stroke="#4a2410" stroke-width="2"/></svg>';
-  var SVG_WATER = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="22" y="40" width="44" height="40" rx="6" fill="#4d9bd6" stroke="#1e4f78" stroke-width="3"/><path d="M66 56 L92 30 L96 36 L68 70" fill="#4d9bd6" stroke="#1e4f78" stroke-width="3" stroke-linejoin="round"/><path d="M22 48 Q8 48 8 62 Q8 74 22 72" fill="none" stroke="#1e4f78" stroke-width="4"/><path d="M30 40 Q44 18 58 40" fill="none" stroke="#1e4f78" stroke-width="4"/></svg>';
-
-  var sceneSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1a3a"/><stop offset="1" stop-color="#4b6bb8"/></linearGradient></defs>' +
-    '<rect width="300" height="150" fill="url(#g)"/><circle cx="44" cy="34" r="16" fill="#f7f1c9"/>' +
-    '<g fill="#fff"><circle cx="100" cy="20" r="1.5"/><circle cx="140" cy="40" r="1.2"/><circle cx="210" cy="16" r="1.6"/><circle cx="270" cy="30" r="1.3"/><circle cx="170" cy="12" r="1.1"/></g>' +
-    '<path d="M0 122 Q60 92 120 120 T300 112 V150 H0Z" fill="#1d3b2a"/>' +
-    '<rect x="96" y="50" width="86" height="24" fill="#c0392b" stroke="#fff" stroke-width="2"/><text x="139" y="67" text-anchor="middle" font-family="Verdana,sans-serif" font-weight="bold" font-size="11" fill="#fff">VOTA PORRÓ</text>' +
-    '<rect x="136" y="74" width="6" height="44" fill="#6b4a2a"/>' +
-    '<g transform="translate(195 45) scale(0.85)">' + porroInner('#8b1e2d', '#d7ecf5') + '</g></svg>';
-  var SCENE = "url('data:image/svg+xml;utf8," + encodeURIComponent(sceneSvg).replace(/'/g, '%27') + "')";
-  var PUZ_T = 212, PUZ_Y = 52;
-
-  function seeded(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-  function normTxt(s) { return s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z]/gi, '').toUpperCase(); }
-  function lev(a, b) {
-    var d = [], i, j;
-    for (i = 0; i <= a.length; i++) { d[i] = [i]; }
-    for (j = 1; j <= b.length; j++) d[0][j] = j;
-    for (i = 1; i <= a.length; i++) for (j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-    return d[a.length][b.length];
-  }
   function head(small, big) { return '<div class="top"><small>' + small + '</small><b>' + big + '</b></div>'; }
-  function toggleCell(b) { b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); }); }
-
-  /* ---- Proves petites: s'usen per activar la quadrícula del paint (pas 4) ---- */
-  var MINI = [
-    { // polítics honestos (la resposta és no marcar-ne cap)
-      build: function (h) {
-        var items = ['🦈', '🐍', '🦊', '🤡', '🐀', '🦆', '🦜', '🐂', '🐷'];
-        h.innerHTML = head('Seleccioni totes les imatges que contenen un', 'polític honest') + '<div class="cgrid"></div><div class="hint" style="margin-top:6px">(Pot ser que no n\'hi hagi cap.)</div>';
-        var g = h.querySelector('.cgrid');
-        items.forEach(function (e, i) {
-          var b = document.createElement('button'); b.type = 'button'; b.className = 'cell'; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', 'Candidat ' + (i + 1)); b.textContent = e;
-          toggleCell(b); g.appendChild(b);
-        });
-      },
-      check: function (h) {
-        var n = h.querySelectorAll('.cell[aria-pressed=true]').length;
-        return n === 0 ? true : 'Ha seleccionat ' + n + ' polític' + (n > 1 ? 's' : '') + ' honest' + (n > 1 ? 's' : '') + ". Se n'han detectat 0.";
-      }
-    },
-    { // text deformat
-      build: function (h) {
-        var word = 'ESCRUTINI', R = seeded(11), svg = '<svg viewBox="0 0 300 90" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Text deformat">';
-        var fonts = ['Georgia,serif', '"Courier New",monospace', 'Impact,Haettenschweiler,sans-serif', 'Verdana,sans-serif'], cols = ['#3a2a6b', '#8b1e2d', '#1d5b3a', '#6b4a10', '#222'];
-        for (var i = 0; i < 7; i++) svg += '<path d="M' + Math.round(R() * 60) + ' ' + Math.round(10 + R() * 70) + ' Q' + Math.round(100 + R() * 100) + ' ' + Math.round(R() * 90) + ' ' + Math.round(240 + R() * 60) + ' ' + Math.round(10 + R() * 70) + '" stroke="' + cols[i % 5] + '" stroke-width="' + (1 + R() * 1.5).toFixed(1) + '" fill="none" opacity=".7"/>';
-        word.split('').forEach(function (ch, i) {
-          var x = 14 + i * 30, y = 56 + (R() * 16 - 8), rot = Math.round(R() * 50 - 25), fs = Math.round(34 + R() * 12);
-          svg += '<text x="' + x + '" y="' + y.toFixed(0) + '" font-size="' + fs + '" font-weight="bold" font-family=\'' + fonts[Math.floor(R() * 4)] + '\' fill="' + cols[Math.floor(R() * 5)] + '" transform="rotate(' + rot + ' ' + x + ' ' + y.toFixed(0) + ')">' + ch + '</text>';
-        });
-        svg += '<path d="M0 ' + Math.round(30 + R() * 30) + ' L300 ' + Math.round(30 + R() * 30) + '" stroke="#c00" stroke-width="2" opacity=".6"/></svg>';
-        h.innerHTML = head('Escrigui el text que veu a la imatge', 'sense errors, si us plau') + '<div class="capTxt">' + svg + '<input type="text" class="capIn" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" aria-label="Text de la imatge"></div>';
-      },
-      check: function (h) { return lev(normTxt(h.querySelector('.capIn').value), 'ESCRUTINI') <= 1 ? true : 'Això no és el que posava la imatge.'; }
-    },
-    { // trencaclosques lliscant
-      build: function (h) {
-        h.innerHTML = head('Arrossegui el control fins que la peça encaixi', 'al seu forat') +
-          '<div class="puz" style="background-image:' + SCENE + '"><div class="hole" style="left:' + PUZ_T + 'px;top:' + PUZ_Y + 'px"></div>' +
-          '<div class="piece" style="top:' + PUZ_Y + 'px;background-image:' + SCENE + ';background-position:-' + PUZ_T + 'px -' + PUZ_Y + 'px"></div></div>' +
-          '<input type="range" class="puzRange" min="0" max="240" value="0" aria-label="Posició de la peça">';
-        var r = h.querySelector('.puzRange'), p = h.querySelector('.piece');
-        r.addEventListener('input', function () { p.style.left = r.value + 'px'; });
-      },
-      check: function (h) { return Math.abs(parseInt(h.querySelector('.puzRange').value, 10) - PUZ_T) <= 7 ? true : 'La peça no encaixa.'; }
-    }
-  ];
-
-  /* ---- Les 5 verificacions del pas 5 ---- */
-  var capNote = '';
   function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = rnd(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 
-  var CAPS = [
-    { // 1 · "No sóc un robot": la casella fuig
+  // "No sóc un robot": la casella fuig moltes vegades. `first`: és la primera (porta el parany del robot)
+  var FUG_LABELS = ['No sóc un robot', 'Jo? Un robot? Mai.', 'No sóc un robot (de veritat)', 'Sóc humà. Em fa mal el cap.', 'Sí, aquesta casella soc jo', 'Humà 100%, certificat'];
+  var FUG_MSGS = ["Ep! S'ha mogut. La casella no vol ser marcada per qualsevol.", 'Gairebé. Insisteixi: els humans són persistents.', 'Ara sí… potser.',
+    'Ha fallat. Els robots, a aquest punt, ja haurien plorat.', "La casella diu que no li ha agradat com l'ha premuda.", 'Un humà de debò ho torna a provar.',
+    "Aquesta no comptava: hi havia massa ànsia.", 'Va, que ja gairebé hi som (mentida).', 'La Junta pren nota de la seva insistència.',
+    "Aquest toc ha estat massa robòtic. Un altre, si us plau.", "No es rendeixi. O sí: és el que faria un robot.", 'Ara de debò. Segur. Potser.'];
+  function makeFug(first) {
+    return {
       auto: true,
       build: function () {
-        var h = $('cap'), dodges = 0, busy = false;
-        var need = obs() ? (S.att.captcha === 0 ? T.dodges : 1) : 0;
-        var LABELS = ['No sóc un robot', 'Jo? Un robot? Mai.', 'No sóc un robot (de veritat)', 'Sóc humà. Em fa mal el cap.'];
-        var MSGS = ["Ep! S'ha mogut. La casella no vol ser marcada per qualsevol.", 'Gairebé. Insisteixi: els humans són persistents.', 'Ara sí… potser.'];
+        var h = $('cap'), dodges = 0, busy = false, self = CAPS[S.cap];
+        var need = obs() ? ((first && S.att.captcha > 0) ? 3 : T.dodges + (TEST ? 0 : rnd(5))) : 0;
         h.innerHTML = head('Confirmi que no és un robot', 'marqui la casella') +
-          '<div class="fugArea"><button type="button" class="fug" role="checkbox" aria-checked="false" aria-label="No sóc un robot"><i class="fb"></i><span>' + LABELS[0] + '</span></button></div>';
+          '<div class="fugArea"><button type="button" class="fug" role="checkbox" aria-checked="false" aria-label="No sóc un robot"><i class="fb"></i><span>' + FUG_LABELS[0] + '</span></button></div>';
         var area = h.querySelector('.fugArea'), f = h.querySelector('.fug'), lab = f.querySelector('span');
         f.style.left = '10px'; f.style.top = '40px';
         function place() {
@@ -1009,45 +820,65 @@ body.dir-open #page{padding-bottom:120px}
         }
         f.addEventListener('click', function () {
           if (busy) return;
-          if (dodges < need) { dodges++; lab.textContent = LABELS[dodges % LABELS.length]; setMsg('m5', 'warn', MSGS[(dodges - 1) % MSGS.length]); place(); return; }
+          if (dodges < need) {
+            dodges++; lab.textContent = FUG_LABELS[dodges % FUG_LABELS.length];
+            setMsg('m5', 'warn', FUG_MSGS[(dodges - 1) % FUG_MSGS.length] + ' (' + dodges + ')'); place(); return;
+          }
           busy = true; f.classList.add('on'); f.setAttribute('aria-checked', 'true'); setMsg('m5', 'info', 'Verificant…');
           later(function () {
-            if (obs() && S.att.captcha === 0) {
-              S.att.captcha = 1; save(); setMsg('m5', 'err', 'Verificació fallida. Sembla que vostè és un robot.'); CAPS[0].build(); return;
+            if (first && obs() && S.att.captcha === 0) {
+              S.att.captcha = 1; save(); setMsg('m5', 'err', 'Verificació fallida. Sembla que vostè és un robot.'); self.build(); return;
             }
             capResult(true);
           }, T.verify * 2);
         });
       }
-    },
-    { // 2 · cinta transportadora de porrons
+    };
+  }
+
+  var CAPS = [
+    makeFug(true),
+    { // 2 · porró a la boca
+      auto: true,
       build: function () {
-        var h = $('cap'), n, total = 3 + rnd(3), others = [SVG_JUG, SVG_WINE, SVG_WATER, '🍾', '🏺', '🐈', '🍺', '🧴'], seq = [], i;
-        for (i = 0; i < total; i++) seq.push(null);
-        for (i = 0, n = 4 + rnd(3); i < n; i++) seq.push(others[rnd(others.length)]);
-        shuffle(seq);
-        var gap = TEST ? 0.12 : 0.6, dur = TEST ? 0.6 : 3.6, count = 0, val = 0;
-        h.innerHTML = head('Quants porrons ha vist passar', 'per la cinta transportadora?') +
-          '<div class="belt" data-count="' + total + '" data-total-ms="' + Math.round((dur + gap * seq.length) * 1000) + '"></div>' +
-          '<div class="stepper"><button type="button" class="btn" id="cMinus" aria-label="Menys">−</button><output id="cVal" aria-live="polite">0</output><button type="button" class="btn" id="cPlus" aria-label="Més">+</button>' +
-          '<button type="button" class="btn tiny" id="cReplay">Tornar a veure</button></div>' +
-          '<div class="hint" style="margin-top:4px">Cinta homologada per la Junta. Ni els porrons ni la cinta són reals.</div>';
-        var belt = h.querySelector('.belt');
-        function run() {
-          belt.innerHTML = '';
-          seq.forEach(function (it, k) {
-            var d = document.createElement('div'); d.className = 'bi'; d.innerHTML = it === null ? porro(['#8b1e2d', null, '#e8b923'][k % 3], k % 2 ? '#cfe8cf' : '#d7ecf5') : (it.charAt(0) === '<' ? it : '<span>' + it + '</span>');
-            d.style.animation = 'beltmove ' + dur + 's linear ' + (k * gap).toFixed(2) + 's 1 both';
-            belt.appendChild(d);
-          });
+        var h = $('cap'), strikes = 0, busy = false, drag = false, dx = 0, dy = 0, PW = 64, MW = 52, px = 0, py = 0, mx = 0, my = 0;
+        h.innerHTML = head('Doni de beure a aquesta persona', 'portant-li el porró a la boca') +
+          '<div class="dragA"><div class="mouth" aria-hidden="true">😐</div><div class="dporro" role="img" aria-label="Porró">' + porro('#8b1e2d') + '</div></div>' +
+          '<div class="hint" id="dragInfo" style="margin-top:4px">Intents: 0/3. Ni una gota pel terra.</div>';
+        var A = h.querySelector('.dragA'), M = h.querySelector('.mouth'), P = h.querySelector('.dporro');
+        function putP(x, y) { px = x; py = y; P.style.left = x + 'px'; P.style.top = y + 'px'; }
+        function dist() { return Math.sqrt(Math.pow(px + PW / 2 - (mx + MW / 2), 2) + Math.pow(py + PW / 2 - (my + MW / 2), 2)); }
+        function resetP() { putP(10, A.clientHeight - PW - 10); }
+        function moveMouth() {
+          var w = A.clientWidth, hh = A.clientHeight, tries = 0;
+          do { mx = 20 + rnd(Math.max(1, w - MW - 40)); my = 8 + rnd(Math.max(1, hh - MW - 90)); tries++; } while (tries < 20 && Math.abs(mx - px) + Math.abs(my - py) < 120);
+          M.style.left = mx + 'px'; M.style.top = my + 'px'; M.textContent = '😐';
+          A.setAttribute('data-mx', String(Math.round(mx + MW / 2))); A.setAttribute('data-my', String(Math.round(my + MW / 2)));
         }
-        run();
-        $('cMinus').addEventListener('click', function () { val = Math.max(0, val - 1); $('cVal').textContent = val; });
-        $('cPlus').addEventListener('click', function () { val = Math.min(20, val + 1); $('cVal').textContent = val; });
-        $('cReplay').addEventListener('click', run);
-        h._check = function () { return val === total ? true : 'El recompte no coincideix amb el de la cinta.'; };
-      },
-      check: function () { return $('cap')._check(); }
+        P.addEventListener('pointerdown', function (e) {
+          e.preventDefault(); if (busy) return;
+          var pr = P.getBoundingClientRect(); drag = true; dx = e.clientX - pr.left; dy = e.clientY - pr.top;
+          try { P.setPointerCapture(e.pointerId); } catch (x) { /* res */ }
+        });
+        P.addEventListener('pointermove', function (e) {
+          if (!drag) return;
+          var r = A.getBoundingClientRect(), j = obs() ? 3 : 0;
+          var x = e.clientX - r.left - dx + (Math.random() - 0.5) * 2 * j, y = e.clientY - r.top - dy + (Math.random() - 0.5) * 2 * j;
+          putP(Math.max(-10, Math.min(r.width - PW + 10, x)), Math.max(-10, Math.min(r.height - PW + 10, y)));
+          M.textContent = dist() < 85 ? '😮' : '😐';
+        });
+        function end() {
+          if (!drag) return; drag = false;
+          if (!obs() || dist() <= 34) { busy = true; M.textContent = '😋'; setMsg('m5', 'ok', 'Glop, glop. La persona està encantada.'); later(function () { capResult(true); }, T.verify); return; }
+          strikes++; busy = true;
+          setMsg('m5', 'warn', 'Ha vessat el porró! (Intent ' + strikes + '/3)');
+          $('dragInfo').textContent = 'Intents: ' + strikes + '/3. Ni una gota pel terra.';
+          if (strikes >= 3) { later(function () { capResult(false, 'Tres porrons vessats.'); }, 700); return; }
+          later(function () { busy = false; resetP(); moveMouth(); }, 800);
+        }
+        ['pointerup', 'pointercancel'].forEach(function (ev) { P.addEventListener(ev, end); });
+        resetP(); moveMouth();
+      }
     },
     { // 3 · abocar el porró
       auto: true,
@@ -1189,10 +1020,11 @@ body.dir-open #page{padding-bottom:120px}
         };
       },
       check: function () { return $('cap')._check(); }
-    }
+    },
+    makeFug(false)
   ];
 
-  function initStep5() { renderCap(); }
+  function initStep3() { renderCap(); }
   function renderCap() {
     var c = CAPS[S.cap];
     $('capHead').textContent = 'Verificació ' + (S.cap + 1) + ' de ' + CAPS.length;
@@ -1202,7 +1034,7 @@ body.dir-open #page{padding-bottom:120px}
     if (!obs()) ok = true;
     if (ok) {
       S.cap++; save();
-      if (S.cap >= CAPS.length) { setMsg('m5', 'ok', (capNote ? capNote + ' ' : '') + 'Verificació superada. Benvingut, ésser humà.'); capNote = ''; show($('btnCap'), false); later(function () { goStep(6); }, T.advance); }
+      if (S.cap >= CAPS.length) { setMsg('m5', 'ok', 'Verificació superada. Benvingut, ésser humà.'); show($('btnCap'), false); later(function () { goStep(4); }, T.advance); }
       else { renderCap(); setMsg('m5', 'ok', 'Verificació superada (' + S.cap + '/' + CAPS.length + '). Continuem.'); }
       return;
     }
@@ -1223,49 +1055,41 @@ body.dir-open #page{padding-bottom:120px}
     }, T.verify);
   });
 
-  /* ================= PAS 6 · Justificant ================= */
-  function genReg() {
-    var num = ('000000' + (1 + rnd(999))).slice(-6), L = 'ABCDEFGHJKLMNPRSTUVXZ'.charAt(rnd(21)), suf = ['bis', 'ter', 'quater', 'quinquies'][rnd(4)];
-    return 'RP/2026/SS/' + num + '-' + L + '/' + suf + '/L-' + (1 + rnd(9)) + '/F-' + (10 + rnd(990));
-  }
-  function initStep6() {
-    var f = S.form;
+  /* ================= PAS 4 · El perfil ================= */
+  function initStep4() {
+    var c = charBySlug(S.user) || CHARS[0], sl = slugOf(c);
     function t(id, v) { $(id).textContent = v || '—'; }
-    var reg = $('r_reg'); reg.innerHTML = '';
-    (S.reg || '—').split('/').forEach(function (part, i) {
-      if (i) { reg.appendChild(document.createTextNode('/')); reg.appendChild(document.createElement('wbr')); }
-      reg.appendChild(document.createTextNode(part));
-    });
-    t('r_nom', f.nom.trim()); t('r_sigles', f.sig.join(''));
-    t('r_eslogan', f.eslogan.trim() ? '«' + f.eslogan.trim() + '»' : '');
-    t('r_ideologia', f.ideologia); t('r_llista', S.llista);
-    $('r_logo').src = S.logo || DEFAULT_LOGO;
-    setMsg('m6', null);
+    t('p_user', c.especie); t('p_tipus', c.tipus);
+    t('p_edat', typeof c.edat === 'number' ? c.edat + ' anys' : String(c.edat));
+    t('p_vestit', c.vestit); t('p_salut', c.salut);
+    $('p_bromaBox').hidden = !c.broma; $('p_broma').textContent = c.broma || '';
+    var ph = $('p_photo'); ph.innerHTML = '';
+    var em = document.createElement('span'); em.textContent = c.ic; ph.appendChild(em);
+    var im = new Image(); im.alt = 'Foto de ' + c.tipus;
+    im.onload = function () { ph.innerHTML = ''; ph.appendChild(im); };
+    im.src = 'personatges/' + sl + '.jpg';
   }
-  $('btnPrint').addEventListener('click', function () {
-    modal({ title: 'Impressió', icon: '🖨️', text: 'La impressora del registre està fora de servei des del 2009' });
-  });
   $('btnReset').addEventListener('click', function () {
     modal({
       title: 'Confirmació', icon: '❓',
-      text: 'Això esborrarà totes les dades del tràmit actual i començarà de nou. Vol continuar?',
+      text: 'Això tancarà la sessió i començarà de nou. Vol continuar?',
       buttons: [
-        { label: 'Sí, esborrar', cb: function () { var keep = S.noObs; S = defaults(); S.noObs = keep; save(); render(); window.scrollTo(0, 0); } },
+        { label: 'Sí, tancar sessió', cb: function () { var keep = S.noObs; S = defaults(); S.noObs = keep; save(); render(); window.scrollTo(0, 0); } },
         { label: 'No' }
       ]
     });
   });
 
-  /* ================= Caducitat de sessió (passos 2 i 3) ================= */
+  /* ================= Caducitat de sessió (pas 2) ================= */
   ['pointerdown', 'touchstart', 'keydown', 'input', 'click', 'scroll'].forEach(function (ev) {
     window.addEventListener(ev, function () { lastActivity = Date.now(); }, { passive: true, capture: true });
   });
   setInterval(function () {
-    if (modalOpen || S.noObs || (S.step !== 2 && S.step !== 3)) return;
+    if (modalOpen || S.noObs || S.step !== 2) return;
     if (Date.now() - lastActivity > T.inactivity * 1000) {
       lastActivity = Date.now();
       modal({ title: 'Sessió caducada', icon: '⌛', text: 'Sessió caducada per inactivitat',
-        buttons: [{ label: 'Acceptar', cb: function () { S.pin = PIN0; save(); goStep(2); } }] });
+        buttons: [{ label: 'Acceptar', cb: function () { goStep(2); } }] });
     }
   }, 1000);
 
@@ -1295,13 +1119,13 @@ body.dir-open #page{padding-bottom:120px}
   }
   (function () {
     var box = $('dirSteps');
-    for (var i = 1; i <= 6; i++) (function (n) {
+    for (var i = 1; i <= 4; i++) (function (n) {
       var b = document.createElement('button'); b.type = 'button'; b.textContent = n;
       b.addEventListener('click', function () { goStep(n); }); box.appendChild(b);
     })(i);
   })();
   $('dirNoObs').addEventListener('change', function () { S.noObs = this.checked; save(); render(); });
-  $('dirReset').addEventListener('click', function () { S.att = { turn: 0, submit: 0, logo: 0, captcha: 0 }; S.logoOk = false; S.cap = 0; S.restarts = 0; save(); toast('Comptadors reiniciats'); render(); });
+  $('dirReset').addEventListener('click', function () { S.att = { turn: 0, captcha: 0 }; S.cap = 0; S.restarts = 0; save(); toast('Comptadors reiniciats'); render(); });
   $('dirClose').addEventListener('click', function () { toggleDirector(false); });
   function checkHash() { if ((location.hash || '').toLowerCase().indexOf('director') > -1) toggleDirector(true); }
   window.addEventListener('hashchange', checkHash);
