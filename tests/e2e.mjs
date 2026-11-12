@@ -61,8 +61,6 @@ async function fillStep3(page, { sig = 'MPP', fourth = '' } = {}) {
   for (let i = 0; i < sig.length; i++) await setReel(page, i, sig[i]);
   if (fourth) await setReel(page, 3, fourth);
   await page.fill('#f_eslogan', 'Porro per a tothom');
-  await page.fill('#f_objectiu', 'Porró gratuït a tots els cims');
-  await page.click('#btnSave');
   await page.selectOption('#f_ideologia', 'Leo Messi');
 }
 async function hold(page, ms = 600) {
@@ -214,17 +212,14 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   await page.fill('#f_eslogan', 'Porro per a tothom');
   const mirrored = await page.evaluate(() => { const s = getComputedStyle(document.getElementById('f_eslogan')); return s.direction + '/' + s.unicodeBidi; });
   assert.match(mirrored, /^rtl\/(bidi-override|isolate-override)$/);
-  await page.fill('#f_objectiu', 'Porró gratuït a tots els cims');
-  assert.ok(await page.locator('#decay').innerText().then(t => /Camp sense desar/.test(t)) || true);
-  await page.click('#btnSave');
-  assert.ok(await page.locator('#f_objectiu').evaluate(e => e.readOnly));
+  assert.equal(await page.locator('#f_objectiu, #btnSave, #decay').count(), 0, 'sense camp d\'objectiu');
   const opts = await page.locator('#f_ideologia option').allInnerTexts();
   assert.ok(opts.includes('Leo Messi') && opts.includes('Depèn de qui pagui la birra') && opts.some(o => /Extrema/.test(o)), 'opcions de broma noves');
-  assert.ok(!opts.some(o => /Centre-centre|Porronista|Altres|cafè|No ho sé/.test(o)), 'opcions retirades: ' + opts.join('|'));
+  assert.ok(!opts.some(o => /Centre-centre|Porronista|Altres|cafè|No ho sé|esquerres|dretes|Extrem centre|Anarquisme|Comunisme|Liberalisme|votava/.test(o)), 'opcions retirades: ' + opts.join('|'));
   assert.equal(await page.locator('#f_altres, #altresBox, #affNum, #affBtns').count(), 0, 'sense «Altres» ni afiliats');
   await page.selectOption('#f_ideologia', 'Leo Messi');
   await shot(page, '03c-pas3-ideologia');
-  ok('Pas 3: sigles amb rodets, eslògan reflectit, objectiu desat; ideologies totes de broma (Leo Messi, «birra», Extrema…), sense Altres ni afiliats');
+  ok('Pas 3: sigles amb rodets, eslògan reflectit; sense objectiu; ideologies de broma sense política (Leo Messi, «birra», Extremadament moderada…), sense Altres ni afiliats');
 
   await page.click('#btnSubmit'); // falta signar la declaració → error però NO reinici
   assert.ok(await page.locator('#e_decl').isVisible());
@@ -383,7 +378,7 @@ console.log('1) Tràmit complet (offline, #test) amb reinici per sigles de 4 lle
   assert.equal(await txt(page, '#r_nom'), 'MOVIMENT POPULAR PRO PORRO');
   assert.equal(await txt(page, '#r_sigles'), 'MPP');
   assert.equal(await txt(page, '#r_eslogan'), '«Porro per a tothom»', 'l\'eslògan es guarda en ordre normal');
-  assert.equal(await txt(page, '#r_objectiu'), 'Porró gratuït a tots els cims');
+  assert.equal(await page.locator('#r_objectiu').count(), 0);
   assert.equal(await txt(page, '#r_ideologia'), 'Leo Messi');
   assert.equal(await txt(page, '#r_llista'), 'Llista B');
   assert.equal(await page.locator('#r_afiliats').count(), 0);
@@ -431,28 +426,6 @@ console.log('2) Botons parany petits');
   await accept(page);
   assert.match(await stepLabel(page), /^Pas 1/);
   ok('Tocar el "Cancel·lar" diminut anul·la tot el tràmit');
-  await ctx.close();
-}
-
-/* ================= 4. L'objectiu s'esborra sol si no es desa ================= */
-console.log('4) Camp que s\'esborra');
-{
-  const ctx = await browser.newContext(mobile);
-  const page = await ctx.newPage();
-  await page.goto(BASE + '#test,director');
-  await page.locator('#dirSteps button', { hasText: '3' }).click();
-  await page.fill('#f_objectiu', 'ABCDEFGHIJ');
-  for (let k = 0; k < 8; k++) { await page.waitForTimeout(1000); await page.keyboard.press('Shift'); } // evita la caducitat de sessió
-  const v = await page.inputValue('#f_objectiu');
-  assert.ok(v.length < 10 && v.length > 0, 'ha perdut lletres: "' + v + '"');
-  await page.click('#btnSave');
-  const frozen = await page.inputValue('#f_objectiu');
-  for (let k = 0; k < 3; k++) { await page.waitForTimeout(900); await page.keyboard.press('Shift'); }
-  assert.equal(await page.inputValue('#f_objectiu'), frozen);
-  ok('El camp perd lletres si no es desa, i es queda quiet un cop desat ("' + v + '")');
-  await page.reload();
-  assert.equal(await page.inputValue('#f_objectiu'), frozen);
-  ok('Camp desat sobreviu a la recàrrega');
   await ctx.close();
 }
 

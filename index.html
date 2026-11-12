@@ -119,8 +119,6 @@ select[size] option{padding:8px 6px}
 .reel .btn{width:34px}
 
 /* Objectiu */
-.oline{display:flex;align-items:center;justify-content:space-between;margin-top:3px;gap:6px}
-#f_objectiu[readonly]{background:#e6f2e2}
 
 
 /* Declaració: mantenir premut */
@@ -335,25 +333,15 @@ body.dir-open #page{padding-bottom:120px}
           <input id="f_eslogan" class="mirror" type="text" autocomplete="off" autocapitalize="off">
           <div class="ferr" id="e_eslogan" hidden></div>
 
-          <label class="lbl" for="f_objectiu">Objectiu principal del partit <span class="req">*</span></label>
-          <textarea id="f_objectiu" placeholder="Ex.: Porró gratuït a tots els cims"></textarea>
-          <div class="oline"><span class="hint" id="decay"></span><button type="button" class="btn" id="btnSave">Desar</button></div>
-          <div class="ferr" id="e_objectiu" hidden></div>
 
           <label class="lbl" for="f_ideologia">Ideologia <span class="req">*</span></label>
           <select id="f_ideologia" size="2">
             <option value="">Seleccioni…</option>
             <option>La que digui la meva mare</option>
-            <option>Ni d'esquerres ni de dretes, del PP</option>
             <option>Leo Messi</option>
             <option>Depèn de qui pagui la birra</option>
             <option>Extremadament moderada</option>
-            <option>Extrem centre</option>
-            <option>Anarquisme amb jerarquia i reunions</option>
-            <option>Comunisme, però amb pis en propietat</option>
-            <option>Liberalisme subvencionat</option>
             <option>La del grup de WhatsApp de la família</option>
-            <option>La que votava el meu avi, més o menys</option>
             <option>La que doni més canapès</option>
             <option>La que no m'obligui a anar a reunions</option>
             <option>Segons com em llevi</option>
@@ -430,7 +418,6 @@ body.dir-open #page{padding-bottom:120px}
         </div>
         <dl class="dl" style="margin-top:12px">
           <div><dt>Eslògan</dt><dd id="r_eslogan"></dd></div>
-          <div><dt>Objectiu principal</dt><dd id="r_objectiu"></dd></div>
           <div><dt>Ideologia</dt><dd id="r_ideologia"></dd></div>
           <div><dt>Candidatura</dt><dd id="r_llista"></dd></div>
         </dl>
@@ -493,8 +480,8 @@ body.dir-open #page{padding-bottom:120px}
   // Si un error de verificació (pas 5) ha de reiniciar només la verificació ('verificacio') o tot el tràmit ('tramit')
   var CAPTCHA_FAIL_RESTART = 'verificacio';
   var T = TEST
-    ? { countdown: 2, inactivity: 6, proc: 150, verify: 150, advance: 600, decay: 4, hold: 300, survey: HASH.indexOf('survey') > -1 ? 1 : 0, surveyRetry: 5, dodges: 1, freeze: true, queue: 3 }
-    : { countdown: 5, inactivity: 60, proc: 1800, verify: 1200, advance: 1200, decay: 12, hold: 2000, survey: 45, surveyRetry: 5, dodges: 3, freeze: false, queue: 12 };
+    ? { countdown: 2, inactivity: 6, proc: 150, verify: 150, advance: 600, hold: 300, survey: HASH.indexOf('survey') > -1 ? 1 : 0, surveyRetry: 5, dodges: 1, freeze: true, queue: 3 }
+    : { countdown: 5, inactivity: 60, proc: 1800, verify: 1200, advance: 1200, hold: 2000, survey: 45, surveyRetry: 5, dodges: 3, freeze: false, queue: 12 };
   var KEY = 'sige_v24_state';
   var FAKE_PCT = [3, 14, 67, 8, 92, 100];
   var PIN0 = '0000';
@@ -506,7 +493,7 @@ body.dir-open #page{padding-bottom:120px}
       step: 1, noObs: false, restarts: 0, cap: 0,
       att: { turn: 0, submit: 0, logo: 0, captcha: 0 },
       pin: PIN0, llista: '',
-      form: { nom: '', sig: ['', '', '', ''], eslogan: '', objectiu: '', objSaved: false, ideologia: '', decl: false },
+      form: { nom: '', sig: ['', '', '', ''], eslogan: '', ideologia: '', decl: false },
       logo: '', logoOk: false, reg: ''
     };
   }
@@ -526,8 +513,8 @@ body.dir-open #page{padding-bottom:120px}
       if (/^\d{4}$/.test(str(s.pin))) d.pin = s.pin;
       d.llista = str(s.llista); d.logo = str(s.logo); d.reg = str(s.reg); d.logoOk = !!s.logoOk;
       if (s.form) {
-        ['nom', 'eslogan', 'objectiu', 'ideologia'].forEach(function (k) { d.form[k] = str(s.form[k]); });
-        d.form.decl = !!s.form.decl; d.form.objSaved = !!s.form.objSaved;
+        ['nom', 'eslogan', 'ideologia'].forEach(function (k) { d.form[k] = str(s.form[k]); });
+        d.form.decl = !!s.form.decl;
         if (Array.isArray(s.form.sig)) for (var i = 0; i < 4; i++) d.form.sig[i] = /^[A-Z]$/.test(str(s.form.sig[i])) ? s.form.sig[i] : '';
       }
     } catch (e) { /* estat corrupte: es comença de nou */ }
@@ -771,18 +758,14 @@ body.dir-open #page{padding-bottom:120px}
   });
 
   /* ================= PAS 3 · Sol·licitud ================= */
-  var lastType = Date.now();
   function initStep3() {
     setMsg('m3', null);
-    ['nom', 'sigles', 'eslogan', 'objectiu', 'ideologia', 'decl'].forEach(function (k) { fieldErr(k, ''); });
+    ['nom', 'sigles', 'eslogan', 'ideologia', 'decl'].forEach(function (k) { fieldErr(k, ''); });
     $('f_nom').value = S.form.nom; buildReels();
     $('f_eslogan').value = S.form.eslogan;
-    $('f_objectiu').value = S.form.objectiu; lockObjectiu(S.form.objSaved);
     $('f_ideologia').value = S.form.ideologia;
     renderHold();
     $('btnSubmit').disabled = false;
-    lastType = Date.now();
-    every(decayTick, 1000);
   }
   function buildReels() {
     var box = $('reels'); box.innerHTML = '';
@@ -800,25 +783,6 @@ body.dir-open #page{padding-bottom:120px}
       paint(); r.appendChild(up); r.appendChild(lt); r.appendChild(dn); box.appendChild(r);
     })(i);
   }
-  function lockObjectiu(on) {
-    S.form.objSaved = on; $('f_objectiu').readOnly = on;
-    $('btnSave').textContent = on ? 'Desbloquejar' : 'Desar';
-    $('decay').textContent = on ? '✓ Camp desat' : '';
-  }
-  $('btnSave').addEventListener('click', function () {
-    if (!S.form.objSaved && !$('f_objectiu').value.trim()) { toast('No hi ha res per desar'); return; }
-    lockObjectiu(!S.form.objSaved); lastType = Date.now(); save();
-  });
-  function decayTick() {
-    var ta = $('f_objectiu');
-    if (S.form.objSaved || !obs() || !ta.value) { if (!S.form.objSaved) $('decay').textContent = ''; return; }
-    var idle = (Date.now() - lastType) / 1000;
-    if (idle >= T.decay) {
-      ta.value = ta.value.slice(0, -1); S.form.objectiu = ta.value; save();
-      $('decay').textContent = '⚠ Camp sense desar: s\'està esborrant!';
-    } else $('decay').textContent = '⚠ Camp sense desar: començarà a esborrar-se en ' + Math.ceil(T.decay - idle) + ' s';
-  }
-  $('f_objectiu').addEventListener('input', function () { S.form.objectiu = this.value; lastType = Date.now(); save(); });
   $('f_eslogan').addEventListener('input', function () { S.form.eslogan = this.value; save(); });
   $('f_nom').addEventListener('input', function () { S.form.nom = this.value; save(); });
   $('f_ideologia').addEventListener('change', function () { S.form.ideologia = this.value; save(); });
@@ -847,7 +811,7 @@ body.dir-open #page{padding-bottom:120px}
   $('frm').addEventListener('submit', function (e) {
     e.preventDefault();
     var f = S.form, errs = [];
-    ['nom', 'sigles', 'eslogan', 'objectiu', 'ideologia', 'decl'].forEach(function (k) { fieldErr(k, ''); });
+    ['nom', 'sigles', 'eslogan', 'ideologia', 'decl'].forEach(function (k) { fieldErr(k, ''); });
     function bad(k, msg) { fieldErr(k, msg); errs.push(k); }
     if (f.sig[3]) {
       if (restart('Error 0x00E3: Les sigles superen el màxim permès.')) return;
@@ -856,8 +820,6 @@ body.dir-open #page{padding-bottom:120px}
     if (!f.nom.trim()) bad('nom', 'Error 0x0010: El camp «Nom del partit» és obligatori');
     if (!f.sig.join('') && !f.sig[3]) bad('sigles', 'Error 0x0011: El camp «Sigles» és obligatori');
     if (!f.eslogan.trim()) bad('eslogan', 'Error 0x0012: El camp «Eslògan» és obligatori');
-    if (!f.objectiu.trim()) bad('objectiu', 'Error 0x0013: El camp «Objectiu principal del partit» és obligatori');
-    else if (!f.objSaved) bad('objectiu', "Error 0x0016: El camp «Objectiu principal del partit» no s'ha desat");
     if (!f.ideologia) bad('ideologia', 'Error 0x0014: Ha de seleccionar una ideologia vàlida (i «Seleccioni…» no ho és)');
     if (!f.decl) bad('decl', 'Error 0x00F1: Ha de signar la declaració responsable');
     if (errs.length) {
@@ -1275,7 +1237,7 @@ body.dir-open #page{padding-bottom:120px}
       reg.appendChild(document.createTextNode(part));
     });
     t('r_nom', f.nom.trim()); t('r_sigles', f.sig.join(''));
-    t('r_eslogan', f.eslogan.trim() ? '«' + f.eslogan.trim() + '»' : ''); t('r_objectiu', f.objectiu.trim());
+    t('r_eslogan', f.eslogan.trim() ? '«' + f.eslogan.trim() + '»' : '');
     t('r_ideologia', f.ideologia); t('r_llista', S.llista);
     $('r_logo').src = S.logo || DEFAULT_LOGO;
     setMsg('m6', null);
