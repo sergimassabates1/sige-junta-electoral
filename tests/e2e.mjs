@@ -178,11 +178,18 @@ console.log('1) Recorregut complet (offline, #test)');
 
   await shot(page, '03b-captcha2-porro-boca');
   await dragPorro(page, false);
-  assert.match(await txt(page, '#m5 .msg'), /Ha vessat el porró! \(Intent 1\/3\)/);
-  await page.waitForTimeout(1000);
+  await page.waitForSelector('.strm path');           // el raig surt del broc
+  await page.waitForTimeout(180);
+  await shot(page, '03b2-porro-vessa');
+  assert.ok(await page.locator('.dporro.anim').count(), 'el porró s\'inclina');
+  await page.waitForFunction(() => /Ha vessat el porró! \(Intent 1\/3\)/.test(document.querySelector('#m5 .msg')?.textContent || ''));
+  await page.waitForFunction(() => !document.querySelector('.dporro.anim'));  // torna a lloc
   await dragPorro(page, true);
+  await page.waitForSelector('.strm path');
+  await page.waitForTimeout(180);
+  await shot(page, '03b3-porro-encert');
   await capIs(page, 3);
-  ok('Captcha 2: portar el porró a la boca (un error = un intent)');
+  ok('Captcha 2: porró inclinat amb raig (paràbola); fallar = vessa al terra, encertar = a la boca');
 
   await shot(page, '03c-captcha3-abocar');
   await holdPour(page, Math.max(200, await pourMs(page, -900)));

@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b3d91">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Seu Electrònica · Junta Electoral de Sant Salvador</title>
+<title>Eleccions Alternatives de Premià de Mar · Seu Electrònica</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -238,10 +238,16 @@ body.dir-open #page{padding-bottom:120px}
 .nouser{-webkit-user-select:none;user-select:none}
 
 /* Captcha: porró a la boca */
-.dragA{position:relative;width:100%;max-width:300px;height:200px;border:1px solid #bbb;background:linear-gradient(#fdfcf5,#efe9d3);overflow:hidden;touch-action:none}
+.dragA{position:relative;width:100%;max-width:300px;height:260px;border:1px solid #bbb;background:linear-gradient(#fdfcf5,#efe9d3);overflow:hidden;touch-action:none}
 .mouth{position:absolute;width:52px;height:52px;font-size:42px;line-height:52px;text-align:center;transition:left .2s,top .2s;-webkit-user-select:none;user-select:none}
 .dporro{position:absolute;width:64px;height:64px;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;z-index:2}
 .dporro svg{width:100%;height:100%;pointer-events:none}
+.dporro.anim{transition:left .45s ease-in-out,top .45s ease-in-out,transform .4s ease-in-out;pointer-events:none}
+.strm{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.strm path{fill:none;stroke:#e8b923;stroke-width:5;stroke-linecap:round}
+.strm ellipse{fill:#e8b923;opacity:.85;transform-box:fill-box;transform-origin:center;transform:scale(0);transition:transform .5s ease-out}
+.strm ellipse.on{transform:scale(1)}
+.floorL{position:absolute;left:0;right:0;bottom:0;height:10px;background:#d9cfa8;border-top:1px solid #b9ad80}
 /* Foto del perfil */
 .carnet .photo{position:relative;width:120px;height:120px;background:#ddd;border:1px solid #999;display:grid;place-items:center;font-size:64px;line-height:1;overflow:hidden}
 .carnet .photo img{width:100%;height:100%;object-fit:cover;display:block}
@@ -251,7 +257,7 @@ body.dir-open #page{padding-bottom:120px}
 <div id="page">
 
   <div id="head">
-    <div id="crest" role="img" aria-label="Escut de la Junta Electoral de Sant Salvador">
+    <div id="crest" role="img" aria-label="Escut de les Eleccions Alternatives de Premià de Mar">
       <svg viewBox="0 0 64 68" xmlns="http://www.w3.org/2000/svg">
         <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4e4e4"/><stop offset="1" stop-color="#8e8e8e"/></linearGradient></defs>
         <path d="M32 3 L59 11 V35 C59 52 47 61 32 66 C17 61 5 52 5 35 V11 Z" fill="url(#sg)" stroke="#3a3a3a" stroke-width="2.5"/>
@@ -263,8 +269,8 @@ body.dir-open #page{padding-bottom:120px}
       </svg>
     </div>
     <div>
-      <h1>Seu Electrònica · Junta Electoral de Sant Salvador<span class="blink">NOU!</span></h1>
-      <p>SIGE v2.3 · Sistema Integrat de Gestió Electoral</p>
+      <h1>Eleccions Alternatives de Premià de Mar<span class="blink">NOU!</span></h1>
+      <p>Seu Electrònica · SIGE v2.3 · Sistema Integrat de Gestió Electoral · Premià de Mar</p>
     </div>
   </div>
 
@@ -353,16 +359,16 @@ body.dir-open #page{padding-bottom:120px}
           <div><dt>Saluda</dt><dd id="p_salut"></dd></div>
           <div id="p_bromaBox" hidden><dt>Dada reservada</dt><dd id="p_broma"></dd></div>
         </dl>
-        <svg id="seal" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Segell: Junta Electoral, verificat">
+        <svg id="seal" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Segell: Eleccions Alternatives de Premià de Mar, verificat">
           <defs><path id="arcTop" d="M 100,100 m -68,0 a 68,68 0 1,1 136,0 a 68,68 0 1,1 -136,0"/></defs>
           <circle cx="100" cy="100" r="94" fill="none" stroke="#c0392b" stroke-width="6"/>
           <circle cx="100" cy="100" r="86" fill="none" stroke="#c0392b" stroke-width="2"/>
           <circle cx="100" cy="100" r="50" fill="none" stroke="#c0392b" stroke-width="3"/>
           <text font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="17" fill="#c0392b">
-            <textPath href="#arcTop" startOffset="0" textLength="420" lengthAdjust="spacing">JUNTA ELECTORAL · VERIFICAT · </textPath>
+            <textPath href="#arcTop" startOffset="0" textLength="420" lengthAdjust="spacing">ELECCIONS ALTERNATIVES · PREMIÀ DE MAR · </textPath>
           </text>
           <text x="100" y="98" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="15" fill="#c0392b">VERIFICAT</text>
-          <text x="100" y="118" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="13" fill="#c0392b">SS · 2026</text>
+          <text x="100" y="118" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="13" fill="#c0392b">PM · 2026</text>
         </svg>
         <p id="readAloud">Aquest perfil és confidencial. No l'ensenyi a ningú.</p>
       </div>
@@ -843,15 +849,15 @@ body.dir-open #page{padding-bottom:120px}
       build: function () {
         var h = $('cap'), strikes = 0, busy = false, drag = false, dx = 0, dy = 0, PW = 64, MW = 52, px = 0, py = 0, mx = 0, my = 0;
         h.innerHTML = head('Doni de beure a aquesta persona', 'portant-li el porró a la boca') +
-          '<div class="dragA"><div class="mouth" aria-hidden="true">😐</div><div class="dporro" role="img" aria-label="Porró">' + porro('#8b1e2d') + '</div></div>' +
+          '<div class="dragA"><div class="floorL"></div><svg class="strm" aria-hidden="true"></svg><div class="mouth" aria-hidden="true">😐</div><div class="dporro" role="img" aria-label="Porró">' + porro('#8b1e2d') + '</div></div>' +
           '<div class="hint" id="dragInfo" style="margin-top:4px">Intents: 0/3. Ni una gota pel terra.</div>';
         var A = h.querySelector('.dragA'), M = h.querySelector('.mouth'), P = h.querySelector('.dporro');
         function putP(x, y) { px = x; py = y; P.style.left = x + 'px'; P.style.top = y + 'px'; }
         function dist() { return Math.sqrt(Math.pow(px + PW / 2 - (mx + MW / 2), 2) + Math.pow(py + PW / 2 - (my + MW / 2), 2)); }
-        function resetP() { putP(10, A.clientHeight - PW - 10); }
+        function resetP() { P.classList.remove('anim'); P.style.transform = ''; putP(10, A.clientHeight - PW - 10); }
         function moveMouth() {
           var w = A.clientWidth, hh = A.clientHeight, tries = 0;
-          do { mx = 20 + rnd(Math.max(1, w - MW - 40)); my = 8 + rnd(Math.max(1, hh - MW - 90)); tries++; } while (tries < 20 && Math.abs(mx - px) + Math.abs(my - py) < 120);
+          do { mx = 20 + rnd(Math.max(1, w - MW - 40)); my = 85 + rnd(Math.max(1, hh - MW - 28 - 85)); tries++; } while (tries < 20 && Math.abs(mx - px) + Math.abs(my - py) < 120);
           M.style.left = mx + 'px'; M.style.top = my + 'px'; M.textContent = '😐';
           A.setAttribute('data-mx', String(Math.round(mx + MW / 2))); A.setAttribute('data-my', String(Math.round(my + MW / 2)));
         }
@@ -867,14 +873,50 @@ body.dir-open #page{padding-bottom:120px}
           putP(Math.max(-10, Math.min(r.width - PW + 10, x)), Math.max(-10, Math.min(r.height - PW + 10, y)));
           M.textContent = dist() < 85 ? '😮' : '😐';
         });
+        var SVGNS = 'http://www.w3.org/2000/svg', K = TEST ? 0.25 : 1, TILT = 70;
+        function ms(n) { return Math.round(n * K); }
+        // Inclina el porró i dibuixa el raig (paràbola) des del broc fins a (tx, ty)
+        function pourTo(dir, sx, sy, tx, ty, landed, then) {
+          var S = $('cap').querySelector('.strm'); S.innerHTML = '';
+          var path = document.createElementNS(SVGNS, 'path');
+          path.setAttribute('d', 'M' + sx.toFixed(1) + ' ' + sy.toFixed(1) + ' Q' + tx.toFixed(1) + ' ' + (sy + (ty - sy) * 0.15).toFixed(1) + ' ' + tx.toFixed(1) + ' ' + ty.toFixed(1));
+          var pud = document.createElementNS(SVGNS, 'ellipse');
+          pud.setAttribute('cx', tx.toFixed(1)); pud.setAttribute('cy', (ty).toFixed(1)); pud.setAttribute('rx', landed ? '7' : '22'); pud.setAttribute('ry', landed ? '3' : '5');
+          S.appendChild(pud); S.appendChild(path);
+          var L = 200; try { L = path.getTotalLength(); } catch (x) { /* res */ }
+          path.style.strokeDasharray = String(L); path.style.strokeDashoffset = String(L);
+          path.style.transition = 'stroke-dashoffset ' + ms(450) + 'ms ease-in';
+          void path.getBoundingClientRect();
+          later(function () { path.style.strokeDashoffset = '0'; pud.classList.add('on'); if (landed) M.textContent = '😋'; else M.textContent = '😢'; }, ms(420));
+          later(function () { path.style.transition = 'stroke-dashoffset ' + ms(350) + 'ms ease-out'; path.style.strokeDashoffset = String(-L); }, ms(420 + 450 + 500));
+          later(then, ms(420 + 450 + 500 + 350 + 300));
+        }
         function end() {
-          if (!drag) return; drag = false;
-          if (!obs() || dist() <= 34) { busy = true; M.textContent = '😋'; setMsg('m5', 'ok', 'Glop, glop. La persona està encantada.'); later(function () { capResult(true); }, T.verify); return; }
-          strikes++; busy = true;
-          setMsg('m5', 'warn', 'Ha vessat el porró! (Intent ' + strikes + '/3)');
-          $('dragInfo').textContent = 'Intents: ' + strikes + '/3. Ni una gota pel terra.';
-          if (strikes >= 3) { later(function () { capResult(false, 'Tres porrons vessats.'); }, 700); return; }
-          later(function () { busy = false; resetP(); moveMouth(); }, 800);
+          if (!drag) return; drag = false; busy = true;
+          setMsg('m5', null);
+          var ok = !obs() || dist() <= 34;
+          var pcx = px + PW / 2, pcy = py + PW / 2, mcx = mx + MW / 2, mcy = my + MW / 2, w = A.clientWidth, hh = A.clientHeight;
+          var th = TILT * Math.PI / 180, ox = 25.6 * Math.cos(th) + 22.7 * Math.sin(th), oy = 25.6 * Math.sin(th) - 22.7 * Math.cos(th);
+          var dir = ok ? (mcx < w / 2 ? -1 : 1) : (mcx >= pcx ? 1 : -1), sx, sy, tx, ty;
+          P.classList.add('anim');
+          if (ok) { // el porró es col·loca damunt la boca, inclinat, i el raig hi cau
+            pcx = mcx - dir * (ox + 16); pcy = mcy - 52 - oy; putP(pcx - PW / 2, pcy - PW / 2);
+            sx = mcx - dir * 16; sy = mcy - 52; tx = mcx; ty = mcy - 6;
+          } else { // inclina el porró allà on l'ha deixat: el raig cau al terra
+            sx = pcx + dir * ox; sy = pcy + oy;
+            tx = Math.max(8, Math.min(w - 8, sx + dir * 30)); ty = Math.max(hh - 14, sy + 16);
+          }
+          P.style.transform = (dir < 0 ? 'scaleX(-1) ' : '') + 'rotate(' + TILT + 'deg)';
+          later(function () {
+            pourTo(dir, sx, sy, tx, ty, ok, function () {
+              if (ok) { setMsg('m5', 'ok', 'Glop, glop. La persona està encantada.'); capResult(true); return; }
+              strikes++;
+              setMsg('m5', 'warn', 'Ha vessat el porró! (Intent ' + strikes + '/3)');
+              $('dragInfo').textContent = 'Intents: ' + strikes + '/3. Ni una gota pel terra.';
+              if (strikes >= 3) { later(function () { capResult(false, 'Tres porrons vessats.'); }, 500); return; }
+              $('cap').querySelector('.strm').innerHTML = ''; busy = false; resetP(); moveMouth();
+            });
+          }, ms(420));
         }
         ['pointerup', 'pointercancel'].forEach(function (ev) { P.addEventListener(ev, end); });
         resetP(); moveMouth();
