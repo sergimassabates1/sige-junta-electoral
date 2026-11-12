@@ -1,6 +1,6 @@
 /* Service worker senzill: memòria cau per funcionar sense connexió.
    Si falla, index.html funciona igualment (és autònom). */
-var CACHE = 'sige-v29-1';
+var CACHE = 'sige-v29-2';
 var ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (e) {

@@ -247,6 +247,8 @@ body.dir-open #page{padding-bottom:120px}
 .strm path{fill:none;stroke:#e8b923;stroke-width:5;stroke-linecap:round}
 .strm ellipse{fill:#e8b923;opacity:.85;transform-box:fill-box;transform-origin:center;transform:scale(0);transition:transform .5s ease-out}
 .strm ellipse.on{transform:scale(1)}
+.strm path.pv{stroke:#e8b923;stroke-width:3;stroke-dasharray:3 6;opacity:.6}
+.dporro{transition:transform .15s}
 .floorL{position:absolute;left:0;right:0;bottom:0;height:10px;background:#d9cfa8;border-top:1px solid #b9ad80}
 /* Foto del perfil */
 .carnet .photo{position:relative;width:120px;height:120px;background:#ddd;border:1px solid #999;display:grid;place-items:center;font-size:64px;line-height:1;overflow:hidden}
@@ -850,7 +852,7 @@ body.dir-open #page{padding-bottom:120px}
         var h = $('cap'), strikes = 0, busy = false, drag = false, dx = 0, dy = 0, PW = 64, MW = 52, px = 0, py = 0, mx = 0, my = 0;
         h.innerHTML = head('Doni de beure a aquesta persona', 'portant-li el porró a la boca') +
           '<div class="dragA"><div class="floorL"></div><svg class="strm" aria-hidden="true"></svg><div class="mouth" aria-hidden="true">😐</div><div class="dporro" role="img" aria-label="Porró">' + porro('#8b1e2d') + '</div></div>' +
-          '<div class="hint" id="dragInfo" style="margin-top:4px">Intents: 0/3. Ni una gota pel terra.</div>';
+          '<div class="hint" id="dragInfo" style="margin-top:4px">Intents: 0/3. Aixequi el porró per sobre de la boca i deixi\'l anar.</div>';
         var A = h.querySelector('.dragA'), M = h.querySelector('.mouth'), P = h.querySelector('.dporro');
         function putP(x, y) { px = x; py = y; P.style.left = x + 'px'; P.style.top = y + 'px'; }
         function dist() { return Math.sqrt(Math.pow(px + PW / 2 - (mx + MW / 2), 2) + Math.pow(py + PW / 2 - (my + MW / 2), 2)); }
@@ -861,9 +863,27 @@ body.dir-open #page{padding-bottom:120px}
           M.style.left = mx + 'px'; M.style.top = my + 'px'; M.textContent = '😐';
           A.setAttribute('data-mx', String(Math.round(mx + MW / 2))); A.setAttribute('data-my', String(Math.round(my + MW / 2)));
         }
+        var SVGNS = 'http://www.w3.org/2000/svg', K = TEST ? 0.25 : 1, TILT = 70;
+        var TH = TILT * Math.PI / 180, OX = 25.6 * Math.cos(TH) + 22.7 * Math.sin(TH), OY = 25.6 * Math.sin(TH) - 22.7 * Math.cos(TH);
+        // On cauria el raig si s'inclinés ara el porró cap a la boca. Encerta si el broc queda per sobre de la boca
+        // (el raig hi cau) o si el porró és a tocar de la boca.
+        function aim() {
+          var pcx = px + PW / 2, pcy = py + PW / 2, mcx = mx + MW / 2, mcy = my + MW / 2;
+          var dir = mcx >= pcx ? 1 : -1, sx = pcx + dir * OX, sy = pcy + OY, fx = sx + dir * 16;
+          var pour = mcy - sy >= -4 && mcy - sy <= 200 && Math.abs(fx - mcx) <= 32;
+          return { dir: dir, sx: sx, sy: sy, mcx: mcx, mcy: mcy, pour: pour, near: dist() <= 40, hit: pour || dist() <= 40 };
+        }
+        function tiltP(dir, on) { P.style.transform = on ? (dir < 0 ? 'scaleX(-1) ' : '') + 'rotate(' + TILT + 'deg)' : ''; }
+        function preview() {
+          var a = aim(), S = A.querySelector('.strm');
+          if (!obs() || !a.pour) { if (S.firstChild) S.innerHTML = ''; tiltP(a.dir, false); M.textContent = a.near || dist() < 85 ? '😮' : '😐'; return; }
+          tiltP(a.dir, true); M.textContent = '😮';
+          S.innerHTML = '<path class="pv" d="M' + a.sx.toFixed(1) + ' ' + a.sy.toFixed(1) + ' Q' + a.mcx.toFixed(1) + ' ' + (a.sy + (a.mcy - a.sy) * 0.15).toFixed(1) + ' ' + a.mcx.toFixed(1) + ' ' + (a.mcy - 6).toFixed(1) + '"/>';
+        }
         P.addEventListener('pointerdown', function (e) {
           e.preventDefault(); if (busy) return;
           var pr = P.getBoundingClientRect(); drag = true; dx = e.clientX - pr.left; dy = e.clientY - pr.top;
+          setMsg('m5', null);
           try { P.setPointerCapture(e.pointerId); } catch (x) { /* res */ }
         });
         P.addEventListener('pointermove', function (e) {
@@ -871,9 +891,8 @@ body.dir-open #page{padding-bottom:120px}
           var r = A.getBoundingClientRect(), j = obs() ? 3 : 0;
           var x = e.clientX - r.left - dx + (Math.random() - 0.5) * 2 * j, y = e.clientY - r.top - dy + (Math.random() - 0.5) * 2 * j;
           putP(Math.max(-10, Math.min(r.width - PW + 10, x)), Math.max(-10, Math.min(r.height - PW + 10, y)));
-          M.textContent = dist() < 85 ? '😮' : '😐';
+          preview();
         });
-        var SVGNS = 'http://www.w3.org/2000/svg', K = TEST ? 0.25 : 1, TILT = 70;
         function ms(n) { return Math.round(n * K); }
         // Inclina el porró i dibuixa el raig (paràbola) des del broc fins a (tx, ty)
         function pourTo(dir, sx, sy, tx, ty, landed, then) {
@@ -894,31 +913,31 @@ body.dir-open #page{padding-bottom:120px}
         function end() {
           if (!drag) return; drag = false; busy = true;
           setMsg('m5', null);
-          var ok = !obs() || dist() <= 34;
-          var pcx = px + PW / 2, pcy = py + PW / 2, mcx = mx + MW / 2, mcy = my + MW / 2, w = A.clientWidth, hh = A.clientHeight;
-          var th = TILT * Math.PI / 180, ox = 25.6 * Math.cos(th) + 22.7 * Math.sin(th), oy = 25.6 * Math.sin(th) - 22.7 * Math.cos(th);
-          var dir = ok ? (mcx < w / 2 ? -1 : 1) : (mcx >= pcx ? 1 : -1), sx, sy, tx, ty;
+          var a = aim(), ok = !obs() || a.hit, w = A.clientWidth, hh = A.clientHeight;
+          var dir = a.dir, sx = a.sx, sy = a.sy, tx, ty, mcx = a.mcx, mcy = a.mcy;
           P.classList.add('anim');
-          if (ok) { // el porró es col·loca damunt la boca, inclinat, i el raig hi cau
-            pcx = mcx - dir * (ox + 16); pcy = mcy - 52 - oy; putP(pcx - PW / 2, pcy - PW / 2);
-            sx = mcx - dir * 16; sy = mcy - 52; tx = mcx; ty = mcy - 6;
-          } else { // inclina el porró allà on l'ha deixat: el raig cau al terra
-            sx = pcx + dir * ox; sy = pcy + oy;
+          if (ok && !a.pour) { // el porró era a tocar de la boca: es col·loca damunt seu, inclinat
+            dir = mcx < w / 2 ? -1 : 1;
+            var pcx = mcx - dir * (OX + 16), pcy = mcy - 52 - OY; putP(pcx - PW / 2, pcy - PW / 2);
+            sx = mcx - dir * 16; sy = mcy - 52;
+          }
+          if (ok) { tx = mcx; ty = mcy - 6; }
+          else { // el raig cau al terra
             tx = Math.max(8, Math.min(w - 8, sx + dir * 30)); ty = Math.max(hh - 14, sy + 16);
           }
-          P.style.transform = (dir < 0 ? 'scaleX(-1) ' : '') + 'rotate(' + TILT + 'deg)';
+          tiltP(dir, true);
           later(function () {
             pourTo(dir, sx, sy, tx, ty, ok, function () {
               if (ok) { setMsg('m5', 'ok', 'Glop, glop. La persona està encantada.'); capResult(true); return; }
               strikes++;
               setMsg('m5', 'warn', 'Ha vessat el porró! (Intent ' + strikes + '/3)');
-              $('dragInfo').textContent = 'Intents: ' + strikes + '/3. Ni una gota pel terra.';
+              $('dragInfo').textContent = 'Intents: ' + strikes + '/3. Aixequi el porró per sobre de la boca i deixi\'l anar.';
               if (strikes >= 3) { later(function () { capResult(false, 'Tres porrons vessats.'); }, 500); return; }
               $('cap').querySelector('.strm').innerHTML = ''; busy = false; resetP(); moveMouth();
             });
           }, ms(420));
         }
-        ['pointerup', 'pointercancel'].forEach(function (ev) { P.addEventListener(ev, end); });
+        ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (ev) { P.addEventListener(ev, end); });
         resetP(); moveMouth();
       }
     },

@@ -85,6 +85,18 @@ async function dragPorro(page, hit) {
   await page.mouse.move(tx, ty, { steps: 5 });
   await page.mouse.up();
 }
+// aixeca el porró per sobre de la boca (el broc, inclinat, queda damunt la boca) sense deixar-lo anar
+async function aimPorro(page) {
+  await page.locator('.dragA').scrollIntoViewIfNeeded();
+  const A = await page.locator('.dragA').boundingBox();
+  const P = await page.locator('.dporro').boundingBox();
+  const sx = P.x + P.width / 2, sy = P.y + P.height / 2;
+  const mcx = A.x + +(await page.locator('.dragA').getAttribute('data-mx')), mcy = A.y + +(await page.locator('.dragA').getAttribute('data-my'));
+  const tx = mcx - 46, ty = mcy - 90;
+  await page.mouse.move(sx, sy); await page.mouse.down();
+  await page.mouse.move((sx + tx) / 2, (sy + ty) / 2, { steps: 5 });
+  await page.mouse.move(tx, ty, { steps: 5 });
+}
 // Passa la verificació i (0-6) correctament. (0 i 6 són la casella fugitiva.)
 async function passCap(page, i) {
   if (i === 0 || i === 6) await fugClick(page);
@@ -184,12 +196,16 @@ console.log('1) Recorregut complet (offline, #test)');
   assert.ok(await page.locator('.dporro.anim').count(), 'el porró s\'inclina');
   await page.waitForFunction(() => /Ha vessat el porró! \(Intent 1\/3\)/.test(document.querySelector('#m5 .msg')?.textContent || ''));
   await page.waitForFunction(() => !document.querySelector('.dporro.anim'));  // torna a lloc
-  await dragPorro(page, true);
-  await page.waitForSelector('.strm path');
+  await aimPorro(page);
+  await page.waitForSelector('.strm path.pv');          // en apuntar: s'inclina i es veu on caurà el raig
+  assert.equal(await txt(page, '.mouth'), '😮');
+  await shot(page, '03b3-porro-apunta');
+  await page.mouse.up();
+  await page.waitForSelector('.strm path:not(.pv)');
   await page.waitForTimeout(180);
-  await shot(page, '03b3-porro-encert');
+  await shot(page, '03b4-porro-encert');
   await capIs(page, 3);
-  ok('Captcha 2: porró inclinat amb raig (paràbola); fallar = vessa al terra, encertar = a la boca');
+  ok('Captcha 2: porró inclinat amb raig; fallar = vessa al terra; aixecar-lo per sobre de la boca = hi cau');
 
   await shot(page, '03c-captcha3-abocar');
   await holdPour(page, Math.max(200, await pourMs(page, -900)));
