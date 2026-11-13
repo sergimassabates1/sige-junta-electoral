@@ -1,8 +1,11 @@
-#!/usr/bin/env python3
-"""Sincronitza la taula de perfils (personatges/PERFILS.md) amb la web (index.html).
+#!/usr/bin/env -S uv run --script
+# /// script
+# dependencies = ["openpyxl"]
+# ///
+"""Sincronitza el full de càlcul de perfils (personatges/PERFILS.xlsx) amb la web (index.html).
 
-  python3 tools/perfils.py export   # index.html  -> personatges/PERFILS.md
-  python3 tools/perfils.py import   # personatges/PERFILS.md -> index.html (+ fotos, sw.js, LLEGEIX.md)
+  uv run tools/perfils.py export   # index.html -> personatges/PERFILS.xlsx
+  uv run tools/perfils.py import   # personatges/PERFILS.xlsx -> index.html (+ fotos, sw.js, LLEGEIX.md)
 
 La columna «#» és la clau: no la canviïs. Si canvies el nom en llatí, la foto
 es reanomena sola (personatges/<nom-en-llati>.jpg).
@@ -13,24 +16,27 @@ import json, os, re, sys, unicodedata
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HTML = os.path.join(ROOT, 'index.html')
-TABLE = os.path.join(ROOT, 'personatges', 'PERFILS.md')
+TABLE = os.path.join(ROOT, 'personatges', 'PERFILS.xlsx')
 SW = os.path.join(ROOT, 'sw.js')
 README = os.path.join(ROOT, 'personatges', 'LLEGEIX.md')
 COLS = [('#', None), ('Personatge', 'tipus'), ('Nom en llatí (usuari)', 'especie'), ('Edat', 'edat'),
         ('Va vestit', 'vestit'), ('Saluda', 'salut'), ('Dada reservada', 'broma'), ('Icona', 'ic')]
 
-HEAD = """# Perfils dels personatges
-
-Edita aquesta taula i després digues-ho a Claude (o executa `python3 tools/perfils.py import`).
-Cada fila és el que veu el jugador al seu perfil.
-
-- **#**: no el canviïs (és com es reconeix cada fila).
-- **Nom en llatí (usuari)**: és el nom d'usuari per entrar. Si el canvies, la foto es reanomena sola.
-- **Dada reservada**: si la deixes buida, el perfil no la mostra.
-- **Icona**: només surt si falta la foto.
-- No facis servir el caràcter `|` dins d'una cel·la (o escriu-lo com `\\|`).
-
-"""
+WIDTHS = [5, 24, 26, 7, 62, 42, 46, 7]
+HELP = [
+    "Com editar els perfils",
+    "",
+    "1. Edita el full «Perfils»: cada fila és el que veu el jugador al seu perfil.",
+    "2. Desa'l en format .xlsx (si LibreOffice pregunta, tria «Mantén el format actual»).",
+    "3. Digues-ho a Claude, o executa: uv run tools/perfils.py import",
+    "",
+    "Columna #: no la canviïs (és com es reconeix cada fila).",
+    "Nom en llatí (usuari): és el nom d'usuari per entrar. Si el canvies, la foto es reanomena sola.",
+    "Dada reservada: si la deixes buida, el perfil no la mostra.",
+    "Icona: només surt si falta la foto.",
+    "Per afegir un personatge: una fila nova amb un número nou, i posa'n la foto a personatges/<nom-en-llati>.jpg.",
+    "Per treure'n un: esborra la fila sencera.",
+]
 
 
 def slug(t):
@@ -45,30 +51,50 @@ def read_chars(s):
     return json.loads(s[c0:c1]), c0, c1
 
 
-def cell(v):
-    return str(v if v is not None else '').replace('|', '\\|').replace('\n', ' ').strip()
-
-
 def export():
+    from openpyxl import Workbook
+    from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
+    from openpyxl.utils import get_column_letter
     chars, _, _ = read_chars(open(HTML, encoding='utf-8').read())
-    out = [HEAD, '| ' + ' | '.join(c for c, _ in COLS) + ' |', '|' + '---|' * len(COLS)]
+    wb = Workbook(); ws = wb.active; ws.title = 'Perfils'
+    ws.append([c for c, _ in COLS])
     for i, ch in enumerate(chars, 1):
-        out.append('| ' + ' | '.join(str(i) if k is None else cell(ch.get(k, '')) for _, k in COLS) + ' |')
-    open(TABLE, 'w', encoding='utf-8').write('\n'.join(out) + '\n')
+        ws.append([i] + [ch.get(k, '') for _, k in COLS[1:]])
+    thin = Side(style='thin', color='BBBBBB')
+    for row in ws.iter_rows():
+        for c in row:
+            c.alignment = Alignment(wrap_text=True, vertical='top')
+            c.border = Border(left=thin, right=thin, top=thin, bottom=thin)
+            if c.row == 1:
+                c.font = Font(bold=True, color='FFFFFF'); c.fill = PatternFill('solid', fgColor='0B3D91')
+                c.alignment = Alignment(wrap_text=True, vertical='center')
+            elif c.column in (2, 3):
+                c.font = Font(bold=c.column == 2, italic=c.column == 3)
+    for i, w in enumerate(WIDTHS, 1):
+        ws.column_dimensions[get_column_letter(i)].width = w
+    ws.freeze_panes = 'D2'
+    ws.row_dimensions[1].height = 30
+    ws.page_setup.orientation = 'landscape'; ws.page_setup.fitToWidth = 1; ws.page_setup.fitToHeight = 0
+    ws.sheet_properties.pageSetUpPr.fitToPage = True; ws.print_title_rows = '1:1'
+    h = wb.create_sheet('Instruccions')
+    for line in HELP:
+        h.append([line])
+    h['A1'].font = Font(bold=True, size=14); h.column_dimensions['A'].width = 110
+    wb.save(TABLE)
     print('Escrit', os.path.relpath(TABLE, ROOT), '(%d personatges)' % len(chars))
 
 
 def parse_table():
-    rows = []
-    for line in open(TABLE, encoding='utf-8'):
-        line = line.strip()
-        if not line.startswith('|') or re.match(r'^\|[\s\-:|]+\|$', line):
+    from openpyxl import load_workbook
+    ws = load_workbook(TABLE, data_only=True)['Perfils']
+    rows, head = [], None
+    for vals in ws.iter_rows(values_only=True):
+        vals = ['' if v is None else (str(int(v)) if isinstance(v, float) and v.is_integer() else str(v)).strip() for v in vals]
+        if head is None:
+            head = vals; continue
+        if not any(vals):
             continue
-        cells = [c.strip().replace('\\|', '|') for c in re.split(r'(?<!\\)\|', line.strip('|'))]
-        if cells[0] == '#':
-            head = cells
-            continue
-        rows.append(dict(zip(head, cells)))
+        rows.append(dict(zip(head, vals)))
     return rows
 
 
