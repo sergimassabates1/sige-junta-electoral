@@ -285,11 +285,12 @@ console.log('1) Recorregut complet (offline, #test)');
   assert.equal(await txt(page, '#p_vestit'), me.vestit);
   assert.equal(await txt(page, '#p_salut'), me.salut);
   assert.equal(await txt(page, '#p_llista'), '🟢 Llista B');
-  assert.ok(await page.locator('#p_bromaBox').isVisible() && /six seven/i.test(await txt(page, '#p_broma')));
+  assert.equal(await page.locator('#p_bromaBox').isVisible(), !!me.broma);
+  if (me.broma) assert.equal(await txt(page, '#p_broma'), me.broma);
   await page.waitForFunction(() => { const i = document.querySelector('#p_photo img'); return i && i.complete && i.naturalWidth > 0; });
   assert.match(await page.locator('#p_photo img').getAttribute('src'), /tung-tung-sahur\.jpg$/, 'la il·lustració es veu fins i tot sense connexió (memòria cau)');
   await shot(page, '04-pas4-perfil');
-  ok('Pas 4: perfil del personatge amb la il·lustració de la carta (offline), les seves dades i la broma reservada');
+  ok('Pas 4: perfil del personatge amb la il·lustració de la carta (offline), les seves dades i la dada reservada si en té');
 
   assert.deepEqual(reqs, [], 'Peticions de xarxa: ' + reqs.join(', '));
   ok('Cap petició de xarxa després de la càrrega (tot fet offline)');
