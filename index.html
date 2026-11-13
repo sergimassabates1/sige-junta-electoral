@@ -201,8 +201,8 @@ select[size] option{padding:8px 6px}
 #gridPanel[hidden]{display:none}
 
 /* Justificant */
-#receipt{background:#fff;border:3px double #0b3d91;padding:14px 12px;position:relative;overflow:hidden}
-#receipt h3{margin:0 0 10px;text-align:center;font-size:19px;line-height:1.25;color:#0b3d91;text-transform:uppercase}
+#receipt,.receipt-copy{background:#fff;border:3px double #0b3d91;padding:14px 12px;position:relative;overflow:hidden}
+#receipt h3,.receipt-copy h3{margin:0 0 10px;text-align:center;font-size:19px;line-height:1.25;color:#0b3d91;text-transform:uppercase}
 .regno{font-family:"Courier New",Courier,monospace;font-size:18px;font-weight:bold;text-align:center;border:2px dashed #333;padding:10px 6px;margin:8px 0 14px;background:#fffbe0}
 .regno small{display:block;font-family:Verdana,sans-serif;font-size:11px;font-weight:normal;color:#555}
 .dl{margin:0}
@@ -211,10 +211,32 @@ select[size] option{padding:8px 6px}
 .dl dd{margin:0;font-size:19px;font-weight:bold;word-wrap:break-word;overflow-wrap:anywhere}
 .dl dd.big{font-size:26px;color:#0b3d91}
 .rwrap{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
-#seal{width:170px;height:170px;transform:rotate(-13deg);margin:2px auto 0;display:block;mix-blend-mode:multiply;opacity:.92}
+#seal,.c-seal{width:170px;height:170px;transform:rotate(-13deg);margin:2px auto 0;display:block;mix-blend-mode:multiply;opacity:.92}
 #s4 .dl dd{font-size:15px;font-weight:normal;line-height:1.4}
 #s4 .dl dd.big{font-size:24px;font-weight:bold}
-#readAloud{font-size:17px;font-weight:bold;text-align:center;border-top:2px solid #0b3d91;padding-top:12px;margin-top:10px}
+.llistes{display:flex;gap:8px;flex-wrap:wrap}
+.llista{flex:1 1 120px;display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 10px;border:2px outset #ddd;background:#efebdb;font-weight:bold;font-size:15px;cursor:pointer;margin:0}
+.llista input{width:20px;height:20px;margin:0}
+.llista.on{border-style:inset;background:#fffbe0}
+.llista.A.on{outline:3px solid #7b3fa0}.llista.B.on{outline:3px solid #2e8b3e}
+.llistes.bad .llista{border-color:#c00}
+#gal{position:fixed;left:0;right:0;top:0;bottom:0;z-index:65;background:#e6dcb8;overflow:auto;-webkit-overflow-scrolling:touch}
+#gal .gin{max-width:640px;margin:0 auto;padding:0 12px 130px;background:#f6f1de;min-height:100%;box-sizing:border-box}
+.galbar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;padding:8px 0;background:#f6f1de;border-bottom:2px solid #0b3d91;margin-bottom:10px}
+.galbar b{flex:1;color:#0b3d91;font-size:15px}
+.galbar button,.galnav button{min-height:44px;min-width:44px;font-size:15px;padding:0 10px}
+#galGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.gt{display:block;width:100%;padding:4px;background:#fff;border:1px solid #999;box-shadow:2px 2px 0 #aaa;text-align:center;cursor:pointer;font:inherit;color:#222}
+.gt .gp{aspect-ratio:450/526;background:#eee;display:grid;place-items:center;font-size:40px;overflow:hidden}
+.gt img{width:100%;height:100%;object-fit:cover;display:block}
+.gt b{display:block;font-size:11px;line-height:1.2;margin-top:4px}
+.gt i{display:block;font-size:10px;color:#666;line-height:1.2}
+.galnav{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.galnav span{flex:1;text-align:center;font-weight:bold}
+#galCard .dl dd{font-size:15px;font-weight:normal;line-height:1.4}
+#galCard .dl dd.big{font-size:24px;font-weight:bold}
+body.gal-open{overflow:hidden}
+#readAloud,.c-readAloud{font-size:17px;font-weight:bold;text-align:center;border-top:2px solid #0b3d91;padding-top:12px;margin-top:10px}
 
 #ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:14px;z-index:50}
 #win{width:100%;max-width:380px;background:#d4d0c8;border:3px outset #f4f2ec;box-shadow:4px 4px 0 rgba(0,0,0,.4)}
@@ -327,6 +349,12 @@ body.dir-open #page{padding-bottom:120px}
         <div id="pinTip" class="tip" role="tooltip" hidden>ℹ️ Ajuda: la contrasenya és <b>1711</b> (17/11, la data de naixement del director).</div>
         <div id="pinRows"></div>
         <div class="ferr" id="e_pin" hidden></div>
+        <span class="lbl" id="llLbl">Candidatura <span class="req">*</span></span>
+        <div class="llistes" id="f_llista" role="radiogroup" aria-labelledby="llLbl">
+          <label class="llista A"><input type="radio" name="llista" value="A"> 🟣 Llista A</label>
+          <label class="llista B"><input type="radio" name="llista" value="B"> 🟢 Llista B</label>
+        </div>
+        <div class="ferr" id="e_llista" hidden></div>
         <div id="m2"></div>
         <div class="row act"><button class="btn" id="btnLogin" type="button">Accedir</button><button class="btn tiny dec" type="button">Cancel·lar</button></div>
       </fieldset>
@@ -348,18 +376,19 @@ body.dir-open #page{padding-bottom:120px}
     <section id="s4" hidden>
       <div id="receipt">
         <h3>Perfil d'usuari verificat</h3>
-        <div class="regno"><small>Usuari</small><span id="p_user">—</span></div>
+        <div class="regno"><small>Usuari</small><span id="p_user" data-p="user">—</span></div>
         <div class="rwrap">
-          <div class="carnet"><div class="photo" id="p_photo"></div><small>FOTO DEL PERFIL</small></div>
+          <div class="carnet"><div class="photo" id="p_photo" data-p="photo"></div><small>FOTO DEL PERFIL</small></div>
           <dl class="dl" style="flex:1 1 180px;min-width:0">
-            <div><dt>Personatge</dt><dd class="big" id="p_tipus"></dd></div>
-            <div><dt>Edat</dt><dd id="p_edat"></dd></div>
+            <div><dt>Personatge</dt><dd class="big" id="p_tipus" data-p="tipus"></dd></div>
+            <div><dt>Edat</dt><dd id="p_edat" data-p="edat"></dd></div>
+            <div data-p="llistaBox"><dt>Candidatura</dt><dd id="p_llista" data-p="llista"></dd></div>
           </dl>
         </div>
         <dl class="dl" style="margin-top:12px">
-          <div><dt>Va vestit</dt><dd id="p_vestit"></dd></div>
-          <div><dt>Saluda</dt><dd id="p_salut"></dd></div>
-          <div id="p_bromaBox" hidden><dt>Dada reservada</dt><dd id="p_broma"></dd></div>
+          <div><dt>Va vestit</dt><dd id="p_vestit" data-p="vestit"></dd></div>
+          <div><dt>Saluda</dt><dd id="p_salut" data-p="salut"></dd></div>
+          <div id="p_bromaBox" data-p="bromaBox" hidden><dt>Dada reservada</dt><dd id="p_broma" data-p="broma"></dd></div>
         </dl>
         <svg id="seal" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Segell: Eleccions Alternatives de Premià de Mar, verificat">
           <defs><path id="arcTop" d="M 100,100 m -68,0 a 68,68 0 1,1 136,0 a 68,68 0 1,1 -136,0"/></defs>
@@ -400,8 +429,19 @@ body.dir-open #page{padding-bottom:120px}
   <div class="g" id="dirSteps"></div>
   <label><input type="checkbox" id="dirNoObs"> Sense obstacles</label>
   <div class="g">
+    <button type="button" id="dirGal">Perfils</button>
     <button type="button" id="dirReset">Reiniciar</button>
     <button type="button" id="dirClose">Tancar</button>
+  </div>
+</div>
+<div id="gal" hidden>
+  <div class="gin">
+    <div class="galbar"><b>Registre de personatges</b><button type="button" id="galClose">Tancar</button></div>
+    <div id="galGrid"></div>
+    <div id="galOne" hidden>
+      <div class="galnav"><button type="button" id="galPrev" aria-label="Anterior">◀</button><button type="button" id="galAll">Tots</button><span id="galPos"></span><button type="button" id="galNext" aria-label="Següent">▶</button></div>
+      <div id="galCard"></div>
+    </div>
   </div>
 </div>
 <div id="toast" hidden></div>
@@ -553,7 +593,7 @@ body.dir-open #page{padding-bottom:120px}
 
   /* ================= Estat i emmagatzematge ================= */
   function defaults() {
-    return { step: 1, noObs: false, restarts: 0, cap: 0, att: { turn: 0, captcha: 0 }, user: '' };
+    return { step: 1, noObs: false, restarts: 0, cap: 0, att: { turn: 0, captcha: 0 }, user: '', llista: '' };
   }
   var memStore = null;
   function str(v) { return typeof v === 'string' ? v : ''; }
@@ -566,7 +606,7 @@ body.dir-open #page{padding-bottom:120px}
       if (typeof s.step === 'number' && s.step >= 1 && s.step <= 4) d.step = s.step;
       if (typeof s.cap === 'number' && s.cap >= 0 && s.cap <= 6) d.cap = s.cap;
       if (typeof s.restarts === 'number') d.restarts = s.restarts;
-      d.noObs = !!s.noObs; d.user = str(s.user);
+      d.noObs = !!s.noObs; d.user = str(s.user); d.llista = (s.llista === 'A' || s.llista === 'B') ? s.llista : '';
       ['turn', 'captcha'].forEach(function (k) { if (s.att && typeof s.att[k] === 'number') d.att[k] = s.att[k]; });
     } catch (e) { /* estat corrupte: es comença de nou */ }
     return d;
@@ -592,7 +632,7 @@ body.dir-open #page{padding-bottom:120px}
   function fieldErr(name, text) {
     var e = $('e_' + name); if (!e) return;
     e.textContent = text || ''; e.hidden = !text;
-    var inp = $('f_' + name) || $(name) || (name === 'sigles' ? $('reels') : null);
+    var inp = $('f_' + name) || $(name);
     if (inp) inp.classList.toggle('bad', !!text);
   }
   function toast(t) {
@@ -765,7 +805,8 @@ body.dir-open #page{padding-bottom:120px}
   }
   var pw = '0000';
   function initStep2() {
-    setMsg('m2', null); fieldErr('user', ''); fieldErr('pin', ''); show($('userTip'), false); show($('pinTip'), false);
+    setMsg('m2', null); fieldErr('user', ''); fieldErr('pin', ''); fieldErr('llista', ''); show($('userTip'), false); show($('pinTip'), false);
+    paintLlista('');
     $('btnLogin').disabled = false; $('f_user').value = ''; pw = '0000';
     buildPin();
   }
@@ -786,16 +827,28 @@ body.dir-open #page{padding-bottom:120px}
     btn.addEventListener('click', function () { var open = tip.hidden; tip.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); });
   }
   tipToggle($('userInfo'), $('userTip')); tipToggle($('pinInfo'), $('pinTip'));
+  function llistaVal() { var r = document.querySelector('input[name=llista]:checked'); return r ? r.value : ''; }
+  function paintLlista(v) {
+    Array.prototype.forEach.call(document.querySelectorAll('input[name=llista]'), function (r) {
+      if (v !== null) r.checked = r.value === v;
+      r.parentNode.classList.toggle('on', r.checked);
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('input[name=llista]'), function (r) {
+    r.addEventListener('change', function () { paintLlista(null); fieldErr('llista', ''); });
+  });
   $('btnLogin').addEventListener('click', function () {
     var ch = findChar($('f_user').value);
-    fieldErr('user', ''); fieldErr('pin', '');
+    var ll = llistaVal();
+    fieldErr('user', ''); fieldErr('pin', ''); fieldErr('llista', '');
     if (obs()) {
       var bad = false;
       if (!ch) { fieldErr('user', 'Error 0x0041: Usuari desconegut al Registre de Personatges.'); bad = true; }
       if (pw !== PIN_OK) { fieldErr('pin', 'Error 0x0042: Contrasenya incorrecta.'); bad = true; }
+      if (!ll) { fieldErr('llista', "Error 0x0043: Ha d'escollir una candidatura (Llista A o Llista B)."); bad = true; }
       if (bad) return;
-    } else if (!ch) ch = CHARS[0];
-    S.user = slugOf(ch); save();
+    } else { if (!ch) ch = CHARS[0]; if (!ll) ll = 'A'; }
+    S.user = slugOf(ch); S.llista = ll; save();
     $('btnLogin').disabled = true; setMsg('m2', 'info', 'Validant credencials…');
     later(function () { goStep(3); }, T.proc / 2);
   });
@@ -1125,19 +1178,77 @@ body.dir-open #page{padding-bottom:120px}
   });
 
   /* ================= PAS 4 · El perfil ================= */
-  function initStep4() {
-    var c = charBySlug(S.user) || CHARS[0], sl = slugOf(c);
-    function t(id, v) { $(id).textContent = v || '—'; }
-    t('p_user', c.especie); t('p_tipus', c.tipus);
-    t('p_edat', typeof c.edat === 'number' ? c.edat + ' anys' : String(c.edat));
-    t('p_vestit', c.vestit); t('p_salut', c.salut);
-    $('p_bromaBox').hidden = !c.broma; $('p_broma').textContent = c.broma || '';
-    var ph = $('p_photo'); ph.innerHTML = '';
+  var LLISTES = { A: '🟣 Llista A', B: '🟢 Llista B' };
+  // Omple una fitxa de perfil (la del pas 4 o una còpia a la galeria). llista: 'A', 'B' o '' (no es mostra)
+  function fillProfile(root, c, llista) {
+    function q(k) { return root.querySelector('[data-p="' + k + '"]'); }
+    function t(k, v) { q(k).textContent = v || '—'; }
+    t('user', c.especie); t('tipus', c.tipus);
+    t('edat', typeof c.edat === 'number' ? c.edat + ' anys' : String(c.edat));
+    t('vestit', c.vestit); t('salut', c.salut);
+    q('llistaBox').hidden = !LLISTES[llista]; q('llista').textContent = LLISTES[llista] || '';
+    q('bromaBox').hidden = !c.broma; q('broma').textContent = c.broma || '';
+    var ph = q('photo'); ph.innerHTML = '';
     var em = document.createElement('span'); em.textContent = c.ic; ph.appendChild(em);
     var im = new Image(); im.alt = 'Foto de ' + c.tipus;
     im.onload = function () { ph.innerHTML = ''; ph.appendChild(im); };
-    im.src = 'personatges/' + sl + '.jpg';
+    im.src = 'personatges/' + slugOf(c) + '.jpg';
   }
+  function initStep4() {
+    fillProfile($('s4'), charBySlug(S.user) || CHARS[0], S.llista || 'A');
+  }
+
+  /* ================= Galeria de perfils (#perfils o botó del director) ================= */
+  var galI = -1;
+  function galGrid() {
+    var g = $('galGrid'); if (g.firstChild) return;
+    CHARS.forEach(function (c, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'gt';
+      b.innerHTML = '<div class="gp"></div><b></b><i></i>';
+      b.querySelector('b').textContent = (i + 1) + '. ' + c.tipus; b.querySelector('i').textContent = c.especie;
+      var gp = b.querySelector('.gp'); gp.textContent = c.ic;
+      var im = new Image(); im.alt = ''; im.onload = function () { gp.innerHTML = ''; gp.appendChild(im); }; im.src = 'personatges/' + slugOf(c) + '.jpg';
+      b.addEventListener('click', function () { galShow(i); });
+      g.appendChild(b);
+    });
+  }
+  function galShow(i) {
+    galI = (i + CHARS.length) % CHARS.length;
+    var card = $('galCard'), r = $('receipt').cloneNode(true);
+    r.removeAttribute('id'); r.className = 'receipt-copy';
+    Array.prototype.forEach.call(r.querySelectorAll('[id]'), function (el) {
+      if (el.id === 'arcTop') { el.id = 'arcTopG'; return; }
+      el.classList.add('c-' + el.id); el.removeAttribute('id');
+    });
+    var tp = r.querySelector('textPath'); if (tp) tp.setAttribute('href', '#arcTopG');
+    var h3 = r.querySelector('h3'); if (h3) h3.textContent = 'Perfil ' + (galI + 1) + ' de ' + CHARS.length;
+    var ra = r.querySelector('.c-readAloud'); if (ra) ra.textContent = 'Vista del director: la candidatura la tria cada jugador en entrar.';
+    card.innerHTML = ''; card.appendChild(r);
+    fillProfile(r, CHARS[galI], '');
+    $('galPos').textContent = (galI + 1) + ' / ' + CHARS.length;
+    $('galGrid').hidden = true; $('galOne').hidden = false; $('gal').scrollTop = 0;
+  }
+  function galList() { galI = -1; $('galOne').hidden = true; $('galGrid').hidden = false; $('galCard').innerHTML = ''; }
+  function openGal() { galGrid(); galList(); $('gal').hidden = false; document.body.classList.add('gal-open'); }
+  function closeGal() { $('gal').hidden = true; document.body.classList.remove('gal-open'); }
+  $('galClose').addEventListener('click', closeGal);
+  $('galAll').addEventListener('click', galList);
+  $('galPrev').addEventListener('click', function () { galShow(galI - 1); });
+  $('galNext').addEventListener('click', function () { galShow(galI + 1); });
+  document.addEventListener('keydown', function (e) {
+    if ($('gal').hidden) return;
+    if (e.key === 'Escape') { if (galI >= 0) galList(); else closeGal(); }
+    if (galI >= 0 && e.key === 'ArrowLeft') galShow(galI - 1);
+    if (galI >= 0 && e.key === 'ArrowRight') galShow(galI + 1);
+  });
+  (function () { // lliscar el dit per passar de perfil
+    var x0 = null, y0 = 0;
+    $('galCard').addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+    $('galCard').addEventListener('touchend', function (e) {
+      if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) galShow(galI + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+  })();
   $('btnReset').addEventListener('click', function () {
     modal({
       title: 'Confirmació', icon: '❓',
@@ -1196,7 +1307,12 @@ body.dir-open #page{padding-bottom:120px}
   $('dirNoObs').addEventListener('change', function () { S.noObs = this.checked; save(); render(); });
   $('dirReset').addEventListener('click', function () { S.att = { turn: 0, captcha: 0 }; S.cap = 0; S.restarts = 0; save(); toast('Comptadors reiniciats'); render(); });
   $('dirClose').addEventListener('click', function () { toggleDirector(false); });
-  function checkHash() { if ((location.hash || '').toLowerCase().indexOf('director') > -1) toggleDirector(true); }
+  $('dirGal').addEventListener('click', openGal);
+  function checkHash() {
+    var h = (location.hash || '').toLowerCase();
+    if (h.indexOf('director') > -1) toggleDirector(true);
+    if (h.indexOf('perfils') > -1) openGal();
+  }
   window.addEventListener('hashchange', checkHash);
 
   /* ================= Arrencada ================= */

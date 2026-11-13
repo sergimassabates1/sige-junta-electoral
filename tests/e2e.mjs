@@ -48,8 +48,10 @@ async function passQueue(page) {
 async function setPw(page, digits = '1711') {
   for (let i = 0; i < 4; i++) await page.locator('.pinrow input').nth(i).fill(digits[i]);
 }
-async function login(page, user, pw = '1711') {
-  await page.fill('#f_user', user); await setPw(page, pw); await page.click('#btnLogin');
+async function login(page, user, pw = '1711', llista = 'A') {
+  await page.fill('#f_user', user); await setPw(page, pw);
+  if (llista) await page.click(`.llista.${llista}`);
+  await page.click('#btnLogin');
 }
 const capIs = (page, n) => page.waitForFunction((n) => document.getElementById('capHead').textContent === 'Verificació ' + n + ' de 7', n, { timeout: 20000 });
 const fugClick = async (page) => { for (let k = 0; k < 14; k++) { await page.locator('.fug').click(); if (await page.locator('.fug.on').count()) return; } throw new Error('la casella no s\'ha deixat marcar'); };
@@ -153,13 +155,15 @@ console.log('1) Recorregut complet (offline, #test)');
   await page.click('#btnLogin');
   assert.match(await txt(page, '#e_user'), /Usuari desconegut/);
   assert.match(await txt(page, '#e_pin'), /Contrasenya incorrecta/);
+  assert.match(await txt(page, '#e_llista'), /Ha d'escollir una candidatura/);
   await page.fill('#f_user', 'Fatxus tradicionalis'); await page.click('#btnLogin');
   assert.match(await txt(page, '#e_user'), /Usuari desconegut/, 'un personatge que ja no hi és no entra');
   await page.fill('#f_user', 'Tung Tung Sahur'); await setPw(page, '3141'); await page.click('#btnLogin');
   assert.equal(await page.locator('#e_user').isVisible(), false);
   assert.match(await txt(page, '#e_pin'), /Contrasenya incorrecta/);
   assert.match(await stepLabel(page), /^Pas 2/);
-  ok('Pas 2: usuari desconegut i contrasenya errònia (3141) no deixen passar');
+  assert.match(await txt(page, '#e_llista'), /candidatura/, 'sense llista no entra');
+  ok('Pas 2: usuari desconegut, contrasenya errònia (3141) o sense candidatura no deixen passar');
   assert.ok(await page.locator('#pinTip').isHidden() && await page.locator('#userTip').isHidden());
   await page.click('#pinInfo'); await page.click('#userInfo');
   assert.match(await txt(page, '#pinTip'), /1711/);
@@ -168,6 +172,10 @@ console.log('1) Recorregut complet (offline, #test)');
   await setPw(page, '1711');
   assert.equal(await page.locator('.pinrow .dg').allInnerTexts().then(a => a.join('')), '1711');
   await page.fill('#f_user', 'tung tung sahur '); // majúscules/espais no importen
+  await page.click('.llista.A'); await page.click('.llista.B'); // canvia d'opinió: compta l'última
+  assert.equal(await page.locator('.llista.on').count(), 1);
+  assert.equal(await page.isHidden('#e_llista'), true);
+  await shot(page, '02b-pas2-llista');
   await page.click('#btnLogin');
   await waitStep(page, 3);
   ok('Pas 2: els tooltips «i» mostren l\'ajuda (1711); l\'usuari és el nom llatí i entra');
@@ -275,6 +283,7 @@ console.log('1) Recorregut complet (offline, #test)');
   assert.equal(await txt(page, '#p_edat'), me.edat + ' anys');
   assert.equal(await txt(page, '#p_vestit'), me.vestit);
   assert.equal(await txt(page, '#p_salut'), me.salut);
+  assert.equal(await txt(page, '#p_llista'), '🟢 Llista B');
   assert.ok(await page.locator('#p_bromaBox').isVisible() && /six seven/i.test(await txt(page, '#p_broma')));
   await page.waitForFunction(() => { const i = document.querySelector('#p_photo img'); return i && i.complete && i.naturalWidth > 0; });
   assert.match(await page.locator('#p_photo img').getAttribute('src'), /tung-tung-sahur\.jpg$/, 'la il·lustració es veu fins i tot sense connexió (memòria cau)');
@@ -286,7 +295,8 @@ console.log('1) Recorregut complet (offline, #test)');
   await page.reload();
   assert.match(await stepLabel(page), /^Pas 4/);
   assert.equal(await txt(page, '#p_user'), 'Tung Tung Sahur');
-  ok('Recàrrega: el perfil persisteix');
+  assert.equal(await txt(page, '#p_llista'), '🟢 Llista B');
+  ok('Recàrrega: el perfil (i la candidatura) persisteix');
   await page.click('#btnReset');
   await page.waitForSelector('#ov:not([hidden])');
   await page.locator('#winBtns button', { hasText: 'Sí' }).click();
@@ -474,6 +484,42 @@ console.log('8b) Enquesta de satisfacció');
 }
 
 /* ================= 9. 360 px sense desbordament ================= */
+console.log('8c) Galeria de perfils');
+{
+  const ctx = await browser.newContext({ ...mobile, viewport: { width: 360, height: 740 } });
+  const page = await ctx.newPage();
+  const errors = []; page.on('pageerror', e => errors.push(e.message));
+  await page.goto(BASE + '#perfils');
+  await page.waitForSelector('#gal:not([hidden])');
+  assert.equal(await page.locator('#galGrid .gt').count(), 15);
+  await page.waitForFunction(() => [...document.querySelectorAll('#galGrid .gt img')].filter(i => i.naturalWidth > 0).length === 15);
+  await shot(page, '05a-galeria');
+  await page.locator('#galGrid .gt').nth(2).click();
+  assert.equal(await txt(page, '#galPos'), '3 / 15');
+  assert.equal(await txt(page, '#galCard [data-p="tipus"]'), CHARS[2].tipus);
+  assert.equal(await txt(page, '#galCard [data-p="user"]'), CHARS[2].especie);
+  assert.equal(await txt(page, '#galCard [data-p="vestit"]'), CHARS[2].vestit);
+  assert.equal(await page.locator('#galCard [data-p="llistaBox"]').isHidden(), true);
+  await page.waitForSelector('#galCard [data-p="photo"] img');
+  await shot(page, '05b-galeria-perfil');
+  await page.click('#galNext'); assert.equal(await txt(page, '#galCard [data-p="tipus"]'), CHARS[3].tipus);
+  await page.click('#galPrev'); await page.click('#galPrev'); await page.click('#galPrev');
+  assert.equal(await txt(page, '#galCard [data-p="tipus"]'), CHARS[0].tipus);
+  await page.click('#galPrev'); assert.equal(await txt(page, '#galPos'), '15 / 15', 'dóna la volta');
+  const w = await page.evaluate(() => document.documentElement.scrollWidth);
+  assert.ok(w <= 360, 'galeria: scrollWidth ' + w);
+  await page.click('#galAll'); assert.equal(await page.isVisible('#galGrid'), true);
+  await page.click('#galClose'); assert.equal(await page.isHidden('#gal'), true);
+  assert.match(await stepLabel(page), /^Pas 1/, 'el tràmit no es toca');
+  ok('#perfils: graella amb les 15 il·lustracions; fitxa completa amb ◀ ▶ (fa la volta), «Tots» i «Tancar»');
+  await page.goto(BASE + '#director'); await page.reload();
+  await page.click('#dirGal');
+  await page.waitForSelector('#gal:not([hidden])');
+  assert.deepEqual(errors, []);
+  ok('El panell del director té el botó «Perfils»');
+  await ctx.close();
+}
+
 console.log('9) Mòbil de 360 px: sense scroll horitzontal');
 {
   const ctx = await browser.newContext({ ...mobile, viewport: { width: 360, height: 740 } });
