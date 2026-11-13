@@ -213,6 +213,7 @@ select[size] option{padding:8px 6px}
 .rwrap{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
 #seal,.c-seal{width:170px;height:170px;transform:rotate(-13deg);margin:2px auto 0;display:block;mix-blend-mode:multiply;opacity:.92}
 #s4 .dl dd{font-size:15px;font-weight:normal;line-height:1.4}
+#s4 .dl dd.llati,#galCard .dl dd.llati{font-style:italic;font-family:Georgia,'Times New Roman',serif;font-size:18px}
 #s4 .dl dd.big{font-size:24px;font-weight:bold}
 .llistes{display:flex;gap:8px;flex-wrap:wrap}
 .llista{flex:1 1 120px;display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 10px;border:2px outset #ddd;background:#efebdb;font-weight:bold;font-size:15px;cursor:pointer;margin:0}
@@ -381,6 +382,7 @@ body.dir-open #page{padding-bottom:120px}
           <div class="carnet"><div class="photo" id="p_photo" data-p="photo"></div><small>FOTO DEL PERFIL</small></div>
           <dl class="dl" style="flex:1 1 180px;min-width:0">
             <div><dt>Personatge</dt><dd class="big" id="p_tipus" data-p="tipus"></dd></div>
+            <div><dt>Nom en llatí</dt><dd class="llati" id="p_llati" data-p="llati"></dd></div>
             <div><dt>Edat</dt><dd id="p_edat" data-p="edat"></dd></div>
             <div data-p="llistaBox"><dt>Candidatura</dt><dd id="p_llista" data-p="llista"></dd></div>
           </dl>
@@ -462,148 +464,148 @@ body.dir-open #page{padding-bottom:120px}
   var FAKE_PCT = [3, 24, 88, 100];
   var PIN_OK = '1711';
 
-  /* ================= Els personatges (els mateixos de l'artifact) ================= */
+  /* ================= Els personatges: s'editen a personatges/PERFILS.md (python3 tools/perfils.py import) ================= */
   var CHARS = [
  {
-  "ic": "🚆",
   "tipus": "El segurata del tren",
   "especie": "Securatus ferroviarius",
   "edat": 44,
   "vestit": "Uniforme fosc, armilla groga fluorescent, walkie, porra i una pistola que tots esperem que sigui de fogueig. Cap rapat i un tatuatge del seu número preferit: el 88.",
-  "salut": "«¡Voy a tope, jefe de equipo!», alçant el walkie."
+  "salut": "«¡Voy a tope, jefe de equipo!», alçant el walkie.",
+  "ic": "🚆"
  },
  {
-  "ic": "🟢",
   "tipus": "El rastafari",
   "especie": "Rastafarus Rototomus",
   "edat": 29,
   "vestit": "Samarreta ampla, sandàlies i collarets. Pell robusta, ulls migoberts i vermells i somriure permanent. Les rastes li arriben al cul i s'ha ajuntat la rasta del cabell amb la rasta del cul, com si fossin dos avatars follant.",
   "salut": "«Yaman!», i xoca el puny amb tothom, molt a poc a poc.",
-  "broma": "La broma final: ja no sap què vol dir estirar o pentinar cap amunt, perquè hi ha dos amunts."
+  "broma": "La broma final: ja no sap què vol dir estirar o pentinar cap amunt, perquè hi ha dos amunts.",
+  "ic": "🟢"
  },
  {
-  "ic": "🎮",
   "tipus": "El streamer",
   "especie": "Xokus brutejus",
   "edat": 33,
   "vestit": "Auriculars de teleoperador, amb el micro de pal, enganxats amb celo. Una llauna de Monster a la mà i un cadàver al congelador: en particular, el del pollastre a la brasa que ahir no es va poder menjar.",
-  "salut": "«Háblame en español, ehhhhh.»"
+  "salut": "«Háblame en español, ehhhhh.»",
+  "ic": "🎮"
  },
  {
-  "ic": "📿",
   "tipus": "El de la pulserita",
   "especie": "Pulseritus patrioticus",
   "edat": 35,
   "vestit": "Vestit rosa i camisa blanca, cabell rinxolat, la pulserita de la bandera d'Espanya i un somriure d'orella a orella, amb unes dents blanques nuclears. Moreno com un moble de roure envernissat. Molt actiu a les altes hores de la matinada.",
-  "salut": "«Bueno, ¿cómo están los máquinas? Lo primero de todo… ¡un saludo!», i xoca la mà fortíssim a cadascú."
+  "salut": "«Bueno, ¿cómo están los máquinas? Lo primero de todo… ¡un saludo!», i xoca la mà fortíssim a cadascú.",
+  "ic": "📿"
  },
  {
-  "ic": "🍺",
   "tipus": "El borratxo de bar",
   "especie": "Manolus Eldelbarus",
   "edat": 52,
   "vestit": "Camisa mig oberta sobre una samarreta interior tacada, amb el pèl canós del pit sortint per sobre. Una cervesa a la mà a les 9 del matí. Bigoti frondós, groc del tabac.",
-  "salut": "«Eh… o no, eh? Eh, eh.»"
+  "salut": "«Eh… o no, eh? Eh, eh.»",
+  "ic": "🍺"
  },
  {
-  "ic": "🏐",
   "tipus": "El del BSC",
   "especie": "Voleyus maresmensis",
   "edat": 24,
   "vestit": "Banyador apretat, ulleres de sol de ciclista i sorra fins als genolls. Sempre porta una venda compressiva al colze d'una lesió que ja s'està curant.",
-  "salut": "«Porto xarxa?», i passa una pilota imaginària de volei a tothom."
+  "salut": "«Porto xarxa?», i passa una pilota imaginària de volei a tothom.",
+  "ic": "🏐"
  },
  {
-  "ic": "🐱",
   "tipus": "Gat còsmic",
   "especie": "Dora Emus",
   "edat": 112,
   "vestit": "Gat còsmic de cos blau i panxa blanca. Butxaca a lo cangur d'on treu un casquet volador, que utilitza com a mètode de transport per sobre de la porta màgica, per alguna raó.",
   "salut": "«El casquet volador!!»",
-  "broma": "Ningú no diu el nom. La gent ha de pensar «és Doraemon?» només amb el casquet volador, la butxaca i la porta màgica."
+  "broma": "Ningú no diu el nom. La gent ha de pensar «és Doraemon?» només amb el casquet volador, la butxaca i la porta màgica.",
+  "ic": "🐱"
  },
  {
-  "ic": "🏋️",
   "tipus": "La crossfitera",
   "especie": "Crisis dels quarantus",
   "edat": 18,
   "vestit": "Malles Nike Pro, top esportiu i rellotge Garmin. Bidó de proteïna a la mà i un kit de xeringues perquè és diabètica. Té pèl al pit per la testosterona.",
   "salut": "Fa un burpee.",
-  "broma": "Diu que és diabètica, però es punxa per ser més forta: està fortíssima."
+  "broma": "Diu que és diabètica, però es punxa per ser més forta: està fortíssima.",
+  "ic": "🏋️"
  },
  {
-  "ic": "🤙",
   "tipus": "El del six seven",
   "especie": "Tung Tung Sahur",
   "edat": 17,
   "vestit": "Dessuadora oversize, cadena, gorra al revés i unes bambes enormes. Molt alt i molt prim, amb el flequillo tapant-li un ull, el mòbil enganxat a la mà amb TikTok en bucle i els ulls vermells de tant scroll.",
   "salut": "«Tung, tung, tung, sahur!», picant el terra amb un bat imaginari.",
-  "broma": "Té el cap rebentat per TikTok. La broma final és el «six seven»: acaba dient «six seven!» amb el gest de balança amb les mans."
+  "broma": "Té el cap rebentat per TikTok. La broma final és el «six seven»: acaba dient «six seven!» amb el gest de balança amb les mans.",
+  "ic": "🤙"
  },
  {
-  "ic": "🎧",
   "tipus": "El raver",
   "especie": "Titanus mandibulus",
   "edat": 26,
   "vestit": "Ulleres de sol encara que sigui a l'ombra, armilla reflectant, polseres de festival i ronyonera. Pupil·les com a plats i tres xiclets a la boca.",
-  "salut": "«Quin dia és?», marcant el ritme amb la mà en alt."
+  "salut": "«Quin dia és?», marcant el ritme amb la mà en alt.",
+  "ic": "🎧"
  },
  {
-  "ic": "🏍️",
   "tipus": "El divorciat amb moto",
   "especie": "Ducattis Divorciatus",
   "edat": 49,
   "vestit": "Jaqueta de cuir, casc a la mà, ulleres d'aviador, samarreta ajustada i Axe Chocolate. Pit depilat, bronzejat a lo Donald Trump, més entrades que les entrades que van vendre Oques Grasses a la gira final i un tupè que vol ser cabell.",
-  "salut": "«MariCarme, si us plau, vull veure els meus fills!», amb el casc a la mà."
+  "salut": "«MariCarme, si us plau, vull veure els meus fills!», amb el casc a la mà.",
+  "ic": "🏍️"
  },
  {
-  "ic": "🥂",
   "tipus": "L'expat",
   "especie": "Expatus Conolianatus",
   "edat": 45,
   "vestit": "Pell rosada i el mòbil sempre obert amb un pis de l'Idealista: «Beautiful loft in Barcelona, 60 m², 3000 €/month, expenses included!».",
-  "salut": "«Hello! Nice place! Is it for rent? I pay double. Do you speak English?», i planta una banderola al mig de la sala."
+  "salut": "«Hello! Nice place! Is it for rent? I pay double. Do you speak English?», i planta una banderola al mig de la sala.",
+  "ic": "🥂"
  },
  {
-  "ic": "🧉",
   "tipus": "L'argentí del mate",
   "especie": "Argentinus matecus",
   "edat": 30,
   "vestit": "Mate a una mà i el termo sota l'altre braç, samarreta de la selecció argentina i xancletes amb mitjons. Barba de tres dies i el cabell ple de gomina.",
-  "salut": "«Hola, ¿cómo estás?» I, sense esperar resposta, es respon ell mateix: «Bien, bien, ¿vos? Ah, bien también, qué bueno, che. Mirá, yo hoy me levanté temprano, me tomé unos mates en el balcón, ¿viste? Con la yerba que me trajo mi vieja de Rosario, porque acá no hay manera de conseguir una yerba decente, boludo. Después fui a la panadería y le pregunté al chabón si tenía medialunas y me dijo que no sabía qué eran, ¡no sabía qué eran!, así que imaginate. Después caminé hasta acá, que está lejísimo, ¿vos viste lo lejos que está? Pero bueno, la verdad es que Barcelona me encanta, la gente es muy amable, aunque hablan un idioma que no entiendo ni medio, pero me las arreglo, ¿viste? Y vos, ¿cómo estás? Ah, ya me lo dijiste. Bien. Qué bueno, che.»"
+  "salut": "«Hola, ¿cómo estás?» I, sense esperar resposta, es respon ell mateix: «Bien, bien, ¿vos? Ah, bien también, qué bueno, che. Mirá, yo hoy me levanté temprano, me tomé unos mates en el balcón, ¿viste? Con la yerba que me trajo mi vieja de Rosario, porque acá no hay manera de conseguir una yerba decente, boludo. Después fui a la panadería y le pregunté al chabón si tenía medialunas y me dijo que no sabía qué eran, ¡no sabía qué eran!, así que imaginate. Después caminé hasta acá, que está lejísimo, ¿vos viste lo lejos que está? Pero bueno, la verdad es que Barcelona me encanta, la gente es muy amable, aunque hablan un idioma que no entiendo ni medio, pero me las arreglo, ¿viste? Y vos, ¿cómo estás? Ah, ya me lo dijiste. Bien. Qué bueno, che.»",
+  "ic": "🧉"
  },
  {
-  "ic": "🛴",
   "tipus": "El nen del patinet elèctric",
   "especie": "Patinetus Classicus",
   "edat": 19,
   "vestit": "Patinet elèctric, xandall, gorra i ronyonera Gucci de quadres. Degradat amb la ratlla afaitada a la cella i ulleres de sol encara que sigui de nit.",
   "salut": "«¿Tiene segarro, amego?»",
-  "broma": "Sense dir-ho: és el que et trobes al polígon de Mataró quan surts de festa, demanant cigarret a la porta del Classic."
+  "broma": "Sense dir-ho: és el que et trobes al polígon de Mataró quan surts de festa, demanant cigarret a la porta del Classic.",
+  "ic": "🛴"
  },
  {
-  "ic": "🕶️",
   "tipus": "El Pitbull fals",
   "especie": "Mister Worldwidus falsificatus",
   "edat": 31,
   "vestit": "Esmòquing negre, camisa blanca, corbatí i ulleres d'aviador fosques. Una calva falsa de làtex que li fa arrugues al front, amb la vora ben visible per sobre de les orelles. Assenyala tothom amb el dit com si fossin la càmera.",
-  "salut": "Fa morros, t'assenyala amb el dit i crida: «¡Dale! ¡Mister Worldwide, Barcelona!»"
+  "salut": "Fa morros, t'assenyala amb el dit i crida: «¡Dale! ¡Mister Worldwide, Barcelona!»",
+  "ic": "🕶️"
  },
  {
-  "ic": "🥬",
   "tipus": "Don Enciam",
   "especie": "Bobobo Bobobobus",
   "edat": 40,
   "vestit": "Un enciam gegant, verd i ple de nervis, que li fa de cap i de cos alhora. Ulleres de pala blanques amb els vidres blau fosc, les celles arrufades i un morro de mala llet. Per sota li surten dos braços i dues cames primíssims, i va descalç.",
-  "salut": "Arrufa les celles, et mira fixament per sobre de les ulleres i diu, molt seriós: «No sóc una col.»"
+  "salut": "Arrufa les celles, et mira fixament per sobre de les ulleres i diu, molt seriós: «No sóc una col.»",
+  "ic": "🥬"
  },
  {
-  "ic": "🛒",
   "tipus": "La senyora del súper",
   "especie": "Rulus mercadonensis",
   "edat": 78,
   "vestit": "La senyora amb rulos.",
-  "salut": "«Perdona, puc passar, que només porto 7 coses?»"
+  "salut": "«Perdona, puc passar, que només porto 7 coses?»",
+  "ic": "🛒"
  }
 ];
 
@@ -1199,7 +1201,7 @@ body.dir-open #page{padding-bottom:120px}
   function fillProfile(root, c, llista) {
     function q(k) { return root.querySelector('[data-p="' + k + '"]'); }
     function t(k, v) { q(k).textContent = v || '—'; }
-    t('user', c.especie); t('tipus', c.tipus);
+    t('user', c.especie); t('tipus', c.tipus); t('llati', c.especie);
     t('edat', typeof c.edat === 'number' ? c.edat + ' anys' : String(c.edat));
     t('vestit', c.vestit); t('salut', c.salut);
     q('llistaBox').hidden = !LLISTES[llista]; q('llista').textContent = LLISTES[llista] || '';

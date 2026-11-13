@@ -1,6 +1,6 @@
 /* Service worker senzill: memòria cau per funcionar sense connexió.
    Si falla, index.html funciona igualment (és autònom). */
-var CACHE = 'sige-v31-2';
+var CACHE = 'sige-v31-3';
 var ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png',
   './personatges/argentinus-matecus.jpg',
   './personatges/bobobo-bobobobus.jpg',
@@ -12,8 +12,8 @@ var ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './i
   './personatges/mister-worldwidus-falsificatus.jpg',
   './personatges/patinetus-classicus.jpg',
   './personatges/pulseritus-patrioticus.jpg',
-  './personatges/rulus-mercadonensis.jpg',
   './personatges/rastafarus-rototomus.jpg',
+  './personatges/rulus-mercadonensis.jpg',
   './personatges/securatus-ferroviarius.jpg',
   './personatges/titanus-mandibulus.jpg',
   './personatges/tung-tung-sahur.jpg',
