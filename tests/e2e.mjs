@@ -326,7 +326,7 @@ console.log('2) Foto del perfil');
   await ctx.close();
 }
 
-/* ================= 3. Els 15 personatges entren amb el seu nom llatí ================= */
+/* ================= 3. Els 17 personatges entren amb el seu nom llatí ================= */
 console.log('3) Tots els personatges');
 {
   const ctx = await browser.newContext(mobile);
@@ -343,8 +343,8 @@ console.log('3) Tots els personatges');
     await page.waitForFunction(() => { const i = document.querySelector('#p_photo img'); return i && i.complete && i.naturalWidth > 0; });
     assert.ok((await page.locator('#p_photo img').getAttribute('src')).endsWith(c.especie.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.jpg'));
   }
-  assert.equal(CHARS.length, 15);
-  ok('Els 15 personatges entren amb el seu nom en llatí i veuen el seu perfil amb la il·lustració de la seva carta');
+  assert.equal(CHARS.length, 17);
+  ok('Els 17 personatges entren amb el seu nom en llatí i veuen el seu perfil amb la il·lustració de la seva carta');
   await page.locator('#dirSteps button', { hasText: '2' }).click();
   await login(page, 'Dora Emu'); // una errada d'un caràcter: s'accepta
   await waitStep(page, 3);
@@ -491,11 +491,11 @@ console.log('8c) Galeria de perfils');
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto(BASE + '#perfils');
   await page.waitForSelector('#gal:not([hidden])');
-  assert.equal(await page.locator('#galGrid .gt').count(), 15);
-  await page.waitForFunction(() => [...document.querySelectorAll('#galGrid .gt img')].filter(i => i.naturalWidth > 0).length === 15);
+  assert.equal(await page.locator('#galGrid .gt').count(), 17);
+  await page.waitForFunction(() => [...document.querySelectorAll('#galGrid .gt img')].filter(i => i.naturalWidth > 0).length === 17);
   await shot(page, '05a-galeria');
   await page.locator('#galGrid .gt').nth(2).click();
-  assert.equal(await txt(page, '#galPos'), '3 / 15');
+  assert.equal(await txt(page, '#galPos'), '3 / 17');
   assert.equal(await txt(page, '#galCard [data-p="tipus"]'), CHARS[2].tipus);
   assert.equal(await txt(page, '#galCard [data-p="user"]'), CHARS[2].especie);
   assert.equal(await txt(page, '#galCard [data-p="vestit"]'), CHARS[2].vestit);
@@ -505,13 +505,13 @@ console.log('8c) Galeria de perfils');
   await page.click('#galNext'); assert.equal(await txt(page, '#galCard [data-p="tipus"]'), CHARS[3].tipus);
   await page.click('#galPrev'); await page.click('#galPrev'); await page.click('#galPrev');
   assert.equal(await txt(page, '#galCard [data-p="tipus"]'), CHARS[0].tipus);
-  await page.click('#galPrev'); assert.equal(await txt(page, '#galPos'), '15 / 15', 'dóna la volta');
+  await page.click('#galPrev'); assert.equal(await txt(page, '#galPos'), '17 / 17', 'dóna la volta');
   const w = await page.evaluate(() => document.documentElement.scrollWidth);
   assert.ok(w <= 360, 'galeria: scrollWidth ' + w);
   await page.click('#galAll'); assert.equal(await page.isVisible('#galGrid'), true);
   await page.click('#galClose'); assert.equal(await page.isHidden('#gal'), true);
   assert.match(await stepLabel(page), /^Pas 1/, 'el tràmit no es toca');
-  ok('#perfils: graella amb les 15 il·lustracions; fitxa completa amb ◀ ▶ (fa la volta), «Tots» i «Tancar»');
+  ok('#perfils: graella amb les 17 il·lustracions; fitxa completa amb ◀ ▶ (fa la volta), «Tots» i «Tancar»');
   await page.goto(BASE + '#director'); await page.reload();
   await page.click('#dirGal');
   await page.waitForSelector('#gal:not([hidden])');

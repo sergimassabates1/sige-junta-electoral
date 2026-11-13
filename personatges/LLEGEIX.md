@@ -20,3 +20,5 @@ Per canviar-ne una, substitueix el fitxer amb el mateix nom. Si en falta una, el
 | L'argentí del mate | Argentinus matecus | `argentinus-matecus.jpg` |
 | El nen del patinet elèctric | Patinetus Classicus | `patinetus-classicus.jpg` |
 | El Pitbull fals | Mister Worldwidus falsificatus | `mister-worldwidus-falsificatus.jpg` |
+| Don Enciam | Bobobo Bobobobus | `bobobo-bobobobus.jpg` |
+| La senyora del súper | Rulus mercadonensis | `rulus-mercadonensis.jpg` |
